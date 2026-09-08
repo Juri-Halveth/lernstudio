@@ -1,0 +1,1206 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lernstudio erleben: Wähle eine Frage und löse eine Aufgabe</title>
+  <meta name="description" content="Erlebe Computer, Programmieren, Sicherheit, Marketing, Mathematik und Server in einer kurzen interaktiven Aufgabe. Vom ersten Schritt bis zur fachlichen Vertiefung.">
+  <link rel="canonical" href="https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/inhalte.html">
+  <link rel="icon" href="favicon.ico?v=4" sizes="any">
+  <link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png?v=4">
+  <meta name="theme-color" content="#07080b">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Lernstudio">
+  <meta property="og:locale" content="de_DE">
+  <meta property="og:url" content="https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/inhalte.html">
+  <meta property="og:title" content="Was möchtest du endlich verstehen oder bauen?">
+  <meta property="og:description" content="Wähle eine Themenwelt, löse eine kurze Aufgabe und sieh, wie dieselbe Logik vom Einstieg bis zur fachlichen Tiefe wächst.">
+  <meta property="og:image" content="https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/social-share.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/social-share.png">
+  <link rel="preload" href="lernreise-mobile-v3.mp3" as="audio" type="audio/mpeg" media="(max-width: 700px), (pointer: coarse)">
+  <link rel="preload" href="lernreise-hintergrund-v2.mp3" as="audio" type="audio/mpeg" media="(min-width: 701px) and (pointer: fine)">
+  <script>try{if(localStorage.getItem("ls_theme")==="light")document.documentElement.setAttribute("data-theme","light")}catch(e){}</script>
+  <style>
+    :root {
+      --bg:#07080b; --ink:#f8f5ed; --muted:#aaa9a5; --line:#32343e;
+      --yellow:#ffd20a; --orange:#ff8a00; --green:#65ef9f; --blue:#66bdff;
+      --paper:#f4efe5; --paper-ink:#211e19;
+      --sans:"Segoe UI Variable Display","Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;
+      --mono:"Cascadia Code","Consolas",ui-monospace,monospace;
+      --world:#ffd20a; --world-rgb:255,210,10; --world-readable:#ffd20a;
+    }
+    * { box-sizing:border-box }
+    [hidden] { display:none!important }
+    html { scroll-behavior:smooth }
+    body { margin:0; overflow-x:hidden; background:var(--bg); color:var(--ink); font:17px/1.55 var(--sans); -webkit-font-smoothing:antialiased }
+    button,a,input { font:inherit }
+    button { color:inherit }
+    a { color:inherit }
+    :focus-visible { outline:3px solid var(--orange); outline-offset:4px }
+    .wrap { width:min(1180px,calc(100% - 36px)); margin:auto }
+    .skip { position:fixed; top:-80px; left:12px; z-index:100; padding:10px 14px; border-radius:9px; background:var(--yellow); color:#171200; font-weight:900 }
+    .skip:focus { top:12px }
+
+    nav { position:sticky; top:0; z-index:60; border-bottom:1px solid var(--line); background:#07080be8; backdrop-filter:blur(16px) }
+    .nav { min-height:68px; display:flex; align-items:center; gap:18px }
+    .logo { display:flex; align-items:center; gap:9px; text-decoration:none; font-weight:900 }
+    .mark { padding:3px 8px; border-radius:8px; background:var(--yellow); color:#171200; font:850 15px var(--mono) }
+    .space { flex:1 }
+    .nav-link { color:#c5c2ba; text-decoration:none; font-size:14px; font-weight:800 }
+    .theme-switch { flex:0 0 auto; width:48px; height:38px; border:1px solid var(--line); border-radius:999px; background:#17181e; color:var(--yellow); cursor:pointer; font-size:18px; font-weight:900 }
+    .theme-switch:hover { border-color:var(--yellow) }
+
+    .hero { position:relative; min-height:calc(100svh - 68px); overflow:hidden; isolation:isolate; background:radial-gradient(circle at 50% 42%,rgba(var(--world-rgb),.12),transparent 32%),#07080b }
+    .space-canvas { position:absolute; inset:0; z-index:-3; width:100%; height:100%; pointer-events:none }
+    .hero::before { content:""; position:absolute; inset:0; z-index:-2; pointer-events:none; background-image:linear-gradient(#ffffff08 1px,transparent 1px),linear-gradient(90deg,#ffffff08 1px,transparent 1px); background-size:42px 42px; transform:perspective(560px) rotateX(62deg) scale(1.8) translateY(18%); transform-origin:center bottom; mask-image:linear-gradient(to bottom,transparent 2%,#000 45%,transparent 96%) }
+    .hero::after { content:""; position:absolute; inset:0; z-index:-1; pointer-events:none; background:radial-gradient(circle at 50% 47%,transparent 18%,#07080b 76%) }
+    .hero-inner { padding:55px 0 72px }
+    .hero-copy { position:relative; z-index:3; max-width:920px; margin:0 auto 34px; text-align:center }
+    .eyebrow { color:var(--yellow); font:850 12px var(--mono); letter-spacing:.15em; text-transform:uppercase }
+    .hero h1 { max-width:13ch; margin:13px auto 18px; font-size:clamp(46px,7vw,88px); line-height:.94; letter-spacing:-.06em }
+    .hero-lead { max-width:720px; margin:auto; color:#c5c2ba; font-size:clamp(18px,2vw,23px) }
+    .truth-badge { display:inline-flex; margin-top:17px; padding:8px 12px; border:1px solid #4a4c56; border-radius:999px; background:#14151ad9; color:#e7e2d8; font-size:13px; font-weight:800 }
+    .arrival-note { display:none; max-width:720px; margin:18px auto 0; padding:14px 18px; border:1px solid rgba(var(--world-rgb),.55); border-radius:18px; background:rgba(var(--world-rgb),.09); color:#f4f1e9; text-align:left }
+    .arrival-note.is-visible { display:block }
+    .arrival-note strong { display:block; margin-bottom:4px; color:var(--world); font-size:14px }
+    .arrival-note span { color:#cbc9c2; line-height:1.55 }
+
+    .portal-stage { position:relative; min-height:620px; margin-top:10px }
+    .portal-stage-inner { position:absolute; inset:0 }
+    .learning-core { position:absolute; left:50%; top:45%; z-index:3; width:210px; height:210px; transform:translate(-50%,-50%); border:1px solid rgba(var(--world-rgb),.68); border-radius:50%; display:grid; place-items:center; background:radial-gradient(circle at 40% 36%,rgba(255,255,255,.23),rgba(var(--world-rgb),.13) 28%,#0b0c10b8 68%); box-shadow:0 0 45px rgba(var(--world-rgb),.32),inset 0 0 35px rgba(var(--world-rgb),.18); pointer-events:none }
+    .learning-core::before,.learning-core::after { content:""; position:absolute; border:1px solid rgba(var(--world-rgb),.35); border-radius:50%; animation:orbit 15s linear infinite }
+    .learning-core::before { inset:-32px; transform:rotateX(67deg) rotateZ(18deg) }
+    .learning-core::after { inset:-67px; transform:rotateY(68deg) rotateZ(-28deg); animation-direction:reverse; animation-duration:21s }
+    .core-pulse { position:absolute; inset:22%; border-radius:50%; background:rgba(var(--world-rgb),.18); filter:blur(7px); animation:pulse 2.8s ease-in-out infinite }
+    .core-copy { position:relative; z-index:2; padding:22px; text-align:center }
+    .core-copy span { display:block; color:var(--world); font:900 11px var(--mono); letter-spacing:.13em }
+    .core-copy strong { display:block; margin-top:7px; font-size:19px; line-height:1.08 }
+    @keyframes orbit { to { rotate:1turn } }
+    @keyframes pulse { 50% { scale:1.22; opacity:.55 } }
+
+    .portal { --x:0px; --y:0px; position:absolute; left:50%; top:45%; z-index:8; width:150px; min-height:112px; padding:13px 11px; transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y))); border:1px solid #3a3c46; border-radius:23px; background:linear-gradient(145deg,#1b1d24f2,#0c0d11f2); box-shadow:0 25px 55px #0009,inset 0 1px #ffffff12; cursor:pointer; text-align:center; font-weight:900; transition:transform .28s ease,border-color .25s,opacity .35s,filter .35s }
+    .portal::before { content:""; position:absolute; inset:9px; border:1px solid #ffffff0c; border-radius:17px }
+    .portal .orb { position:relative; display:grid; place-items:center; width:47px; height:47px; margin:0 auto 7px; border:1px solid #666873; border-radius:50%; background:#090a0d; color:var(--yellow); font:900 23px var(--mono); box-shadow:0 0 20px #ffd20a18 }
+    .portal small { position:relative; display:block; color:#97969a; font-size:10px; font-weight:750 }
+    .portal:hover,.portal.active { border-color:var(--world); transform:translate(calc(-50% + var(--x)),calc(-50% + var(--y) - 8px)); box-shadow:0 28px 72px #000b,0 0 32px rgba(var(--world-rgb),.28) }
+    .portal.active .orb { border-color:var(--world); color:#161200; background:var(--world); box-shadow:0 0 25px rgba(var(--world-rgb),.45) }
+    .portal[data-world="computer"] { --x:-370px; --y:-115px }
+    .portal[data-world="code"] { --x:0px; --y:-195px }
+    .portal[data-world="security"] { --x:370px; --y:-115px }
+    .portal[data-world="marketing"] { --x:-370px; --y:145px }
+    .portal[data-world="math"] { --x:0px; --y:195px }
+    .portal[data-world="server"] { --x:370px; --y:145px }
+    .stage-hint { position:absolute; left:50%; bottom:4px; z-index:10; transform:translateX(-50%); width:max-content; max-width:90%; padding:7px 11px; border:1px solid #30323b; border-radius:999px; background:#0b0c10e8; color:#a9a7aa; text-align:center; font:750 11px var(--mono); letter-spacing:.08em }
+
+    .experience { position:absolute; top:16px; left:0; right:0; z-index:12; min-height:620px; overflow:hidden; border:1px solid rgba(var(--world-rgb),.65); border-radius:30px; background:#0c0d11ed; box-shadow:0 55px 130px #000d,0 0 65px rgba(var(--world-rgb),.17); opacity:0; pointer-events:none; transform:scale(.88); transition:opacity .35s,transform .6s cubic-bezier(.16,.84,.28,1) }
+    .portal-stage.is-open { min-height:700px }
+    .portal-stage.is-open .experience { opacity:1; pointer-events:auto; transform:scale(1) }
+    .portal-stage.is-open .portal,.portal-stage.is-open .learning-core,.portal-stage.is-open .stage-hint { opacity:0; pointer-events:none; filter:blur(12px) }
+    .experience-back { position:absolute; inset-block-start:20px; inset-inline-start:22px; z-index:20; padding:8px 11px; border:1px solid #3f414a; border-radius:999px; background:#111218cc; color:#aaa9ad; cursor:pointer; font:800 11px var(--mono); letter-spacing:.05em }
+    .experience-back:hover { border-color:var(--world); color:#eeeae1 }
+    .depth-gate,.experience-scene,.mission { display:none }
+    .experience.is-choosing .depth-gate { min-height:620px; padding:78px clamp(24px,7vw,110px) 44px; display:grid; place-items:center; text-align:center; background:radial-gradient(circle at 50% 48%,rgba(var(--world-rgb),.2),transparent 35%),#0c0d11 }
+    .depth-gate-inner { width:min(920px,100%) }
+    .depth-gate h2 { max-width:13ch; margin:12px auto 16px; font-size:clamp(42px,6vw,76px); line-height:.96; letter-spacing:-.055em }
+    .depth-gate p { max-width:650px; margin:0 auto 34px; color:#c2beb5; font-size:19px }
+    .experience.is-observing .experience-scene { min-height:620px; display:flex }
+    .experience.is-acting .mission { min-height:620px; display:flex }
+    .experience-scene { position:relative; padding:72px clamp(28px,7vw,100px) 34px; overflow:hidden; flex-direction:column; background:radial-gradient(circle at 48% 47%,rgba(var(--world-rgb),.16),transparent 31%),linear-gradient(135deg,#111218d9,#08090cd9) }
+    .experience-scene::before { content:""; position:absolute; inset:0; pointer-events:none; background-image:linear-gradient(rgba(var(--world-rgb),.07) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--world-rgb),.07) 1px,transparent 1px); background-size:31px 31px; transform:perspective(500px) rotateX(60deg) scale(1.6); opacity:.75 }
+    .scene-top { position:relative; z-index:2; display:flex; justify-content:center; align-items:center; gap:10px; font:800 11px var(--mono); letter-spacing:.1em; color:#b6b4b4 }
+    .live-dot { width:9px; height:9px; border-radius:50%; background:var(--green); box-shadow:0 0 16px var(--green) }
+    .effect-machine { position:relative; z-index:2; flex:1; min-height:245px; display:grid; place-items:center; perspective:900px; transform-style:preserve-3d }
+    .machine-orbit { position:absolute; width:310px; height:170px; border:1px solid rgba(var(--world-rgb),.35); border-radius:50%; transform:rotateX(68deg) rotateZ(-12deg); box-shadow:0 0 28px rgba(var(--world-rgb),.12) }
+    .machine-orbit.second { width:235px; height:235px; transform:rotateY(68deg) rotateZ(24deg) }
+    .machine-core { position:relative; z-index:2; width:140px; height:140px; display:grid; place-items:center; border:1px solid rgba(var(--world-rgb),.65); border-radius:32px; background:linear-gradient(145deg,rgba(var(--world-rgb),.22),#101116 65%); box-shadow:0 28px 55px #0009,0 0 42px rgba(var(--world-rgb),.22); transform:rotateX(8deg) rotateY(-12deg) translateZ(50px); transition:.5s }
+    .machine-core span { color:var(--world); font:900 58px var(--mono); text-shadow:0 0 24px rgba(var(--world-rgb),.55) }
+    .effect-machine.solved .machine-core { transform:rotateX(0) rotateY(0) translateZ(75px) scale(1.12); box-shadow:0 30px 70px #000a,0 0 80px rgba(var(--world-rgb),.62) }
+    .signal { position:absolute; width:12px; height:12px; border:2px solid #5d606b; border-radius:50%; background:#111218; transition:.35s }
+    .signal:nth-of-type(1) { transform:translate3d(-190px,-70px,10px) }
+    .signal:nth-of-type(2) { transform:translate3d(190px,-45px,45px) }
+    .signal:nth-of-type(3) { transform:translate3d(0,130px,75px) }
+    .signal.on { border-color:var(--world); background:var(--world); box-shadow:0 0 24px rgba(var(--world-rgb),.8) }
+    .effect-caption { position:absolute; bottom:10px; left:50%; width:min(440px,90%); transform:translateX(-50%); text-align:center; color:#c8c5bd; font-weight:800 }
+    .effect-caption b { color:var(--world) }
+
+    .observe-footer { position:relative; z-index:8; display:flex; align-items:center; margin-top:auto; padding-top:18px }
+    .focus-forward { margin-inline-start:auto; padding:13px 18px; border:1px solid var(--world); border-radius:11px; background:var(--world); color:#171200; cursor:pointer; font-weight:900; box-shadow:0 0 28px rgba(var(--world-rgb),.18) }
+    .focus-forward::after { content:" →" }
+    [dir="rtl"] .focus-forward::after { content:" ←" }
+    .mission { position:relative; z-index:2; padding:78px clamp(25px,8vw,130px) 34px; background:radial-gradient(circle at 50% 30%,rgba(var(--world-rgb),.08),transparent 31%),#15161be8; flex-direction:column }
+    .mission > * { width:min(780px,100%); margin-inline:auto }
+    .level-map { width:min(920px,100%); margin:0 auto; display:grid; grid-template-columns:repeat(3,1fr); gap:12px }
+    .level-chip { min-height:138px; padding:18px; border:1px solid #3d3f48; border-radius:17px; background:#101116; color:#8f9098; cursor:pointer; text-align:start; transition:.25s }
+    .level-chip small { display:block; color:var(--world); font:850 10px var(--mono); letter-spacing:.1em }
+    .level-chip span { display:block; margin-top:8px; color:#f0ece2; font:900 18px/1.15 var(--sans); letter-spacing:-.02em }
+    .level-chip .route-note { display:block; margin-top:9px; color:#aaa8a2; font:700 12px/1.4 var(--sans); font-style:normal; letter-spacing:0 }
+    .level-chip:hover { border-color:var(--world); transform:translateY(-4px) }
+    .level-chip.active { border-color:var(--world); background:rgba(var(--world-rgb),.11); color:var(--world); box-shadow:inset 0 0 22px rgba(var(--world-rgb),.08) }
+    .level-chip.done .route-note::after { content:" ✓"; color:var(--green) }
+    .mission-kicker { color:var(--world); font:850 11px var(--mono); letter-spacing:.12em; text-align:center }
+    .mission h2 { margin:12px auto 12px; font-size:clamp(40px,5vw,66px); line-height:.95; letter-spacing:-.05em; text-align:center }
+    .mission-question { margin:0 auto 19px; color:#d5d1c8; font-size:21px; text-align:center }
+    .mission-instruction { margin:0 auto 16px; color:#b7b4ac; font-size:14px; font-weight:750; text-align:center }
+    .mission.is-contextual { padding-top:58px }
+    .mission.is-contextual h2 { margin-bottom:16px; font-size:clamp(34px,4vw,50px) }
+    .mission-context { margin-bottom:17px; overflow:hidden; border:1px solid rgba(var(--world-rgb),.48); border-radius:15px; background:#0a0b0f; box-shadow:0 16px 38px #0007 }
+    .mission-context[hidden] { display:none }
+    .mission-context-grid { display:grid; grid-template-columns:minmax(0,1.08fr) minmax(260px,.92fr) }
+    .mission-context-tech { min-width:0; border-inline-end:1px solid #30323a }
+    .mission-context-label { padding:9px 14px; border-bottom:1px solid #30323a; color:var(--world); font:850 10px var(--mono); letter-spacing:.1em }
+    .mission-context-code { margin:0; padding:15px 17px 12px; overflow:auto; color:#f4f1e8; font:750 14px/1.55 var(--mono); white-space:pre-wrap }
+    .mission-context-note { margin:0; padding:0 17px 14px; color:#aaa8a2; font-size:12px; line-height:1.5 }
+    .human-counterpart { min-width:0; display:grid; grid-template-rows:auto minmax(0,1fr); background:linear-gradient(145deg,#11141b,#090a0e) }
+    .counterpart-screen { min-height:0; height:100%; box-sizing:border-box; display:flex; flex-direction:column; padding:13px 15px 15px }
+    .counterpart-bar { display:flex; align-items:center; gap:5px; margin-bottom:12px; color:#888b93; font:800 9px var(--mono); letter-spacing:.07em }
+    .counterpart-bar i { width:7px; height:7px; border-radius:50%; background:#4c4f57 }
+    .counterpart-bar span { margin-inline-start:5px }
+    .counterpart-title { color:#f4f1e8; font-size:14px; line-height:1.35 }
+    .counterpart-output { display:flex; min-height:58px; align-items:center; justify-content:center; margin:10px 0; padding:12px; border:1px solid #343843; border-radius:12px; background:#171a21; color:#d7d9df; font-size:16px; font-weight:800; text-align:center; transition:.25s ease }
+    .counterpart-detail { min-height:36px; margin:0 0 11px; color:#d8d5cd; font-size:12px; font-weight:750; line-height:1.5 }
+    .counterpart-action { width:100%; min-height:48px; margin-top:2px; padding:11px 13px; border:1px solid var(--world); border-radius:10px; background:var(--world); color:#171200; box-shadow:0 0 24px rgba(var(--world-rgb),.2); font:900 12px var(--sans); cursor:pointer }
+    .counterpart-action:hover,.counterpart-action:focus-visible { filter:brightness(1.08); transform:translateY(-1px); outline:3px solid rgba(var(--world-rgb),.35); outline-offset:3px }
+    .counterpart-screen.is-active .counterpart-output { border-color:var(--world); background:rgba(var(--world-rgb),.16); color:#fff; box-shadow:0 0 25px rgba(var(--world-rgb),.22) }
+    .counterpart-screen.is-active .counterpart-action { border-color:#4d515b; background:#22252d; color:#e4e2dc; box-shadow:none }
+    .mission.is-guided { justify-content:center }
+    .mission.is-guided .mission-kicker,.mission.is-guided > h2,.mission.is-guided .mission-question,.mission.is-guided .mission-instruction { display:none }
+    .cause-demo { position:relative; flex:1; min-height:480px; display:flex; flex-direction:column; align-items:center; justify-content:center; margin:0 auto; padding:38px 0 22px; text-align:center; isolation:isolate }
+    .cause-demo::before { content:""; position:absolute; z-index:-1; width:min(460px,80vw); aspect-ratio:1; border-radius:50%; background:radial-gradient(circle,rgba(var(--world-rgb),.2),rgba(var(--world-rgb),.06) 38%,transparent 70%); filter:blur(2px); pointer-events:none }
+    .cause-demo[hidden] { display:none }
+    .cause-demo-progress { display:flex; gap:8px; margin-bottom:26px }
+    .cause-demo-progress span { width:7px; height:7px; border-radius:50%; background:#41424a; transition:.3s }
+    .cause-demo-progress span.is-done { background:var(--world); box-shadow:0 0 12px rgba(var(--world-rgb),.65) }
+    .cause-demo-visual { width:118px; height:118px; display:grid; place-items:center; margin-bottom:25px; border:1px solid rgba(var(--world-rgb),.5); border-radius:50%; background:radial-gradient(circle at 36% 30%,rgba(var(--world-rgb),.28),#101116 66%); color:var(--world); box-shadow:0 0 46px rgba(var(--world-rgb),.16); font:950 34px var(--mono); transition:.35s }
+    .cause-demo-visual.is-changed { transform:scale(1.06); box-shadow:0 0 70px rgba(var(--world-rgb),.38); animation:demoGlow .8s ease both }
+    .cause-demo-label { color:var(--world); font:850 11px var(--mono); letter-spacing:.12em; text-transform:uppercase }
+    .cause-demo h3 { max-width:15ch; margin:10px auto 12px; font-size:clamp(34px,5vw,58px); line-height:.98; letter-spacing:-.045em }
+    .cause-demo-copy { max-width:560px; min-height:3.2em; margin:0 auto 23px; color:#c9c5bc; font-size:18px; line-height:1.6 }
+    .cause-demo-output { max-width:560px; min-height:0; margin:-7px auto 22px; color:#fff; text-align:center; font-size:16px; font-weight:850; opacity:0; transform:translateY(8px); transition:.3s }
+    .cause-demo-output.is-changed { opacity:1; transform:none; color:var(--world); text-shadow:0 0 24px rgba(var(--world-rgb),.6); animation:demoGlow .8s ease both }
+    .cause-demo-action { min-width:min(330px,100%); min-height:58px; padding:13px 24px; border:1px solid var(--world); border-radius:999px; background:var(--world); color:#151200; cursor:pointer; font-size:15px; font-weight:950; transition:transform .18s,box-shadow .18s }
+    .cause-demo-action:hover { transform:translateY(-2px); box-shadow:0 0 32px rgba(var(--world-rgb),.28) }
+    .cause-demo-action[hidden] { display:none }
+    .cause-demo.is-stepping .cause-demo-visual,.cause-demo.is-stepping .cause-demo-label,.cause-demo.is-stepping h3,.cause-demo.is-stepping .cause-demo-copy { animation:guidedIn .38s ease both }
+    @keyframes guidedIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:none} }
+    @keyframes demoGlow { 0%{transform:scale(.985);filter:brightness(.7)} 45%{transform:scale(1.018);filter:brightness(1.4)} 100%{transform:none;filter:none} }
+    .mission-options { display:grid; gap:8px }
+    .mission-step { padding:13px 14px; border:1px solid #42444e; border-radius:11px; background:#212229; cursor:pointer; text-align:left; transition:.2s }
+    .mission-step strong { display:block; color:#f2efe7; font-size:15px; line-height:1.35 }
+    .mission-step small { display:block; margin-top:4px; color:#aaa8a2; font-size:12px; line-height:1.5 }
+    .mission-step:hover { border-color:#83858e; transform:translateX(4px) }
+    .mission-step:disabled { opacity:.35; cursor:default; transform:none }
+    .mission-step.is-correct { border-color:var(--green); background:#102b1c; color:#e5ffed }
+    .mission-step.is-correct:disabled { opacity:1 }
+    .mission-step.is-wrong { border-color:#a44d4d; background:#321818; color:#ffdede }
+    .answer-feedback { display:inline; margin-inline-start:.35em; color:#dfffea; font-size:13px; font-weight:700; line-height:1.55; opacity:.92 }
+    .mission-step.is-wrong .answer-feedback { color:#ffdede }
+    .mission.solved .mission-step:not(.is-correct) { display:none }
+    .mission.solved .mission-instruction { display:none }
+    .mission-result { min-height:60px; margin-top:12px; padding:12px; border-radius:11px; background:#0b0c10; color:#b8b5ad; font-size:14px }
+    .mission-result.success { color:#dfffea; border:1px solid #336b4a; background:#102b1c }
+    .mission-actions { display:flex; align-items:center; gap:9px; margin-top:12px }
+    .small-btn { padding:9px 11px; border:1px solid #484a54; border-radius:9px; background:#202127; cursor:pointer; font-size:12px; font-weight:850 }
+    .small-btn:disabled { opacity:.35; cursor:not-allowed }
+    .reveal-link { display:none; margin-inline-start:auto; color:var(--world); font-size:12px; font-weight:900; text-decoration:none }
+    .mission.solved.is-final .reveal-link { display:inline }
+    .next-level { display:none; margin-inline-start:auto; border-color:var(--world); color:#171200; background:var(--world) }
+    .mission.solved:not(.is-final) .next-level { display:inline-flex }
+
+    .artifact-panel { position:absolute; z-index:4; inset:70px 12% 88px; display:flex; flex-direction:column; justify-content:center; opacity:0; transform:translateY(18px) scale(.96); pointer-events:none; transition:.35s }
+    .effect-machine.is-advanced .machine-orbit,.effect-machine.is-advanced .machine-core,.effect-machine.is-advanced .signal { opacity:.08 }
+    .effect-machine.is-advanced .artifact-panel { opacity:1; transform:none }
+    .artifact-label { margin-bottom:9px; color:var(--world); font:850 10px var(--mono); letter-spacing:.12em }
+    .artifact-code { width:100%; margin:0; padding:18px; overflow:auto; border:1px solid rgba(var(--world-rgb),.46); border-radius:15px; background:#07080bd9; color:#e8e5dd; box-shadow:0 22px 65px #000a,0 0 32px rgba(var(--world-rgb),.12); white-space:pre-wrap; font:750 clamp(12px,1.35vw,16px)/1.65 var(--mono) }
+    .artifact-note { margin:10px 0 0; color:#aaa8a2; font-size:12px; line-height:1.5 }
+
+    .meaning { padding:90px 0; background:var(--paper); color:var(--paper-ink) }
+    .meaning-head { max-width:810px; margin:0 auto 35px; text-align:center }
+    .meaning .eyebrow { color:#765000 }
+    .meaning h2 { margin:12px 0; font-size:clamp(39px,5vw,65px); line-height:.98; letter-spacing:-.05em }
+    .meaning-head p { color:#5b554c; font-size:20px }
+    .truth-grid { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); overflow:hidden; border:1px solid #d5ccbd; border-radius:25px; background:#fff; box-shadow:0 28px 75px #51442d20 }
+    .depth-visual { position:relative; min-height:470px; padding:30px; overflow:hidden; display:grid; place-items:center; background:#14151a; color:#fff }
+    .depth-visual::before { content:""; position:absolute; inset:0; background:radial-gradient(circle,rgba(var(--world-rgb),.22),transparent 45%) }
+    .rings { position:relative; width:310px; height:310px; transform-style:preserve-3d; transform:rotateX(64deg) rotateZ(-20deg) }
+    .ring { position:absolute; border:2px solid rgba(var(--world-rgb),.5); border-radius:50%; box-shadow:0 0 30px rgba(var(--world-rgb),.12); transition:.45s }
+    .ring:nth-child(1) { inset:100px; background:rgba(var(--world-rgb),.23) }
+    .ring:nth-child(2) { inset:55px }
+    .ring:nth-child(3) { inset:5px }
+    .rings[data-depth="0"] .ring:nth-child(1),.rings[data-depth="1"] .ring:nth-child(2),.rings[data-depth="2"] .ring:nth-child(3) { border-color:var(--world); background:rgba(var(--world-rgb),.15); box-shadow:0 0 45px rgba(var(--world-rgb),.48) }
+    .depth-name { position:absolute; bottom:31px; left:30px; right:30px; text-align:center }
+    .depth-name strong { display:block; color:var(--world); font-size:24px }
+    .depth-name span { color:#bbb8b0 }
+    .truth-copy { padding:34px }
+    .truth-copy h3 { margin:8px 0 12px; font-size:36px; line-height:1.03; letter-spacing:-.035em }
+    .truth-copy > p { color:#5f584e }
+    .depth-control { margin:23px 0 }
+    .depth-control label { display:block; margin-bottom:9px; font:850 11px var(--mono); letter-spacing:.1em; color:#745900 }
+    .depth-range { width:100%; accent-color:#a97900 }
+    .depth-scale { display:flex; justify-content:space-between; color:#746d63; font-size:12px; font-weight:800 }
+    .depth-card { min-height:135px; padding:18px; border:1px solid #ded5c7; border-radius:14px; background:#faf7f1 }
+    .depth-card strong { display:block; margin-bottom:7px; font-size:19px }
+    .depth-card p { margin:0; color:#5d564c }
+    .shared-truth { margin-top:18px; padding:15px; border-radius:12px; background:#fff0ad; color:#45370a; font-weight:750 }
+
+    .projects-section { padding:84px 0 }
+    .projects-head { display:flex; align-items:end; justify-content:space-between; gap:24px; margin-bottom:28px }
+    .projects-head h2 { margin:10px 0 0; font-size:clamp(36px,5vw,58px); line-height:1; letter-spacing:-.045em }
+    .projects-head p { max-width:450px; color:var(--muted) }
+    .projects { display:grid; grid-template-columns:repeat(5,1fr); gap:13px }
+    .project { min-height:255px; padding:17px; overflow:hidden; border:1px solid var(--line); border-radius:18px; background:#121318 }
+    .project-art { height:125px; display:grid; place-items:center; overflow:hidden; border-radius:13px; background:#090a0d }
+    .project h3 { margin:15px 0 4px; font-size:18px }
+    .project p { margin:0; color:var(--muted); font-size:14px }
+    .xo { display:grid; grid-template-columns:repeat(3,28px); gap:5px }
+    .xo i { width:28px; height:28px; border:1px solid #555; border-radius:5px; display:grid; place-items:center; font:900 18px var(--mono); font-style:normal }
+    .todo { width:75%; display:grid; gap:9px }
+    .todo i { height:13px; border-radius:99px; background:#34363d }
+    .todo i:nth-child(2) { width:70%; background:var(--green) }
+    .password { color:var(--yellow); font:900 22px var(--mono); animation:scramble 2s steps(2) infinite }
+    @keyframes scramble { 50% { color:var(--orange); letter-spacing:4px } }
+    .quiz-orbit { width:74px; height:74px; border:2px solid var(--blue); border-radius:50%; display:grid; place-items:center; color:#fff; font:900 34px var(--mono); box-shadow:0 0 30px #64b8ff44 }
+    .cashflow { display:flex; align-items:center; gap:5px }
+    .cashflow i { width:28px; height:28px; border-radius:7px; background:#34363d }
+    .cashflow b { color:var(--yellow) }
+
+    .closing { padding:76px 0; background:var(--yellow); color:#171200 }
+    .closing-grid { display:grid; grid-template-columns:1fr auto; align-items:center; gap:30px }
+    .closing h2 { max-width:15ch; margin:10px 0; font-size:clamp(39px,5vw,64px); line-height:1; letter-spacing:-.045em }
+    .closing p { max-width:700px; font-size:19px }
+    .price-card { min-width:300px; padding:24px; border-radius:19px; background:#171200; color:#fff }
+    .price-card strong { display:block; font-size:34px }
+    .price-card span { display:block; color:#c9c5bb }
+    .actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:18px }
+    .btn { display:inline-flex; justify-content:center; padding:13px 17px; border:1px solid #3a3420; border-radius:11px; text-decoration:none; font-weight:900 }
+    .btn.dark { border-color:#171200; background:#171200; color:#fff }
+    .btn.light { border-color:#fff; background:#fff; color:#171200 }
+    footer { padding:36px 0; color:#9f9d97; font-size:14px }
+    .footer { display:flex; flex-wrap:wrap; gap:14px }
+    .footer a { text-decoration:none }
+
+    /* Dieselbe gespeicherte Hell-/Dunkel-Wahl wie auf Startseite und Studio. */
+    :root[data-theme="light"] {
+      --bg:#f4efe5; --ink:#211e19; --muted:#655f56; --line:#d5ccbd;
+      --paper:#fffaf1; --paper-ink:#211e19;
+    }
+    :root[data-theme="light"] body { background:var(--bg); color:var(--ink) }
+    :root[data-theme="light"] nav { border-color:#d5ccbd; background:#f4efe5ed }
+    :root[data-theme="light"] .nav-link { color:#5f584e }
+    :root[data-theme="light"] .theme-switch { border-color:#c6bdae; background:#fffaf1; color:#765000 }
+    :root[data-theme="light"] .hero { background:radial-gradient(circle at 50% 42%,rgba(var(--world-rgb),.15),transparent 34%),#f4efe5 }
+    :root[data-theme="light"] .hero::before { background-image:linear-gradient(#211e190d 1px,transparent 1px),linear-gradient(90deg,#211e190d 1px,transparent 1px) }
+    :root[data-theme="light"] .hero::after { background:radial-gradient(circle at 50% 47%,transparent 20%,#f4efe5 78%) }
+    :root[data-theme="light"] .hero-lead { color:#5f584e }
+    :root[data-theme="light"] .hero .eyebrow,
+    :root[data-theme="light"] .core-copy span,
+    :root[data-theme="light"] .level-chip.active,
+    :root[data-theme="light"] .machine-core span,
+    :root[data-theme="light"] .effect-caption b,
+    :root[data-theme="light"] .mission-kicker,
+    :root[data-theme="light"] .human-counterpart .mission-context-label,
+    :root[data-theme="light"] .cause-demo-label,
+    :root[data-theme="light"] .reveal-link { color:var(--world-readable) }
+    :root[data-theme="light"] .truth-badge { border-color:#cfc6b8; background:#fffaf1e8; color:#423d35 }
+    :root[data-theme="light"] .learning-core { background:radial-gradient(circle at 40% 36%,#fff,rgba(var(--world-rgb),.18) 31%,#fffaf1d9 72%); box-shadow:0 0 42px rgba(var(--world-rgb),.2),inset 0 0 35px rgba(var(--world-rgb),.15) }
+    :root[data-theme="light"] .portal { border-color:#cec5b7; background:linear-gradient(145deg,#fffdf8f2,#eee7dcf2); color:#211e19; box-shadow:0 22px 45px #6d5a3b2b,inset 0 1px #fff }
+    :root[data-theme="light"] .portal .orb { border-color:#bcb2a3; background:#fffaf1; color:#765000 }
+    :root[data-theme="light"] .portal small { color:#6b645b }
+    :root[data-theme="light"] .stage-hint { border-color:#cfc6b8; background:#fffaf1ed; color:#5f584e }
+    :root[data-theme="light"] .experience { background:#fffdf8f2; box-shadow:0 42px 100px #59451738,0 0 50px rgba(var(--world-rgb),.12) }
+    :root[data-theme="light"] .experience-back { border-color:#c9c0b2; background:#fffaf1e8; color:#4e483f }
+    :root[data-theme="light"] .experience-back:hover { color:#211e19 }
+    :root[data-theme="light"] .experience.is-choosing .depth-gate { background:radial-gradient(circle at 50% 48%,rgba(var(--world-rgb),.17),transparent 37%),#fffaf1 }
+    :root[data-theme="light"] .depth-gate p { color:#5f584e }
+    :root[data-theme="light"] .level-chip { border-color:#cfc6b8; background:#fff; color:#675f54 }
+    :root[data-theme="light"] .level-chip span { color:#211e19 }
+    :root[data-theme="light"] .level-chip .route-note { color:#5f584e }
+    :root[data-theme="light"] .experience-scene { background:radial-gradient(circle at 48% 47%,rgba(var(--world-rgb),.17),transparent 33%),linear-gradient(135deg,#fffdf8e8,#eee7dce8) }
+    :root[data-theme="light"] .scene-top { color:#5f584e }
+    :root[data-theme="light"] .machine-core { background:linear-gradient(145deg,rgba(var(--world-rgb),.22),#fffaf1 68%); box-shadow:0 24px 48px #5646272b,0 0 38px rgba(var(--world-rgb),.18) }
+    :root[data-theme="light"] .signal { border-color:#a69d8f; background:#fffaf1 }
+    :root[data-theme="light"] .effect-caption { color:#4e483f }
+    :root[data-theme="light"] .mission { background:radial-gradient(circle at 50% 30%,rgba(var(--world-rgb),.1),transparent 33%),#fffaf1ed }
+    :root[data-theme="light"] .mission-question { color:#3f3a33 }
+    :root[data-theme="light"] .mission-instruction { color:#5f584e }
+    :root[data-theme="light"] .mission-context { background:#fff; box-shadow:0 14px 30px #5a482623 }
+    :root[data-theme="light"] .mission-context-tech { border-color:#d7cfc2; background:#17181e }
+    :root[data-theme="light"] .mission-context-label { border-color:#d7cfc2 }
+    :root[data-theme="light"] .human-counterpart { background:linear-gradient(145deg,#fffdf8,#eee7dc) }
+    :root[data-theme="light"] .counterpart-bar { color:#69635a }
+    :root[data-theme="light"] .counterpart-bar i { background:#a49b8d }
+    :root[data-theme="light"] .counterpart-title { color:#211e19 }
+    :root[data-theme="light"] .counterpart-output { border-color:#cbc2b4; background:#fff; color:#332f29 }
+    :root[data-theme="light"] .counterpart-detail { color:#575149 }
+    :root[data-theme="light"] .counterpart-screen.is-active .counterpart-output { color:#211e19 }
+    :root[data-theme="light"] .counterpart-screen.is-active .counterpart-action { border-color:#bcb2a3; background:#e8e0d4; color:#211e19 }
+    :root[data-theme="light"] .cause-demo-progress span { background:#bcb3a5 }
+    :root[data-theme="light"] .cause-demo-visual { background:radial-gradient(circle at 36% 30%,rgba(var(--world-rgb),.3),#fffaf1 68%) }
+    :root[data-theme="light"] .cause-demo-copy { color:#504a42 }
+    :root[data-theme="light"] .cause-demo-output { color:#211e19 }
+    :root[data-theme="light"] .mission-step { border-color:#c9c0b2; background:#fff; color:#211e19 }
+    :root[data-theme="light"] .mission-step:disabled { opacity:.78; color:#514b43; border-color:#c1b8aa; background:#fbf7ef }
+    :root[data-theme="light"] .mission-step strong { color:#211e19 }
+    :root[data-theme="light"] .mission-step small { color:#615a51 }
+    :root[data-theme="light"] .mission-step:hover { border-color:#746d63 }
+    :root[data-theme="light"] .mission-step.is-correct { border-color:#24804b; background:#e5ffed; color:#153b24 }
+    :root[data-theme="light"] .mission-step.is-wrong { border-color:#a44d4d; background:#fff0f0; color:#6e2525 }
+    :root[data-theme="light"] .answer-feedback { color:#164b2b }
+    :root[data-theme="light"] .mission-step.is-wrong .answer-feedback { color:#6e2525 }
+    :root[data-theme="light"] .mission-result { background:#eee7dc; color:#4e483f }
+    :root[data-theme="light"] .mission-result.success { color:#164b2b; background:#e5ffed }
+    :root[data-theme="light"] .small-btn { border-color:#c1b8aa; background:#eee7dc; color:#211e19 }
+    :root[data-theme="light"] .small-btn:disabled { opacity:.68; color:#5d564d }
+    :root[data-theme="light"] .arrival-note { background:#fffaf1; color:#211e19 }
+    :root[data-theme="light"] .arrival-note span { color:#4e483f }
+    :root[data-theme="light"] .artifact-note { color:#5f584e }
+    :root[data-theme="light"] .projects-section { background:#f4efe5 }
+    :root[data-theme="light"] .project { border-color:#d5ccbd; background:#fffaf1 }
+    :root[data-theme="light"] .project-art { background:#17181e }
+    :root[data-theme="light"] footer { color:#655f56 }
+    .sound-switch { min-width:82px; padding:9px 12px; border:1px solid #464954; border-radius:999px; background:#111218; color:#d8d5ce; cursor:pointer; font:800 11px var(--sans); white-space:nowrap }
+    .sound-switch[aria-pressed="true"] { border-color:var(--world); color:var(--world); box-shadow:0 0 18px rgba(var(--world-rgb),.16) }
+    .sound-switch:focus-visible { outline:3px solid rgba(var(--world-rgb),.38); outline-offset:3px }
+    :root[data-theme="light"] .sound-switch { border-color:#bdb4a7; background:#fffaf1; color:#2d2924 }
+    :root[data-theme="light"] .sound-switch[aria-pressed="true"] { color:var(--world-readable) }
+
+    @media (max-width:1000px) {
+      .portal-stage { min-height:650px }
+      .portal[data-world="computer"] { --x:-290px }
+      .portal[data-world="security"] { --x:290px }
+      .portal[data-world="marketing"] { --x:-290px }
+      .portal[data-world="server"] { --x:290px }
+      .experience { grid-template-columns:1fr; position:relative; inset:auto; display:none; transform:none }
+      .portal-stage.is-open { min-height:auto }
+      .portal-stage.is-open .portal-stage-inner { position:relative }
+      .portal-stage.is-open .experience { display:block; opacity:1; transform:none }
+      .experience-scene { min-height:470px }
+      .mission { border:0 }
+      .truth-grid { grid-template-columns:1fr }
+      .projects { grid-template-columns:repeat(3,1fr) }
+      .closing-grid { grid-template-columns:1fr }
+      .price-card { min-width:0; max-width:420px }
+    }
+    @media (max-width:720px) {
+      .hero-inner { padding-top:42px }
+      /* Ein direkter Themenlink fuehrt auf dem Smartphone sofort zum Erlebnis.
+         Die allgemeine Einleitung und die Suchparameter-Erklaerung wiederholen
+         dort nur, was die bereits geoeffnete Themenwelt sichtbar zeigt. */
+      body.has-direct-world .hero-copy { display:none }
+      body.has-direct-world .hero-inner { padding-top:18px }
+      .portal-stage { min-height:auto }
+      .portal-stage-inner { position:relative; display:grid; grid-template-columns:repeat(2,1fr); gap:10px }
+      .learning-core { position:relative; left:auto; top:auto; grid-column:1/-1; width:180px; height:180px; margin:30px auto 45px; transform:none }
+      .portal { position:relative; left:auto; top:auto; width:auto; min-height:102px; transform:none!important }
+      .stage-hint { position:relative; left:auto; bottom:auto; grid-column:1/-1; transform:none; text-align:center; margin-top:8px }
+      .portal-stage.is-open .learning-core,.portal-stage.is-open .portal,.portal-stage.is-open .stage-hint { display:none }
+      .experience { grid-column:1/-1; border-radius:20px }
+      .experience.is-choosing .depth-gate { min-height:590px; padding:74px 20px 28px }
+      .depth-gate h2 { font-size:43px }
+      .depth-gate p { margin-bottom:24px; font-size:17px }
+      .experience.is-observing .experience-scene { min-height:590px }
+      .experience.is-acting .mission { min-height:590px }
+      .experience-scene { min-height:430px; padding:70px 20px 24px }
+      .machine-orbit { width:260px }
+      .signal:nth-of-type(1) { transform:translate3d(-135px,-70px,10px) }
+      .signal:nth-of-type(2) { transform:translate3d(135px,-45px,45px) }
+      .mission { padding:74px 20px 24px }
+      .level-map { grid-template-columns:1fr; gap:8px }
+      .level-chip { min-height:0; display:block; padding:16px; text-align:start }
+      .level-chip small { font-size:9px }
+      .level-chip span { display:block; margin-top:4px }
+      .level-chip .route-note { margin-top:6px }
+      .effect-machine.is-advanced { min-height:0; display:block; padding:34px 0 8px }
+      .effect-machine.is-advanced .machine-orbit,
+      .effect-machine.is-advanced .machine-core,
+      .effect-machine.is-advanced .signal { display:none }
+      .effect-machine.is-advanced .artifact-panel { position:relative; inset:auto; min-height:0; opacity:1; transform:none }
+      .effect-machine.is-advanced .effect-caption { position:relative; inset:auto; width:100%; margin:14px 0 0; transform:none }
+      .artifact-code { padding:13px; font-size:11px }
+      .mission-context-grid { grid-template-columns:1fr }
+      .mission-context-tech { border-inline-end:0; border-bottom:1px solid #30323a }
+      .counterpart-screen { min-height:270px }
+      .mission h2 { font-size:37px }
+      .cause-demo { min-height:500px; padding:20px 0 10px }
+      .cause-demo-visual { width:102px; height:102px; margin-bottom:21px }
+      .cause-demo-copy { font-size:16px }
+      .truth-copy,.depth-visual { padding:24px }
+      .projects { display:flex; overflow-x:auto; scroll-snap-type:x mandatory; padding-bottom:10px }
+      .project { min-width:235px; scroll-snap-align:start }
+      .projects-head { display:block }
+      .nav-link:not(:last-child) { display:none }
+    }
+    @media (max-width:440px) {
+      .logo span:last-child { display:none }
+      .hero h1 { font-size:45px }
+      .learning-core { width:160px; height:160px }
+      .portal { padding:11px 7px; font-size:14px }
+      .portal .orb { width:41px; height:41px; font-size:20px }
+      .effect-machine { min-height:235px }
+      .machine-core { width:115px; height:115px }
+      .rings { width:270px; height:270px }
+      .price-card strong { font-size:29px }
+      .actions .btn { width:100% }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      *,*::before,*::after { animation:none!important; transition:none!important; scroll-behavior:auto!important }
+      .space-canvas { display:none }
+    }
+  </style>
+
+</head>
+<body>
+  <a class="skip" href="#welten">Direkt zu den Themenwelten</a>
+  <nav><div class="wrap nav"><a class="logo" href="index.html"><span class="mark">&lt;/&gt;</span><span>Mein Lernstudio</span></a><span class="space"></span><a class="nav-link" href="#welten">Erleben</a><a class="nav-link" href="#bedeutung">Was steckt dahinter?</a><a class="nav-link" href="angebot.html">Preis</a><button class="sound-switch" id="soundToggle" type="button" aria-label="Leise Klangatmosphäre umschalten" aria-pressed="false">Klang an</button><button class="theme-switch" id="themeToggle" type="button" aria-label="Farbschema umschalten" aria-pressed="false" title="Aussehen zwischen Hell und Dunkel wechseln">◐</button><a class="nav-link" href="studio.html">Zum Studio →</a></div></nav>
+
+  <main>
+    <header class="hero" id="welten">
+      <canvas class="space-canvas" id="spaceCanvas" aria-hidden="true"></canvas>
+      <div class="wrap hero-inner">
+        <div class="hero-copy">
+          <div class="eyebrow">DU BRAUCHST KEIN VORWISSEN. NUR EINE FRAGE.</div>
+          <h1>Was möchtest du endlich verstehen oder bauen?</h1>
+          <p class="hero-lead">Berühre eine Welt. Löse darin eine kurze Aufgabe. Danach siehst du, wie dieselbe Idee vom ersten Aha-Moment bis zu eigener Software und tiefen Systemen wächst.</p>
+          <span class="truth-badge">Eine Lernplattform für Erwachsene ab 18 · keine Spielesammlung · <span id="renderStatus">Grafik wird geprüft</span></span>
+          <div class="arrival-note" id="arrivalNote" role="status"><strong id="arrivalTitle"></strong><span id="arrivalText"></span></div>
+        </div>
+
+        <div class="portal-stage" id="portalStage">
+          <div class="portal-stage-inner" id="portalStageInner">
+            <div class="learning-core" aria-hidden="true"><span class="core-pulse"></span><div class="core-copy"><span>DEIN EINSTIEG</span><strong>Eine Frage genügt.</strong></div></div>
+
+            <button class="portal" data-world="computer"><span class="orb">▣</span>Computer<small>Was geschieht nach meinem Klick?</small></button>
+            <button class="portal" data-world="code"><span class="orb">&lt;/&gt;</span>Programmieren<small>Wie wird aus einer Idee Software?</small></button>
+            <button class="portal" data-world="security"><span class="orb">◇</span>Sicherheit<small>Woran erkenne ich ein Risiko?</small></button>
+            <button class="portal" data-world="marketing"><span class="orb">⌕</span>Marketing &amp; SEO<small>Warum hört jemand wirklich zu?</small></button>
+            <button class="portal" data-world="math"><span class="orb">∞</span>Mathematik<small>Was bewirkt diese Zahl?</small></button>
+            <button class="portal" data-world="server"><span class="orb">⬡</span>Server &amp; Systeme<small>Wohin reist eine Anfrage?</small></button>
+            <div class="stage-hint">WÄHLE EINE WELT · DU KANNST JEDERZEIT ZURÜCK</div>
+
+            <section class="experience is-choosing" id="experience" aria-live="polite" aria-label="Interaktive Themenwelt">
+              <button class="experience-back" id="closeWorld" type="button">← Themenwelten</button>
+              <div class="depth-gate" id="depthGate">
+                <div class="depth-gate-inner">
+                  <div class="eyebrow" id="gateKicker">PROGRAMMIEREN · DEIN EINSTIEG</div>
+                  <h2 id="gateTitle">Wie wird aus einer Idee Software?</h2>
+                  <p id="gateLead">Du hast Programmieren gewählt. Wähle den Ausschnitt, den du jetzt erleben möchtest.</p>
+                  <div class="level-map" role="tablist" aria-label="Ausschnitte im gewählten Thema">
+                    <button class="level-chip active" type="button" role="tab" aria-selected="true" data-level="0"><small>ERSTER BEFEHL</small><span>Bring den Knopf zum Leben.</span><em class="route-note">Klick, Funktion und sichtbare Wirkung</em></button>
+                    <button class="level-chip" type="button" role="tab" aria-selected="false" data-level="1"><small>ECHTER CODE</small><span>Lies den wirklichen Befehl.</span><em class="route-note">Die entscheidende Codezeile verstehen</em></button>
+                    <button class="level-chip" type="button" role="tab" aria-selected="false" data-level="2"><small>ZUSTAND SCHÜTZEN</small><span>Schütze den neuesten Zustand.</span><em class="route-note">Alte Antworten sicher zurückhalten</em></button>
+                  </div>
+                </div>
+              </div>
+              <div class="experience-scene">
+                <div class="scene-top"><span class="live-dot"></span><span id="sceneLabel">PROGRAMMIEREN · BEOBACHTEN</span></div>
+                <div class="effect-machine" id="effectMachine">
+                  <span class="machine-orbit"></span><span class="machine-orbit second"></span>
+                  <span class="signal"></span><span class="signal"></span><span class="signal"></span>
+                  <div class="machine-core"><span id="machineSymbol">&lt;/&gt;</span></div>
+                  <div class="artifact-panel" id="artifactPanel" aria-live="polite" aria-hidden="true" hidden>
+                    <div class="artifact-label" id="artifactLabel">ECHTER AUSSCHNITT</div>
+                    <pre class="artifact-code" id="artifactCode"></pre>
+                    <p class="artifact-note" id="artifactNote"></p>
+                  </div>
+                  <div class="effect-caption" id="effectCaption">Die Maschine wartet auf deine Reihenfolge.</div>
+                </div>
+                <div class="observe-footer"><button class="focus-forward" id="openTask" type="button">Aufgabe öffnen</button></div>
+              </div>
+              <div class="mission" id="mission">
+                <div class="mission-kicker" id="missionKicker">DEINE 30-SEKUNDEN-AUFGABE</div>
+                <h2 id="missionTitle">Bring den Knopf zum Leben.</h2>
+                <div class="mission-context" id="missionContext" hidden>
+                  <div class="mission-context-grid">
+                    <div class="mission-context-tech">
+                      <div class="mission-context-label" id="missionContextLabel">AUSSCHNITT</div>
+                      <pre class="mission-context-code" id="missionContextCode"></pre>
+                      <p class="mission-context-note" id="missionContextNote"></p>
+                    </div>
+                    <section class="human-counterpart" aria-labelledby="counterpartLabel">
+                      <div class="mission-context-label" id="counterpartLabel">WAS EIN MENSCH DAVON SIEHT</div>
+                      <div class="counterpart-screen" id="counterpartScreen">
+                        <div class="counterpart-bar" aria-hidden="true"><i></i><i></i><i></i><span>DEINE SICHTBARE OBERFLÄCHE</span></div>
+                        <strong class="counterpart-title" id="counterpartTitle"></strong>
+                        <div class="counterpart-output" id="counterpartOutput" role="status" aria-live="polite"></div>
+                        <p class="counterpart-detail" id="counterpartDetail"></p>
+                        <button class="counterpart-action" id="counterpartAction" type="button"></button>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+                <p class="mission-question" id="missionQuestion">Welche drei Schritte verbinden einen Klick mit einer sichtbaren Wirkung?</p>
+                <p class="mission-instruction" id="missionInstruction">Klicke die drei Bausteine in der richtigen Reihenfolge an.</p>
+                <div class="cause-demo" id="causeDemo">
+                  <div class="cause-demo-progress" id="causeDemoProgress" aria-label="Fortschritt in fünf kleinen Schritten"><span></span><span></span><span></span><span></span><span></span></div>
+                  <div class="cause-demo-visual" id="causeDemoVisual" aria-hidden="true">↖</div>
+                  <div class="cause-demo-label" id="causeDemoLabel">Du beginnst</div>
+                  <h3 id="causeDemoTitle">Ein Mausklick.</h3>
+                  <p class="cause-demo-copy" id="causeDemoCopy">Klicke einmal. Danach erscheint nur der nächste Teil der Wirkung.</p>
+                  <div class="cause-demo-output" id="causeDemoOutput" role="status" aria-live="polite"></div>
+                  <button class="cause-demo-action" id="causeDemoAction" type="button">Mausklick ausführen</button>
+                </div>
+                <div class="mission-options" id="missionOptions"></div>
+                <div class="mission-result" id="missionResult" aria-live="polite">Noch ist nichts verbunden. Beginne mit dem ersten Schritt.</div>
+                <div class="mission-actions"><button class="small-btn" id="resetMission" type="button">Neu versuchen</button><button class="small-btn" id="showSolution" type="button">Lösung zeigen</button><button class="small-btn next-level" id="nextLevel" type="button">Nächsten Ausschnitt ansehen →</button><a class="reveal-link" id="revealMeaning" href="#bedeutung">Das ganze Thema einordnen ↓</a></div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <section class="meaning" id="bedeutung" hidden aria-hidden="true">
+      <div class="wrap">
+        <div class="meaning-head"><div class="eyebrow">DAS WAR KEIN SPIEL OHNE SINN</div><h2>Du hast gerade ein Grundprinzip benutzt.</h2><p id="meaningIntro">Ein Ereignis löst eine Regel aus. Die Regel verändert einen Zustand. Genau daraus wächst später eine Anwendung.</p></div>
+        <div class="truth-grid">
+          <div class="depth-visual"><div class="rings" id="depthRings" data-depth="0"><span class="ring"></span><span class="ring"></span><span class="ring"></span></div><div class="depth-name"><strong id="depthName">Erster Kontakt</strong><span>Dasselbe Prinzip. Eine andere Auflösung.</span></div></div>
+          <div class="truth-copy">
+            <div class="eyebrow">EIN THEMA · DREI AUSSCHNITTE</div>
+            <h3 id="truthTitle">Du verbindest die sichtbare Wirkung mit dem ganzen System.</h3>
+            <p>Du wirst nicht als „Anfänger“ oder „Experte“ in eine Schublade gesteckt. Du siehst drei Seiten desselben Themas und erkennst, wie sie zusammengehören.</p>
+            <div class="depth-control"><label for="depthRange">VON DER ERSTEN WIRKUNG BIS ZUM GANZEN SYSTEM</label><input class="depth-range" id="depthRange" type="range" min="0" max="2" step="1" value="0"><div class="depth-scale"><span>Wirkung sehen</span><span>selbst bauen</span><span>System prüfen</span></div></div>
+            <div class="depth-card"><strong id="depthTitle"></strong><p id="depthText"></p></div>
+            <p class="shared-truth" id="sharedTruth">Wer neu beginnt, sieht die erste Wirkung. Wer Erfahrung mitbringt, erkennt darin Zustände, Tests und Architektur. Beide arbeiten am selben Ursprung.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="projects-section" id="projekte"><div class="wrap"><div class="projects-head"><div><div class="eyebrow">DARAUS WIRD ETWAS EIGENES</div><h2>Projekte, die du wirklich bedienst.</h2></div><p>Du liest nicht nur Antworten. Je nach Lektion entscheidest, veränderst, programmierst, vergleichst oder prüfst du direkt im Browser.</p></div><div class="projects"><article class="project"><div class="project-art"><div class="xo"><i>X</i><i></i><i>O</i><i></i><i>X</i><i></i><i>O</i><i></i><i>X</i></div></div><h3>Drei gewinnt</h3><p>Züge, Zustand und Gewinnregel.</p></article><article class="project"><div class="project-art"><div class="todo"><i></i><i></i><i></i><i></i></div></div><h3>To-do-Liste</h3><p>Daten hinzufügen und verändern.</p></article><article class="project"><div class="project-art"><span class="password">A7!k2#Q</span></div><h3>Passwort-Generator</h3><p>Zufall und sichere Auswahl.</p></article><article class="project"><div class="project-art"><div class="quiz-orbit">?</div></div><h3>Quiz-Spiel</h3><p>Fragen, Punkte und Rückmeldung.</p></article><article class="project"><div class="project-art"><div class="cashflow"><i></i><b>→</b><i></i><b>→</b><i></i></div></div><h3>Shop-Kasse</h3><p>Zahlung, Beleg und Erstattung.</p></article></div></div></section>
+
+    <section class="closing"><div class="wrap closing-grid"><div><div class="eyebrow" style="color:#5f4900">WAS DICH IM STUDIO ERWARTET</div><h2>Kein Zuschauen. Ein Ort zum Verstehen und Anwenden.</h2><p>Du bekommst keinen Videokurs zum Nebenherlaufen. Dich erwarten kurze Erklärungen, Bilder, Vorhersagefragen, Quizze, Code im Browser, Graphen, Simulationen und Projekte. Du kannst ganz von vorne beginnen oder tief in Software, Sicherheit, Marketing, Mathematik und Systeme einsteigen. Keine Prüfungen, keine Benotung und kein staatlich anerkannter Abschluss.</p><div class="actions"><a class="btn dark" href="studio.html">Alle Lernpfade öffnen →</a><a class="btn light" href="angebot.html">Alle Inhalte und Grenzen ansehen</a></div></div><div class="price-card"><strong>Für alle.</strong><span>Alle veröffentlichten Lektionen kostenlos</span><span>Ohne Kauf, Konto oder Wallet</span></div></div></section>
+  </main>
+
+  <footer><div class="wrap footer"><a href="index.html">Startseite</a><a href="angebot.html">Unsere Idee</a><a href="wissen.html">Wissen</a><span class="space"></span><a href="impressum.html">Impressum</a><a href="datenschutz.html">Datenschutz</a><a href="agb.html">AGB</a></div></footer>
+
+  <script src="evolution-webgl.js?v=1"></script>
+  <script src="ambient-sound.js?v=10"></script>
+  <script>
+    (() => {
+      const APPEARANCE_KEY = "ls_theme";
+      const appearanceButton = document.getElementById("themeToggle");
+      const themeColor = Array.from(document.getElementsByTagName("meta")).find(node => node.name === "theme-color");
+
+      function applyAppearance(theme) {
+        const light = theme === "light";
+        document.documentElement.toggleAttribute("data-theme",light);
+        if (light) document.documentElement.setAttribute("data-theme","light");
+        if (appearanceButton) {
+          appearanceButton.setAttribute("aria-pressed",String(light));
+          appearanceButton.setAttribute("aria-label",light ? "Dunkles Aussehen einschalten" : "Helles Aussehen einschalten");
+          appearanceButton.title = light ? "Dunkles Aussehen einschalten" : "Helles Aussehen einschalten";
+        }
+        if (themeColor) themeColor.content = light ? "#f4efe5" : "#07080b";
+      }
+
+      let savedAppearance = "dark";
+      try { savedAppearance = localStorage.getItem(APPEARANCE_KEY) === "light" ? "light" : "dark"; } catch (error) {}
+      applyAppearance(savedAppearance);
+      if (appearanceButton) appearanceButton.addEventListener("click",() => {
+        const next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+        applyAppearance(next);
+        try { localStorage.setItem(APPEARANCE_KEY,next); } catch (error) {}
+      });
+
+      const worlds = {
+        computer: { color:"#66bdff", rgb:"102,189,255", label:"COMPUTER", symbol:"▣", title:"Zeig dem Computer den Weg.", question:"Was geschieht zwischen deiner Hand und dem sichtbaren Ergebnis?", effect:"Eingabe erkannt. Regel ausgeführt. Ergebnis sichtbar.", steps:["Du klickst auf ein sichtbares Bedienelement","Das Programm prüft die passende Regel","Der Bildschirm zeigt das neue Ergebnis"], stepDetails:["Deine Hand gibt dem Computer ein klares Signal.","Das Programm entscheidet anhand seiner Anweisungen, was jetzt geschehen soll.","Erst danach erscheint für dich eine sichtbare Veränderung."], demo:{action:"Beispieldatei öffnen",before:"Die Datei ist noch geschlossen.",stages:["Du klickst auf das Dateisymbol.","Das Programm erkennt den Klick und lädt die Datei.","Das Fenster mit dem Inhalt wird geöffnet."],after:"Geöffnet: Der Inhalt der Beispieldatei ist jetzt sichtbar."}, shuffled:[1,2,0], meaning:"Deine Handlung wird als Eingabe erkannt. Ein Programm folgt einer Regel. Erst danach erscheint die Wirkung.", depths:[["Erster Kontakt","Du klickst, öffnest Dateien und erkennst: Der Computer reagiert nicht magisch. Er verarbeitet Eingaben nach Regeln."],["Selbstständig arbeiten","Du verbindest Programme, Betriebssystem, Konten, Netz und Backups. Fehler lassen sich dadurch Schritt für Schritt eingrenzen."],["Ins System schauen","Du untersuchst Bits, CPU, Speicher, Prozesse und Zustände. Das macht sichtbar, worauf komplexe Software wirklich aufbaut."]]},
+        code: { color:"#ffd20a", rgb:"255,210,10", label:"PROGRAMMIEREN", symbol:"</>", title:"Bring den Knopf zum Leben.", question:"Welche drei Schritte verbinden einen Mausklick mit einer sichtbaren Wirkung?", effect:"Der Mausklick erreicht die Funktion. Der Text in der Box verändert sich.", steps:["Du drückst mit der Maus auf den Knopf","Der Browser startet die hinterlegte Funktion","Die Funktion ersetzt den Text in der Box"], stepDetails:["Der Browser bemerkt genau diesen Mausklick und ordnet ihn dem Knopf zu.","Die Funktion enthält die Anweisung, was nach dem Klick geschehen soll.","Aus „Noch nichts passiert“ wird sichtbar „Bereit“ und die Box leuchtet auf."], demo:{action:"Mausklick ausprobieren",before:"Noch nichts passiert. Klicke auf den Knopf darüber.",stages:["Dein Mausklick erreicht den sichtbaren Knopf.","Der Browser startet die mit dem Knopf verbundene Funktion.","Die Funktion schreibt einen neuen Text in diese Box."],after:"Bereit: Der Text wurde verändert und die Box leuchtet auf."}, shuffled:[2,0,1], meaning:"Ein Ereignis löst eine Funktion aus. Die Funktion verändert den Zustand der Seite. Aus dieser kleinen Kette wachsen Anwendungen.", depths:[["Erster Kontakt","Du lässt einen Knopf reagieren und siehst sofort, was dein erster Befehl bewirkt."],["Selbst etwas bauen","Du verbindest HTML, Funktionen, Daten, DOM, APIs und Fehlerbehandlung zu bedienbaren Anwendungen."],["Architektur verstehen","Du untersuchst Asynchronität, Zustände, Schnittstellen, Tests und Sicherheitsgrenzen eigener Software."]]},
+        security: { color:"#65ef9f", rgb:"101,239,159", label:"SICHERHEIT", symbol:"◇", title:"Prüfe, bevor du vertraust.", question:"Eine Paketmail verlangt sofort Geld. Wie prüfst du sie sinnvoll?", effect:"Druck erkannt. Quelle getrennt geprüft. Risiko eingegrenzt.", steps:["Du bemerkst den künstlichen Zeitdruck in der Mail","Du prüfst den Absender außerhalb der Mail","Du öffnest den Anbieter nur über seinen offiziellen Weg"], stepDetails:["Drohung und Eile sind Warnzeichen, aber noch kein Beweis.","Du benutzt weder Link noch Telefonnummer aus der verdächtigen Nachricht.","Die echte App oder selbst eingegebene Adresse zeigt, ob wirklich etwas offen ist."], demo:{action:"Paketmail sicher prüfen",before:"Ungeprüft: Die Mail behauptet, dass sofort 1,99 € fehlen.",stages:["Du erkennst den Druck und klickst noch keinen Link.","Du öffnest die offizielle Paket-App getrennt von der Mail.","Die App zeigt: Es ist keine Zahlung offen."],after:"Geprüft: Die Behauptung der Mail wird nicht bestätigt."}, shuffled:[1,0,2], meaning:"Ein einzelnes Gefühl beweist noch keinen Angriff. Mehrere Warnzeichen, eine getrennte Prüfung und ein sicherer Weg ergeben eine belastbare Entscheidung.", depths:[["Sicher im Alltag","Du erkennst Phishing, Fake-Shops und schwache Passwörter an konkreten Entscheidungen."],["Webrisiken verstehen","Du untersuchst Eingaben, Sitzungen, Rechte und Netzwerke in einer sicheren Lernumgebung."],["Systemgrenzen prüfen","Du arbeitest mit Authentifizierung, Autorisierung, Signaturen, Mandantengrenzen und Bedrohungsmodellen."]]},
+        marketing: { color:"#ff9b55", rgb:"255,155,85", label:"MARKETING & SEO", symbol:"⌕", title:"Beantworte die echte Frage.", question:"Wie wird aus einer Suchanfrage eine hilfreiche Seite?", effect:"Frage erkannt. Nutzen erklärt. Wirkung messbar gemacht.", steps:["Du liest, was der Mensch wirklich wissen möchte","Die Seite beantwortet genau diese Frage verständlich","Du misst, ob Menschen die Antwort tatsächlich nutzen"], stepDetails:["Hinter Suchwörtern steckt ein konkretes Ziel, nicht nur eine Wortfolge.","Ein klares Beispiel hilft mehr als ein leeres Werbeversprechen.","Klicks und Handlungen zeigen, ob die Antwort ihren Zweck erfüllt."], demo:{action:"Suchfrage beantworten",before:"Suchfrage: Wie lerne ich Computer ohne Vorwissen?",stages:["Du erkennst: Gesucht wird ein einfacher Anfang.","Die Seite zeigt einen ersten Schritt und ein echtes Beispiel.","Ein Klick auf die Übung macht den Nutzen messbar."],after:"Hilfreiche Antwort: erst verstehen, dann direkt ausprobieren."}, shuffled:[2,0,1], meaning:"Gute Sichtbarkeit beginnt nicht mit einem Trick. Sie verbindet die wirkliche Frage eines Menschen mit einer klaren Antwort und einer messbaren Reaktion.", depths:[["Ein Angebot erklären","Du beginnst bei Problem, Nutzen und verständlicher Sprache statt bei leeren Werbewörtern."],["Sichtbarkeit aufbauen","Du verbindest Suchabsicht, Inhalte, SEO, Anzeigen, Bilder, Kanäle und Messwerte."],["Wachstum steuern","Du prüfst Positionierung, Funnel, Attribution, Tests, Conversion und wirtschaftliche Grenzen als System."]]},
+        math: { color:"#c69cff", rgb:"198,156,255", label:"MATHEMATIK", symbol:"∞", title:"Mach die Beziehung sichtbar.", question:"Wie findest du heraus, was eine Zahl in einer Formel bewirkt?", effect:"Wert verändert. Graph beobachtet. Zusammenhang erklärt.", steps:["Du veränderst genau einen Wert in der Formel","Du beobachtest die Bewegung der Linie im Graphen","Du beschreibst, welche Wirkung dieser Wert hat"], stepDetails:["Nur eine Änderung macht Ursache und Wirkung vergleichbar.","Die abstrakte Zahl wird als sichtbare Veränderung erkennbar.","Aus der Beobachtung entsteht eine verständliche mathematische Regel."], demo:{action:"Wert von 2 auf 4 erhöhen",before:"y = 2x + 1: Die Linie steigt pro Schritt um 2.",stages:["Du ersetzt in der Formel nur die 2 durch eine 4.","Der Graph zeichnet die Linie mit der neuen Steigung.","Die Linie wächst jetzt pro Schritt doppelt so stark."],after:"y = 4x + 1: Die Linie ist sichtbar steiler geworden."}, shuffled:[1,2,0], meaning:"Eine Formel ist keine Wand aus Zeichen. Du veränderst gezielt einen Wert, beobachtest die Wirkung und beschreibst die Beziehung.", depths:[["Formeln sehen lernen","Zahlen, Gleichungen, Prozente und Geometrie beginnen mit sichtbaren Beziehungen."],["Zusammenhänge anwenden","Du lässt Funktionen, Graphen, Steigung, Schnittpunkte und Wahrscheinlichkeit auf Eingaben reagieren."],["Modelle hinterfragen","Du rekonstruierst Grenzwerte, Ableitungen, Wachstum, Trigonometrie und die Grenzen eines Modells."]]},
+        server: { color:"#6ce5df", rgb:"108,229,223", label:"SERVER & SYSTEME", symbol:"⬡", title:"Schick die Anfrage auf Reisen.", question:"Welche Stationen braucht eine Antwort aus dem Internet?", effect:"Anfrage gesendet. Serverregel ausgeführt. Antwort geprüft.", steps:["Dein Browser sendet eine konkrete Anfrage","Der Server führt die passende Regel aus","Dein Browser prüft und zeigt die Antwort"], stepDetails:["Die Anfrage nennt, welche Information oder Handlung gebraucht wird.","Der Server liest Daten, prüft Regeln und erzeugt eine Antwort.","Status und Inhalt zeigen, ob der Weg funktioniert hat."], demo:{action:"Beispielanfrage senden",before:"Browser wartet: Noch wurde keine Anfrage gesendet.",stages:["Der Browser fragt den Server nach /status.","Der Server prüft seinen Zustand und erstellt die Antwort.","Der Browser erhält Status 200 und zeigt den Inhalt."],after:"Antwort 200 OK: Der Beispieldienst ist erreichbar."}, shuffled:[2,0,1], meaning:"Eine Webseite antwortet nicht aus dem Nichts. Browser, Netzwerk, Serverregel und Daten bilden einen prüfbaren Weg.", depths:[["Hinter die Seite schauen","Du lernst Pfade, Dateien, Prozesse, Ports und erste sichere Befehle kennen."],["Dienste verbinden","Du verbindest HTTP, APIs, Docker, Zustände, Fehlercodes und Logs zu einer Webanwendung."],["Produktion verstehen","Du prüfst Healthchecks, Berechtigungen, Idempotenz, Webhooks, Zahlungsfluss und Wiederherstellung als Gesamtsystem."]]}
+      };
+
+      const advancedLevels = {
+        computer: [
+          {
+            label:"PRAXISMODUS", title:"Finde den echten Engpass.",
+            question:"Welcher Prozess ist die erste sinnvolle Spur?",
+            artifactLabel:"TASK-MANAGER · MOMENTAUFNAHME",
+            artifact:"browser.exe   CPU 96 %   RAM 1,2 GB   reagiert nicht\neditor.exe     CPU  2 %   RAM 0,4 GB   aktiv\nsystem         CPU  7 %   RAM 0,8 GB   aktiv",
+            note:"Eine Momentaufnahme beweist noch nicht die Ursache. Sie zeigt, wo die nächste Prüfung sinnvoll beginnt.",
+            counterpart:{title:"Dein Bildschirm hängt",before:"Die Webseite dreht sich weiter …",action:"Task-Manager prüfen",after:"Browser: 96 % CPU · reagiert nicht",detail:"Du siehst jetzt, welcher Prozess die erste sinnvolle Spur liefert."},
+            choices:["Den ganzen Computer sofort ausschalten","Den betroffenen Prozess und seine Auslastung prüfen","Alle persönlichen Dateien löschen"], correct:1,
+            effect:"Der Fehler wird eingegrenzt, bevor etwas verändert wird.",
+            explanation:"Richtig. Nicht der ganze Computer ist ausgefallen. Der auffällige Prozess liefert die kleinste sinnvolle Spur für den nächsten Test.",
+            bridge:"Im Studio vertiefst du diese Spur: Prozess, CPU und Arbeitsspeicher werden zu Werkzeugen für eine ruhige Fehlersuche."
+          },
+          {
+            label:"EXPERTENMODUS", title:"Ordne einen alten Zustand ein.",
+            question:"Warum erscheint nach Aktion B wieder Ergebnis A?",
+            artifactLabel:"ZUSTAND · ZEITLICHE REIHENFOLGE",
+            artifact:"Aktion A startet ───────── Antwort A kommt spät\nAktion B startet ── Antwort B kommt früh ── Anzeige B\n                         Antwort A ───────── Anzeige A  ← alt",
+            note:"Das Problem liegt nicht in der Taste. Zwei Ergebnisse erreichen denselben sichtbaren Zustand in anderer Reihenfolge.",
+            counterpart:{title:"Eine Suche, zwei Antworten",before:"Du suchst erst A und direkt danach B.",action:"Antworten eintreffen lassen",after:"Neueste Ansicht bleibt: B",detail:"Die verspätete Antwort A darf die aktuelle Ansicht B nicht ersetzen."},
+            choices:["Der Bildschirm hat zu wenige Pixel","Eine ältere asynchrone Antwort überschreibt den neueren Zustand","Der Arbeitsspeicher kennt keine Zahlen"], correct:1,
+            effect:"Zeit, Prozess und sichtbarer Zustand werden als gemeinsame Fehlerkette erkannt.",
+            explanation:"Genau. Wenn Antworten in anderer Reihenfolge eintreffen, braucht das System eine Regel, welche Antwort noch gültig ist.",
+            bridge:"Im Studio wächst genau dieser Blick weiter: von Eingabe und Zustand bis zu zeitlich versetzten Antworten und stabilen Oberflächen."
+          }
+        ],
+        code: [
+          {
+            label:"PRAXISMODUS", title:"Lies den wirklichen Befehl.",
+            question:"Welche Zeile verändert den sichtbaren Text?",
+            artifactLabel:"JAVASCRIPT · ECHTER MINI-AUSSCHNITT",
+            artifact:"button.addEventListener(\"click\", () => {\n  output.textContent = \"Bereit\";\n});",
+            note:"addEventListener verbindet den Klick mit einer Funktion. textContent verändert anschließend den sichtbaren Zustand.",
+            counterpart:{title:"Kleine Seite im Browser",before:"Noch nichts passiert",action:"Knopf anklicken",after:"Bereit",detail:"Der Klick startet die Funktion. Sie setzt den sichtbaren Text auf „Bereit“."},
+            choices:["button.addEventListener(...) ","output.textContent = \"Bereit\"","Die schließende Klammer });"], correct:1,
+            effect:"Nicht nur Begriffe: Eine konkrete Codezeile verändert die Oberfläche.",
+            explanation:"Richtig. Der Klick startet die Funktion. In der Funktion weist textContent dem Ausgabefeld einen neuen sichtbaren Text zu.",
+            bridge:"Im Studio baust du daraus Schritt für Schritt eigene Oberflächen: Element finden, Klick verbinden, Wert verändern und Wirkung prüfen."
+          },
+          {
+            label:"EXPERTENMODUS", title:"Schütze den neuesten Zustand.",
+            question:"Warum prüft der Code id === requestId?",
+            artifactLabel:"JAVASCRIPT · ASYNCHRONER ZUSTAND",
+            artifact:"const id = ++requestId;\nconst data = await load(query);\nif (id === requestId) {\n  render(data);\n}",
+            note:"await wartet auf eine Antwort. Währenddessen kann bereits eine neuere Anfrage gestartet worden sein.",
+            counterpart:{title:"Suche nach zwei Begriffen",before:"Neueste Suche: B",action:"Alte Antwort A eintreffen lassen",after:"Ansicht bleibt: B",detail:"Die Nummernprüfung schützt die neueste sichtbare Ansicht."},
+            choices:["Damit jede Antwort doppelt angezeigt wird","Damit eine späte alte Antwort nicht die neueste Ansicht überschreibt","Damit der Server ohne Netzwerk arbeitet"], correct:1,
+            effect:"Asynchronität wird nicht nur benannt, sondern an einer Zustandsgrenze kontrolliert.",
+            explanation:"Genau. Nur die noch aktuelle Anfrage darf rendern. So kann eine langsamere alte Antwort den neueren Zustand nicht zurückdrehen.",
+            bridge:"Im Studio zerlegst du diese Lösung in Funktionen, Werte, Ereignisse und await und setzt sie anschließend selbst wieder zusammen."
+          }
+        ],
+        security: [
+          {
+            label:"PRAXISMODUS", title:"Prüfe das Recht am Objekt.",
+            question:"Welche Prüfung schützt Bestellung 4711?",
+            artifactLabel:"API-ANFRAGE · BERECHTIGUNG",
+            artifact:"GET /api/orders/4711\n\nsession.user = 27\norder.owner = 41",
+            note:"Angemeldet zu sein beweist nur eine Identität. Es beweist noch nicht das Recht auf jede Bestellnummer.",
+            counterpart:{title:"Bestellung 4711",before:"Angemeldet als Nutzer 27",action:"Bestellung öffnen",after:"Zugriff abgelehnt",detail:"Nutzer 27 ist nicht Eigentümer 41. Die Bestellung bleibt geschützt."},
+            choices:["Nur prüfen, ob 4711 eine Zahl ist","Prüfen, ob session.user und order.owner zusammenpassen","Die Bestellnummer im Browser verstecken"], correct:1,
+            effect:"Authentifizierung und Autorisierung werden sauber getrennt.",
+            explanation:"Richtig. Der Server muss für genau dieses Objekt prüfen, ob der angemeldete Nutzer darauf zugreifen darf. Eine versteckte Nummer wäre kein Schutz.",
+            bridge:"Im Studio vertiefst du dieselbe Schutzlogik: Wer bist du, was darfst du und auf welches konkrete Objekt bezieht sich dieses Recht?"
+          },
+          {
+            label:"EXPERTENMODUS", title:"Sichere einen wiederholten Webhook.",
+            question:"Was verhindert Fälschung und Doppelwirkung?",
+            artifactLabel:"WEBHOOK · VERTRAUEN UND WIEDERHOLUNG",
+            artifact:"raw body + timestamp ── HMAC-Signatur prüfen\nevent.id = evt_42 ───── UNIQUE speichern\nTransaktion ─────────── Wirkung genau einmal",
+            note:"Eine gültige Signatur beantwortet nicht automatisch, ob dasselbe Ereignis schon verarbeitet wurde.",
+            counterpart:{title:"Zahlungseingang",before:"Ereignis evt_42 wartet",action:"Ereignis zweimal senden",after:"1× verarbeitet · 1× ignoriert",detail:"Die Signatur prüft die Herkunft. Die ID verhindert eine doppelte Wirkung."},
+            choices:["Nur die Absender-E-Mail lesen","Signatur prüfen und event.id idempotent speichern","Jede Wiederholung erneut freischalten"], correct:1,
+            effect:"Authentizität und Idempotenz schützen zwei verschiedene Kanten derselben Wirkungskette.",
+            explanation:"Genau. Die Signatur bindet die Herkunft. Die eindeutige Ereignis-ID verhindert, dass ein legitimer Retry dieselbe Wirkung doppelt ausführt.",
+            bridge:"Im Studio verbindest du Request, Signatur, Datenbankregel und Transaktion zu genau dieser belastbaren Wirkungskette."
+          }
+        ],
+        marketing: [
+          {
+            label:"PRAXISMODUS", title:"Beantworte, was wirklich gesucht wird.",
+            question:"Was sollte diese Seite stattdessen sagen?",
+            artifactLabel:"SUCHABSICHT · SEITE",
+            artifact:"Suchfrage: Computer lernen für Senioren\n\nSeitentitel: Innovative digitale Synergien\nEinstieg: Wir revolutionieren Ihre Zukunft.",
+            note:"Die vorhandenen Sätze klingen groß, beantworten aber weder Startpunkt noch Lernhandlung.",
+            counterpart:{title:"Suchergebnis für einen echten Menschen",before:"Innovative digitale Synergien",action:"Klare Antwort zeigen",after:"Computer von Grund auf lernen",detail:"Die neue Zeile beantwortet direkt, was gesucht wurde."},
+            choices:["Noch mehr Superlative ergänzen","Konkret zeigen, was ohne Vorwissen gelernt und ausprobiert wird","Die Suchfrage zehnmal unsichtbar wiederholen"], correct:1,
+            effect:"Suchabsicht wird in eine klare, überprüfbare Antwort übersetzt.",
+            explanation:"Richtig. Eine hilfreiche Seite nennt den Startpunkt, die konkrete Handlung und das erwartbare Ergebnis, ohne etwas zu garantieren.",
+            bridge:"Im Studio machst du daraus eine vollständige Seite: Suchfrage erkennen, klare Antwort formulieren und ihre Wirkung ehrlich prüfen."
+          },
+          {
+            label:"EXPERTENMODUS", title:"Lass dich nicht von einer Zahl täuschen.",
+            question:"Welche Aussage tragen diese Zahlen?",
+            artifactLabel:"A/B-TEST · ROHDATEN",
+            artifact:"Variante A: 4 Käufe / 40 Besuche  = 10 %\nVariante B: 7 Käufe / 70 Besuche  = 10 %",
+            note:"Mehr absolute Käufe bedeuten bei unterschiedlich vielen Besuchen nicht automatisch eine bessere Variante.",
+            counterpart:{title:"A/B-Auswertung",before:"A: 4 Käufe · B: 7 Käufe",action:"Besuche einrechnen",after:"A: 10 % · B: 10 %",detail:"Auf dem Bericht ist sichtbar: Keine Variante hat hier die bessere Rate."},
+            choices:["B gewinnt sicher, weil 7 größer als 4 ist","Beide Raten sind gleich; Unsicherheit und Stichprobe müssen weiter geprüft werden","A gewinnt, weil sie weniger Besucher brauchte"], correct:1,
+            effect:"Messung wird von bloßer Zahlengröße getrennt.",
+            explanation:"Genau. Beide beobachteten Raten liegen bei zehn Prozent. Für eine belastbare Entscheidung fehlen unter anderem mehr Daten und eine Unsicherheitsprüfung.",
+            bridge:"Im Studio führst du diesen Vergleich weiter: von Anteilen über Tests und Attribution bis zu ehrlichen Entscheidungsgrenzen."
+          }
+        ],
+        math: [
+          {
+            label:"PRAXISMODUS", title:"Verändere die Steigung.",
+            question:"Was bewirkt 4 statt 2?",
+            artifactLabel:"FUNKTION · DREI PUNKTE",
+            artifact:"y = 2x + 1\n\nx = 0  →  y = 1\nx = 1  →  y = 3\nx = 2  →  y = 5",
+            note:"Die Zahl vor x bestimmt, wie stark y zunimmt, wenn x um eins wächst.",
+            counterpart:{title:"Gerade im Koordinatensystem",before:"Steigung 2: +2 je Schritt",action:"Steigung auf 4 setzen",after:"Steigung 4: +4 je Schritt",detail:"Die Gerade steigt sichtbar stärker an."},
+            choices:["Die Gerade steigt steiler","Der Startwert wird automatisch null","Der Graph wird zu einem Kreis"], correct:0,
+            effect:"Eine Zahl in der Formel wird als sichtbare Veränderung des Graphen verstanden.",
+            explanation:"Richtig. Mit 4 statt 2 wächst y pro x-Schritt um vier. Die Gerade steigt deshalb steiler; der Startwert 1 bleibt gleich.",
+            bridge:"Im Studio veränderst du weitere Werte, beobachtest ihre Graphen und leitest die Regel anschließend selbst aus der sichtbaren Wirkung ab."
+          },
+          {
+            label:"EXPERTENMODUS", title:"Lies eine lokale Änderungsrate.",
+            question:"Was bedeutet f′(3) = 6?",
+            artifactLabel:"ABLEITUNG · LOKALE AUSSAGE",
+            artifact:"f(x) = x²\nf′(x) = 2x\nf′(3) = 6",
+            note:"Die Ableitung beschreibt die Steigung direkt an einer Stelle, nicht automatisch das Verhalten überall.",
+            counterpart:{title:"Kurve bei x = 3",before:"Punkt: (3 | 9)",action:"Tangente einblenden",after:"Lokale Steigung: 6",detail:"Du siehst die Steigung genau an diesem Punkt, nicht überall zugleich."},
+            choices:["Nahe x = 3 ändert sich f ungefähr um 6 je zusätzlicher x-Einheit","Die Funktion besitzt genau sechs Werte","Für jedes x ist f(x) gleich 6"], correct:0,
+            effect:"Formel, lokale Bedeutung und Geltungsgrenze werden miteinander verbunden.",
+            explanation:"Genau. Die Tangentensteigung bei x = 3 ist 6. Das ist eine lokale Änderungsrate und keine Behauptung, dass die gesamte Funktion überall gleich wächst.",
+            bridge:"Im Studio wächst dieser Blick von Gerade und Steigung über Sekante und Grenzübergang bis zur selbst erklärten Ableitung."
+          }
+        ],
+        server: [
+          {
+            label:"PRAXISMODUS", title:"Folge dem Fehler zur nächsten Station.",
+            question:"Welche Spur solltest du zuerst prüfen?",
+            artifactLabel:"SERVER-LOG · ANTWORTKETTE",
+            artifact:"HTTP 500\napi duration: 120 ms\ndatabase timeout: 5000 ms\nconnection pool: 20 / 20 busy",
+            note:"Der Browser sieht nur 500. Das Log zeigt, an welcher nachgelagerten Station Zeit verloren geht.",
+            counterpart:{title:"Eine Seite wird geladen",before:"Browser wartet …",action:"Anfrage verfolgen",after:"Datenbank-Pool: 20/20 belegt",detail:"Der sichtbare Fehler führt zur belasteten Station hinter der Seite."},
+            choices:["Schriftfarbe der Website","Datenbankverbindungen und langsame Abfragen","Logo im Browsertab"], correct:1,
+            effect:"Ein allgemeiner Fehlercode wird zur prüfbaren technischen Spur.",
+            explanation:"Richtig. Der volle Verbindungspool und der Datenbank-Timeout weisen auf die nächste sinnvolle Prüfgrenze. Das beweist noch nicht die endgültige Ursache.",
+            bridge:"Im Studio verfolgst du weitere Fehlerketten von Request und Statuscode über Logs bis zu Prozess, Datenbank und Netzwerk."
+          },
+          {
+            label:"EXPERTENMODUS", title:"Verarbeite einen Retry genau einmal.",
+            question:"Warum braucht der Retry ID und Transaktion?",
+            artifactLabel:"VERTEILTES SYSTEM · RETRY",
+            artifact:"POST /webhook  event.id = evt_42  retry #3\nUNIQUE(event.id)\nBEGIN → grant_access → COMMIT",
+            note:"Netzwerke wiederholen legitime Anfragen. Die Fachwirkung darf dadurch nicht mehrfach entstehen.",
+            counterpart:{title:"Zugang freischalten",before:"Netzwerk sendet evt_42 dreimal",action:"Retries verarbeiten",after:"Zugang genau 1× freigeschaltet",detail:"Der Mensch erhält einen Zugang, obwohl das Netzwerk dieselbe Nachricht wiederholt."},
+            choices:["Damit jeder Retry einen weiteren Zugang erzeugt","Damit Prüfung und Wirkung atomar genau einmal gebunden werden","Damit der Server nie eine Antwort senden muss"], correct:1,
+            effect:"Retry, Idempotenz und atomare Wirkung werden als ein Produktionsproblem erkannt.",
+            explanation:"Genau. Die eindeutige ID erkennt Wiederholungen. Die Transaktion verhindert einen halbfertigen Zustand zwischen Erkennen und Freischalten.",
+            bridge:"Im Studio setzt du HTTP, Datenbank und Zustände zu einer idempotenten, atomaren Verarbeitung zusammen und prüfst ihre Grenzen."
+          }
+        ]
+      };
+
+      const worldOrder = ["computer","code","security","marketing","math","server"];
+      const guidedIntros = {
+        computer:["Ein Klick auf eine Datei.","Klicke einmal auf die Beispieldatei. Danach siehst du einzeln, wie der Computer sie öffnet."],
+        code:["Ein Mausklick.","Klicke einmal auf den Knopf. Danach siehst du einzeln, was dieser Klick im Browser auslöst."],
+        security:["Eine verdächtige Nachricht.","Prüfe die Paketmail, ohne ihren Link zu öffnen. Danach siehst du jeden sicheren Prüfschritt einzeln."],
+        marketing:["Eine echte Suchfrage.","Nimm die Frage eines Menschen ernst. Danach siehst du, wie eine hilfreiche Antwort entsteht."],
+        math:["Eine Zahl verändert sich.","Ersetze nur die 2 durch eine 4. Danach beobachtest du einzeln, was sich am Graphen verändert."],
+        server:["Eine Anfrage startet.","Sende eine kleine Statusanfrage. Danach folgst du ihr einzeln bis zur sichtbaren Antwort."]
+      };
+      const worldGuidance = {
+        computer:{
+          kicker:"DEINE AUSWAHL · COMPUTER VERSTEHEN",
+          title:"Was passiert zwischen deinem Klick und dem Ergebnis?",
+          lead:"Du hast Computer verstehen gewählt. Wähle den Vorgang, den du jetzt sehen möchtest.",
+          tags:["DATEI ÖFFNEN","ENGPASS FINDEN","ALTE ANTWORT STOPPEN"],
+          notes:["Datei, Programm und sichtbares Ergebnis","Auslastung prüfen und die Ursache finden","Neue und alte Ergebnisse sicher unterscheiden"]
+        },
+        code:{
+          kicker:"DEINE AUSWAHL · PROGRAMMIEREN",
+          title:"Wie wird aus einer Idee Software?",
+          lead:"Du hast Programmieren gewählt. Wähle den Ausschnitt, den du jetzt erleben möchtest.",
+          tags:["ERSTER BEFEHL","ECHTER CODE","ZUSTAND SCHÜTZEN"],
+          notes:["Klick, Funktion und sichtbare Wirkung","Die entscheidende Codezeile verstehen","Alte Antworten sicher zurückhalten"]
+        },
+        security:{
+          kicker:"DEINE AUSWAHL · SICHERHEIT",
+          title:"Wie wird aus einem Verdacht eine sichere Prüfung?",
+          lead:"Du hast Sicherheit gewählt. Wähle die Situation, die du jetzt prüfen möchtest.",
+          tags:["NACHRICHT PRÜFEN","ZUGRIFF SCHÜTZEN","ZAHLUNG ABSICHERN"],
+          notes:["Druck erkennen und die Quelle prüfen","Identität und Berechtigung unterscheiden","Signatur und Wiederholung getrennt schützen"]
+        },
+        marketing:{
+          kicker:"DEINE AUSWAHL · MARKETING & SEO",
+          title:"Was möchte ein Mensch wirklich wissen?",
+          lead:"Du hast Marketing und SEO gewählt. Wähle die Wirkung, die du jetzt nachvollziehen möchtest.",
+          tags:["FRAGE ERKENNEN","ANTWORT SICHTBAR MACHEN","ZAHLEN PRÜFEN"],
+          notes:["Das Ziel hinter den Suchwörtern sehen","Suchabsicht und Seite miteinander verbinden","Rate, Menge und Unsicherheit unterscheiden"]
+        },
+        math:{
+          kicker:"DEINE AUSWAHL · MATHEMATIK",
+          title:"Was bewirkt eine Zahl in einer Formel?",
+          lead:"Du hast Mathematik gewählt. Wähle die Beziehung, die du jetzt sichtbar machen möchtest.",
+          tags:["ZAHL VERÄNDERN","STEIGUNG LESEN","MODELL PRÜFEN"],
+          notes:["Einen Wert ändern und den Graph beobachten","Die entscheidende Zahl in der Formel erkennen","Lokale Änderung und Modellgrenze verstehen"]
+        },
+        server:{
+          kicker:"DEINE AUSWAHL · SERVER & SYSTEME",
+          title:"Welchen Weg nimmt eine Anfrage bis zur Antwort?",
+          lead:"Du hast Server und Systeme gewählt. Wähle den Weg, dem du jetzt folgen möchtest.",
+          tags:["ANFRAGE SENDEN","FEHLER VERFOLGEN","WIEDERHOLUNG ABSICHERN"],
+          notes:["Browser, Server und Antwort verbinden","Logs lesen und die belastete Station finden","ID, Transaktion und Wirkung zusammenhalten"]
+        }
+      };
+      const $ = id => document.getElementById(id);
+      const stage = $("portalStage");
+      const stageInner = $("portalStageInner");
+      const experience = $("experience");
+      const machine = $("effectMachine");
+      const mission = $("mission");
+      let current = "code";
+      let currentLevel = 0;
+      let guidedStep = 0;
+      let counterpartExplored = false;
+      let advancedWrong = new Set();
+      const completedLevels = new Set();
+      const ambient = window.LernstudioAmbient;
+      if (ambient) ambient.attach($("soundToggle"));
+      const params = new URLSearchParams(location.search);
+      const allowedCampaignParams = ["utm_source","utm_medium","utm_campaign","utm_term","utm_content","gclid"];
+
+      function preserveCampaignContext() {
+        const retained = new URLSearchParams();
+        allowedCampaignParams.forEach(name => {
+          const value = params.get(name);
+          if (value) retained.set(name,value.slice(0,180));
+        });
+        document.querySelectorAll('a[href^="angebot.html"],a[href^="studio.html"]').forEach(link => {
+          const url = new URL(link.getAttribute("href"),location.href);
+          retained.forEach((value,name) => url.searchParams.set(name,value));
+          url.searchParams.set("thema",current);
+          link.href = url.pathname.split("/").pop() + url.search + url.hash;
+        });
+      }
+
+      function setShareableState(key,level,replace = true) {
+        const url = new URL(location.href);
+        url.searchParams.set("thema",key);
+        url.searchParams.set("tiefe",String(level + 1));
+        history[replace ? "replaceState" : "pushState"]({thema:key,tiefe:level + 1},"",url.pathname + url.search + url.hash);
+      }
+
+      function setTheme(world) {
+        document.documentElement.style.setProperty("--world", world.color);
+        document.documentElement.style.setProperty("--world-rgb", world.rgb);
+        const readable = {
+          "102,189,255":"#005b8f",
+          "255,210,10":"#765000",
+          "101,239,159":"#146037",
+          "255,155,85":"#8f3c00",
+          "198,156,255":"#623496",
+          "108,229,223":"#006965"
+        };
+        document.documentElement.style.setProperty("--world-readable", readable[world.rgb] || "#765000");
+      }
+
+      function setFocusPhase(phase) {
+        experience.classList.remove("is-choosing","is-observing","is-acting");
+        experience.classList.add("is-" + phase);
+      }
+
+      function beginLevel(level) {
+        renderLevel(level);
+        setShareableState(current,currentLevel,false);
+        preserveCampaignContext();
+        setFocusPhase("observing");
+        setTimeout(() => experience.scrollIntoView({ behavior:"smooth", block:"center" }), 60);
+      }
+
+      function renderCounterpart(view) {
+        const screen = $("counterpartScreen");
+        const output = $("counterpartOutput");
+        const detail = $("counterpartDetail");
+        const action = $("counterpartAction");
+        let active = false;
+        $("counterpartTitle").textContent = view.title;
+        screen.classList.remove("is-active");
+        output.textContent = view.before;
+        detail.textContent = "Drücke nur auf den Knopf darunter. Mehr brauchst du jetzt noch nicht zu tun.";
+        action.textContent = "Veränderung ansehen";
+        action.setAttribute("aria-pressed","false");
+        action.onclick = () => {
+          active = !active;
+          screen.classList.toggle("is-active",active);
+          output.textContent = active ? view.after : view.before;
+          detail.textContent = active
+            ? "Das hat der Knopf verändert. " + view.detail
+            : "Drücke nur auf den Knopf darunter. Mehr brauchst du jetzt noch nicht zu tun.";
+          action.textContent = active ? "Ausgangszustand ansehen" : "Veränderung ansehen";
+          action.setAttribute("aria-pressed",String(active));
+          if (active && !counterpartExplored) {
+            counterpartExplored = true;
+            $("missionQuestion").hidden = false;
+            $("missionInstruction").hidden = false;
+            $("missionOptions").hidden = false;
+            $("resetMission").hidden = false;
+            $("showSolution").hidden = false;
+            $("missionInstruction").textContent = "Jetzt ist die Wirkung sichtbar. Wähle die Aussage, die Code und Wirkung verbindet.";
+            $("showSolution").disabled = false;
+            renderOptions();
+            setTimeout(() => $("missionQuestion").scrollIntoView({ behavior:"smooth", block:"center" }), 60);
+          }
+        };
+      }
+
+      function renderWorld(key, open = true) {
+        current = key;
+        const world = worlds[key];
+        const guidance = worldGuidance[key];
+        setTheme(world);
+        evolutionScene.setWorld(worldOrder.indexOf(key), world.rgb);
+        evolutionScene.setOpen(open);
+        document.querySelectorAll(".portal").forEach(portal => portal.classList.toggle("active", portal.dataset.world === key));
+        $("gateKicker").textContent = guidance.kicker;
+        $("gateTitle").textContent = guidance.title;
+        $("gateLead").textContent = guidance.lead;
+        document.querySelectorAll(".level-chip").forEach((button,index) => {
+          const title = index === 0 ? world.title : advancedLevels[key][index - 1].title;
+          const tag = document.createElement("small");
+          const heading = document.createElement("span");
+          const note = document.createElement("em");
+          tag.textContent = guidance.tags[index];
+          heading.textContent = title;
+          note.className = "route-note";
+          note.textContent = guidance.notes[index];
+          button.replaceChildren(tag,heading,note);
+          button.setAttribute("aria-label", guidance.tags[index] + ": " + title + ". " + guidance.notes[index]);
+        });
+        $("sceneLabel").textContent = world.label + " · BEOBACHTEN";
+        $("machineSymbol").textContent = world.symbol;
+        renderLevel(0);
+        renderMeaning(0);
+        if (open) {
+          setShareableState(key,0,false);
+          preserveCampaignContext();
+          setFocusPhase("choosing");
+          stage.classList.add("is-open");
+          setTimeout(() => $("experience").scrollIntoView({ behavior:"smooth", block:"center" }), 80);
+        }
+      }
+
+      function renderLevel(level) {
+        currentLevel = Math.max(0,Math.min(2,Number(level) || 0));
+        guidedStep = 0;
+        counterpartExplored = false;
+        advancedWrong = new Set();
+        const world = worlds[current];
+        const guidance = worldGuidance[current];
+        const advanced = currentLevel ? advancedLevels[current][currentLevel - 1] : null;
+        evolutionScene.setSolved(false);
+        machine.classList.remove("solved","is-advanced");
+        mission.classList.remove("solved","is-final","is-guided","is-contextual");
+        $("nextLevel").textContent = currentLevel < 2 ? "Weiter: " + (currentLevel === 0 ? advancedLevels[current][0].title : advancedLevels[current][1].title) + " →" : "Das ganze Thema einordnen ↓";
+        $("revealMeaning").style.display = "none";
+        // Die Einordnung behauptet eine abgeschlossene Handlung. Sie darf vor
+        // einer tatsächlich gelösten Ebene weder sichtbar noch erreichbar sein.
+        $("bedeutung").hidden = true;
+        $("bedeutung").setAttribute("aria-hidden","true");
+        document.querySelectorAll(".signal").forEach(signal => signal.classList.remove("on"));
+        document.querySelectorAll(".level-chip").forEach(button => {
+          const buttonLevel = Number(button.dataset.level);
+          const active = buttonLevel === currentLevel;
+          button.classList.toggle("active", active);
+          button.classList.toggle("done", completedLevels.has(current + ":" + buttonLevel));
+          button.setAttribute("aria-selected", String(active));
+        });
+
+        if (!advanced) {
+          mission.classList.add("is-guided");
+          $("artifactPanel").hidden = true;
+          $("artifactPanel").setAttribute("aria-hidden","true");
+          $("causeDemo").hidden = false;
+          $("missionContext").hidden = true;
+          $("missionOptions").hidden = true;
+          $("missionResult").hidden = true;
+          $("resetMission").hidden = true;
+          $("showSolution").hidden = true;
+          $("missionQuestion").hidden = false;
+          $("missionInstruction").hidden = false;
+          $("missionKicker").textContent = world.label + " · " + guidance.tags[0];
+          $("missionTitle").textContent = world.title;
+          $("missionQuestion").textContent = world.question;
+          $("missionInstruction").textContent = "Bringe die drei Bausteine in die Reihenfolge, in der die Wirkung wirklich entsteht.";
+          $("effectCaption").innerHTML = "<b>" + world.title + "</b><br>" + world.question;
+          $("missionResult").textContent = "Noch ist nichts verbunden. Beginne mit dem ersten Schritt.";
+        } else {
+          machine.classList.add("is-advanced");
+          mission.classList.add("is-contextual");
+          $("artifactPanel").hidden = false;
+          $("artifactPanel").setAttribute("aria-hidden","false");
+          $("causeDemo").hidden = true;
+          $("missionContext").hidden = false;
+          $("missionOptions").hidden = true;
+          $("missionResult").hidden = true;
+          $("resetMission").hidden = true;
+          $("showSolution").hidden = true;
+          $("showSolution").disabled = true;
+          $("missionQuestion").hidden = true;
+          $("missionInstruction").hidden = true;
+          $("artifactLabel").textContent = advanced.artifactLabel;
+          $("artifactCode").textContent = advanced.artifact;
+          $("artifactNote").textContent = advanced.note;
+          $("missionContextLabel").textContent = advanced.artifactLabel;
+          $("missionContextCode").textContent = advanced.artifact;
+          $("missionContextNote").textContent = advanced.note;
+          renderCounterpart(advanced.counterpart);
+          $("missionKicker").textContent = world.label + " · " + guidance.tags[currentLevel];
+          $("missionTitle").textContent = advanced.title;
+          $("missionQuestion").textContent = advanced.question;
+          $("missionInstruction").textContent = "Wähle jetzt die Erklärung, die zur sichtbaren Veränderung passt.";
+          $("effectCaption").innerHTML = "<b>Schau zuerst nur hin.</b> Du musst die Begriffe noch nicht kennen.";
+          $("missionResult").textContent = "Du musst die Begriffe noch nicht kennen. Suche zuerst nach der sichtbaren Ursache und Wirkung.";
+        }
+        $("missionResult").className = "mission-result";
+        renderGuidedStep();
+        renderOptions();
+      }
+
+      function renderGuidedStep() {
+        if (currentLevel > 0) return;
+        const world = worlds[current];
+        const demo = world.demo;
+        const intro = guidedIntros[current];
+        const action = $("causeDemoAction");
+        const output = $("causeDemoOutput");
+        const visual = $("causeDemoVisual");
+        const labels = ["Du beginnst","Deine Handlung","Im System","Die sichtbare Wirkung","Du hast es verstanden"];
+        const titles = [intro[0],world.steps[0],world.steps[1],world.steps[2],"Aus einer Handlung wird eine Wirkung."];
+        const copies = [intro[1],world.stepDetails[0],world.stepDetails[1],world.stepDetails[2],world.meaning];
+        const actions = [demo.action,"Was macht das System daraus? →","Was verändert sich sichtbar? →","Warum ist das wichtig? →",""];
+        const symbols = [world.symbol,"1","2","3","✓"];
+
+        $("causeDemoLabel").textContent = labels[guidedStep];
+        $("causeDemoTitle").textContent = titles[guidedStep];
+        $("causeDemoCopy").textContent = copies[guidedStep];
+        visual.textContent = symbols[guidedStep];
+        visual.classList.toggle("is-changed",guidedStep >= 3);
+        output.textContent = guidedStep === 3 ? demo.after : "";
+        output.classList.toggle("is-changed",guidedStep === 3);
+        action.textContent = actions[guidedStep];
+        action.hidden = guidedStep === 4;
+        document.querySelectorAll("#causeDemoProgress span").forEach((dot,index) => dot.classList.toggle("is-done",index <= guidedStep));
+        const flow = $("causeDemo");
+        flow.classList.remove("is-stepping");
+        void flow.offsetWidth;
+        flow.classList.add("is-stepping");
+      }
+
+      function advanceGuidedStep() {
+        if (currentLevel > 0 || guidedStep >= 4) return;
+        guidedStep += 1;
+        document.querySelectorAll(".signal").forEach((signal,index) => signal.classList.toggle("on",index < guidedStep));
+        renderGuidedStep();
+        if (guidedStep === 4) completeLevel(worlds[current].effect,worlds[current].meaning,"");
+      }
+
+      function renderOptions() {
+        const options = $("missionOptions");
+        options.innerHTML = "";
+        if (currentLevel > 0) {
+          const advanced = advancedLevels[current][currentLevel - 1];
+          options.classList.toggle("is-locked",!counterpartExplored);
+          advanced.choices.forEach((choice,index) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = "mission-step";
+            button.textContent = choice;
+            button.classList.toggle("is-wrong", advancedWrong.has(index));
+            button.disabled = !counterpartExplored || advancedWrong.has(index);
+            if (advancedWrong.has(index)) {
+              const feedback = document.createElement("span");
+              feedback.className = "answer-feedback";
+              feedback.setAttribute("role","status");
+              feedback.textContent = "— Noch nicht. Diese Antwort erklärt den sichtbaren Ausschnitt nicht vollständig. Prüfe, welche Information wirklich belegt ist.";
+              button.append(feedback);
+            }
+            button.addEventListener("click", () => chooseAdvanced(index));
+            options.append(button);
+          });
+        }
+      }
+
+      function chooseAdvanced(index, revealed = false) {
+        if (!counterpartExplored) return;
+        const advanced = advancedLevels[current][currentLevel - 1];
+        if (index !== advanced.correct) {
+          advancedWrong.add(index);
+          renderOptions();
+          $("missionResult").hidden = true;
+          return;
+        }
+        document.querySelectorAll(".mission-step").forEach((button,buttonIndex) => {
+          button.disabled = true;
+          button.classList.toggle("is-correct", buttonIndex === advanced.correct);
+        });
+        completeLevel(advanced.effect, advanced.explanation, advanced.bridge, revealed);
+      }
+
+      function completeLevel(effect, explanation, bridge, revealed = false) {
+        completedLevels.add(current + ":" + currentLevel);
+        evolutionScene.setSolved(true);
+        machine.classList.add("solved");
+        mission.classList.add("solved");
+        mission.classList.toggle("is-final", currentLevel === 2);
+        $("bedeutung").hidden = false;
+        $("bedeutung").setAttribute("aria-hidden","false");
+        renderMeaning(currentLevel);
+        $("effectCaption").innerHTML = "<b>Wirkung:</b> " + effect;
+        const clearExplanation = explanation.replace(/^(Richtig|Genau)\.\s*/, "");
+        $("showSolution").hidden = true;
+        let scrollTarget = $("missionResult");
+        if (currentLevel > 0) {
+          const selectedAnswer = document.querySelector(".mission-step.is-correct");
+          const feedback = document.createElement("span");
+          feedback.className = "answer-feedback";
+          feedback.setAttribute("role","status");
+          feedback.textContent = (revealed ? "— Auflösung. " : "— Stark erkannt. ") + clearExplanation + " " + bridge;
+          selectedAnswer.append(feedback);
+          $("missionResult").hidden = true;
+          scrollTarget = selectedAnswer;
+        } else {
+          $("missionResult").textContent = "Stark gelöst. " + clearExplanation;
+          $("missionResult").className = "mission-result success";
+          $("missionResult").hidden = false;
+        }
+        if (currentLevel === 2) $("revealMeaning").style.display = "inline";
+        document.querySelectorAll(".level-chip").forEach(button => button.classList.toggle("done",completedLevels.has(current + ":" + button.dataset.level)));
+        setTimeout(() => scrollTarget.scrollIntoView({ behavior:"smooth", block:"nearest" }), 40);
+      }
+
+      function resetMission() {
+        renderLevel(currentLevel);
+      }
+
+      function showSolution() {
+        if (currentLevel > 0 && counterpartExplored) chooseAdvanced(advancedLevels[current][currentLevel - 1].correct, true);
+      }
+
+      function renderMeaning(depth) {
+        const world = worlds[current];
+        const info = world.depths[depth];
+        $("meaningIntro").textContent = world.meaning;
+        $("truthTitle").textContent = world.label.charAt(0) + world.label.slice(1).toLowerCase() + ": dieselbe Idee wächst mit dir.";
+        $("depthRings").dataset.depth = String(depth);
+        $("depthName").textContent = info[0];
+        $("depthTitle").textContent = info[0];
+        $("depthText").textContent = info[1];
+      }
+
+      document.querySelectorAll(".portal").forEach(portal => portal.addEventListener("click", () => {
+        if (ambient) ambient.select(portal.dataset.world);
+        renderWorld(portal.dataset.world);
+      }));
+      document.querySelectorAll(".level-chip").forEach(button => button.addEventListener("click", () => beginLevel(Number(button.dataset.level))));
+      $("openTask").addEventListener("click", () => { setFocusPhase("acting"); setTimeout(() => experience.scrollIntoView({ behavior:"smooth", block:"center" }), 60); });
+      $("closeWorld").addEventListener("click", () => { stage.classList.remove("is-open"); setFocusPhase("choosing"); evolutionScene.setOpen(false); evolutionScene.setSolved(false); stage.scrollIntoView({ behavior:"smooth", block:"center" }); });
+      $("resetMission").addEventListener("click", resetMission);
+      $("showSolution").addEventListener("click", showSolution);
+      $("causeDemoAction").addEventListener("click", advanceGuidedStep);
+      $("nextLevel").addEventListener("click", () => beginLevel(Math.min(2,currentLevel + 1)));
+      $("depthRange").addEventListener("input", event => renderMeaning(Number(event.target.value)));
+
+      const reduced = matchMedia("(prefers-reduced-motion: reduce)");
+      const canvas = $("spaceCanvas");
+      const evolutionScene = window.LernstudioEvolution.create(canvas,{reducedMotion:reduced});
+      $("renderStatus").textContent = evolutionScene.available ? "WebGL-Raum aktiv" : "statische Ersatzansicht aktiv";
+      const requestedWorld = params.get("thema");
+      const requestedDepth = Math.max(0,Math.min(2,(Number(params.get("tiefe")) || 1) - 1));
+      if (worldOrder.includes(requestedWorld)) {
+        document.body.classList.add("has-direct-world");
+        const world = worlds[requestedWorld];
+        $("arrivalTitle").textContent = "Du suchst nach " + world.label.toLowerCase() + ".";
+        $("arrivalText").textContent = "Darum landest du direkt in dieser Themenwelt. Du siehst zuerst einen echten Ausschnitt und entscheidest danach selbst, ob du weitergehen möchtest.";
+        $("arrivalNote").classList.add("is-visible");
+        renderWorld(requestedWorld,true);
+        if (requestedDepth > 0) beginLevel(requestedDepth);
+        else setShareableState(requestedWorld,0,true);
+      } else {
+        renderWorld("code",false);
+      }
+      preserveCampaignContext();
+    })();
+  </script>
+</body>
+</html>

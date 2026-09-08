@@ -1,0 +1,21 @@
+{
+  "name": "lernstudio",
+  "version": "2.0.0",
+  "description": "Kostenlose offene Lernplattform mit lokalen Profilen und freiwilliger Wallet-Anzeige",
+  "main": "app.js",
+  "scripts": {
+    "test": "node werkzeug/test.js",
+    "build": "node werkzeug/website-bauen.js",
+    "start": "node werkzeug/serve.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "basic-ftp": "^6.0.1"
+  },
+  "devDependencies": {
+    "jsdom": "26.1.0"
+  }
+}

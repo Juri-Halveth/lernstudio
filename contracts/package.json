@@ -1,0 +1,15 @@
+{
+  "name": "eve-learning-rewards-research",
+  "version": "0.1.0-local",
+  "private": true,
+  "description": "Portable local EVE learning-voucher research prototype; no public deployment",
+  "license": "MIT",
+  "engines": { "node": ">=22 <25" },
+  "scripts": { "test": "node --test --test-concurrency=1 test/local-contract.test.cjs" },
+  "devDependencies": {
+    "@openzeppelin/contracts": "4.9.6",
+    "ethers": "6.15.0",
+    "ganache": "7.9.2",
+    "solc": "0.8.26"
+  }
+}

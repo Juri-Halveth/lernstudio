@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TIEFER: Wie prüfst du eine überzeugende Antwort?</title>
+<meta name="description" content="TIEFER ist ein kostenloses Denkspiel ohne Anmeldung. Vergleiche Perspektiven und Begründungen, mit transparentem Ergebnis, lokaler Speicherung und ohne Intelligenzdiagnose.">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/genie.html">
+<meta name="theme-color" content="#0a0a0b">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Lernstudio">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="favicon.ico?v=4" sizes="any">
+<link rel="icon" type="image/png" sizes="48x48" href="favicon-48.png?v=4">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="stylesheet" href="pwa.css?v=1">
+<script defer src="pwa.js?v=3"></script>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Lernstudio">
+<meta property="og:locale" content="de_DE">
+<meta property="og:url" content="https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/genie.html">
+<meta property="og:title" content="TIEFER: Wie prüfst du eine überzeugende Antwort?">
+<meta property="og:description" content="Ein kostenloses Denkspiel über Perspektiven, Begründungen und die Grenzen schneller Antworten.">
+<meta property="og:image" content="https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/social-share.png">
+<meta property="og:image:secure_url" content="https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/social-share.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Mein Lernstudio – Lerne nicht nur, was stimmt. Verstehe, warum.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TIEFER: Wie prüfst du eine Antwort?">
+<meta name="twitter:description" content="Kostenlos, ohne Anmeldung und ohne Intelligenzdiagnose.">
+<meta name="twitter:image" content="https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/social-share.png">
+<!--
+  ==========================================================================
+  TIEFER  ·  eine Datei, läuft offline per Doppelklick  ·  Vanilla JS
+  ==========================================================================
+  Jede Frage hat eine OBERFLÄCHE, und darunter die Wahrheit. Der Spieler geht
+  Schicht für Schicht tiefer, sieht die Layer real absinken (fast 3D), hört
+  einen ruhigen Ambient-Klang, der sich pro Layer verschiebt, und sammelt
+  GENIE-PUNKTE. Am Ende verdichtet der Score den Lauf zu einem sichtbaren Rang.
+
+  NEUE LAYER: einfach unten im LEVELS-Array einen Block ergänzen (reine Daten).
+  Aufbau:
+    {
+      tag:'Kopf', frage:'Oberflächen-Frage',
+      mood:{ glow:'#hex', glyph:'∞', chord:[freqHz,freqHz,freqHz] },
+      wahl:[ {text:'Antwort', tief:true|false}, ... ],   // tief = die einsichtige
+      antwort_flach:'Reaktion oberflächlich', antwort_tief:'Reaktion tief',
+      enthuellung:'die tiefere Wahrheit (getippt)', aha:'Merksatz'
+    }
+  Hinweis: Texte bewusst OHNE Gedankenstrich, nur Kommas.
+  ==========================================================================
+-->
+<style>
+  :root{ --ink:#e9eef8; --dim:#8b94ad; --gold:#e9c26a; --line:#1e2536; --good:#8fe6b0; --accent:#8fb8ff; }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{ color:var(--ink); font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; overflow:hidden; background:#05060c; }
+  #bg{ position:fixed; inset:0; z-index:0; transition:background 1.6s ease; background:radial-gradient(1100px 720px at 50% 8%, #14203a 0%, #070a14 55%, #05060c 100%); }
+  #glyph{ position:fixed; inset:0; z-index:0; display:flex; align-items:center; justify-content:center; font-size:44vh; font-weight:800; color:#fff; opacity:.035; transition:opacity 1.2s ease; pointer-events:none; user-select:none; font-family:Georgia,serif; }
+  #code{ position:fixed; inset:0; width:100%; height:100%; z-index:1; pointer-events:none; }
+  .wrap{position:relative; z-index:2; height:100%; display:flex; flex-direction:column}
+  header{padding:16px 22px 6px; display:flex; align-items:center; justify-content:space-between; gap:12px}
+  .brand{font-size:15px; letter-spacing:.34em; font-weight:800}
+  .brand small{display:block; letter-spacing:.05em; font-weight:500; color:var(--dim); font-size:10.5px; margin-top:3px}
+  .hud{display:flex; align-items:center; gap:16px}
+  .score{font-size:12px; color:var(--dim); text-align:right; font-variant-numeric:tabular-nums}
+  .score b{color:var(--gold); font-size:15px}
+  .snd{background:#101627; border:1px solid #263049; color:var(--dim); border-radius:10px; width:38px; height:34px; cursor:pointer; font-size:15px}
+  .snd.on{color:var(--gold); border-color:#3a3a20}
+  .save{display:none; background:#101627; border:1px solid #3a4662; color:#d9e2f5; border-radius:12px; min-height:42px; padding:0 14px; cursor:pointer; font-size:13px; font-weight:650; align-items:center; gap:8px; white-space:nowrap; box-shadow:0 8px 24px rgba(0,0,0,.24)}
+  body.playing .save{display:inline-flex}
+  .save:hover{color:var(--gold); border-color:var(--gold); transform:translateY(-1px)}
+  .save-mark{font-family:Georgia,serif; font-size:21px; line-height:1; transform:rotate(-8deg); color:var(--gold)}
+  .toast{position:fixed; left:50%; bottom:24px; transform:translate(-50%,16px); z-index:60; max-width:min(430px,92vw);
+    background:#0d1424; border:1px solid #2a3550; color:#cdd6ea; border-radius:14px; padding:14px 16px; font-size:13.5px; line-height:1.55;
+    box-shadow:0 18px 50px rgba(0,0,0,.55); opacity:0; pointer-events:none; transition:opacity .35s ease, transform .35s ease}
+  .toast.show{opacity:1; transform:translate(-50%,0)}
+  .toast b{color:var(--gold)}
+
+  .stage{flex:1; position:relative; perspective:1200px; perspective-origin:50% 42%; overflow:hidden}
+  .stack{position:absolute; inset:0; transform-style:preserve-3d; display:flex; align-items:center; justify-content:center}
+  .card{ position:absolute; width:min(700px,92vw); background:linear-gradient(180deg,rgba(14,19,34,.92),rgba(19,26,44,.92));
+    border:1px solid var(--line); border-radius:18px; padding:26px 28px 22px;
+    box-shadow:0 34px 90px rgba(0,0,0,.6); transform-style:preserve-3d;
+    transition:transform .95s cubic-bezier(.22,.61,.24,1), opacity .8s ease; }
+  .card.active{transform:translateZ(0) translateY(0) rotateX(0); opacity:1}
+  .card.coming{transform:translateZ(-560px) translateY(96px) rotateX(14deg); opacity:0; pointer-events:none}
+  .card.gone{transform:translateZ(-960px) translateY(-130px) rotateX(20deg); opacity:0; pointer-events:none}
+  .ghost{position:absolute; width:min(660px,88vw); height:120px; border-radius:16px; border:1px solid #141b2b; background:rgba(11,17,30,.6); pointer-events:none;}
+
+  .tag{font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--gold); margin-bottom:12px}
+  .iq{display:inline-block; font-size:9.5px; letter-spacing:.2em; text-transform:uppercase; color:var(--gold); border:1px solid #6a5524; background:rgba(233,194,106,.09); border-radius:999px; padding:3px 10px; margin:-2px 0 14px}
+  .frage{font-size:22px; line-height:1.35; font-weight:600; margin:0 0 20px; min-height:60px}
+  @media(max-width:520px){ .frage{font-size:19px} #glyph{font-size:38vh} }
+  .waehl{display:flex; flex-direction:column; gap:10px}
+  .waehl button{ text-align:left; background:rgba(12,18,34,.85); color:var(--ink); border:1px solid #232c42; border-radius:12px;
+    padding:13px 16px; font-size:15px; cursor:pointer; transition:background .15s,border-color .15s,transform .1s; font-family:inherit }
+  .waehl button:hover{background:rgba(19,27,48,.95); border-color:#3a476e; transform:translateX(3px)}
+  .waehl button:disabled{opacity:.5; cursor:default; transform:none}
+  .reaktion{font-size:13.5px; color:var(--accent); margin:2px 0 12px; min-height:18px}
+  .reaktion.tief{color:var(--good)}
+  .enth{font-size:16px; line-height:1.56; margin:0 0 14px; white-space:pre-wrap}
+  .aha{font-size:13.5px; color:var(--dim); border-left:2px solid var(--gold); padding:8px 0 8px 12px; margin:0 0 18px; font-style:italic}
+  .pts{font-size:12px; color:var(--good); margin:0 0 10px}
+  .btn{display:inline-flex; align-items:center; gap:8px; background:var(--gold); color:#1a1405; border:none; border-radius:12px;
+    padding:12px 20px; font-size:15px; font-weight:700; cursor:pointer; font-family:inherit; transition:filter .15s,transform .1s}
+  .btn:hover{filter:brightness(1.08); transform:translateY(1px)}
+  .btn.ghostbtn{background:transparent; color:var(--dim); border:1px solid #2a3450}
+  .hidden{display:none}
+  .center{max-width:640px; text-align:center}
+  .center h1{font-size:30px; margin:0 0 4px}
+  .center .lead{color:var(--dim); font-size:15.5px; line-height:1.6; margin:8px 0 16px}
+  .terms{display:grid; gap:8px; margin:16px 0; text-align:left}
+  .termrow{padding:10px 12px; border:1px solid #2b3550; border-radius:10px; background:rgba(8,13,24,.72); color:#cbd4e7; font-size:12.5px; line-height:1.45}
+  .termrow b{color:var(--gold)}
+  .center .big{font-size:44px; color:var(--gold); font-weight:800; margin:10px 0 2px; font-variant-numeric:tabular-nums}
+  .rank{font-size:18px; margin:2px 0 6px}
+  .codebox{margin:16px 0; padding:14px 16px; border:1px dashed #39456a; border-radius:12px; background:rgba(233,194,106,.06)}
+  .codebox b{color:var(--gold); font-size:20px}
+  .angebot{ margin:18px auto 0; max-width:420px; width:100% }
+  .rangtext{ margin:13px auto 0; max-width:360px; font-size:13.5px; line-height:1.55; color:var(--dim) }
+  .rangtext b{ color:var(--ink); font-weight:600 }
+  .motto{ margin:11px auto 0; max-width:360px; font-size:12.5px; font-style:italic; color:var(--gold); opacity:.85 }
+  .feindruck{ margin:9px auto 0; max-width:360px; font-size:11.5px; line-height:1.5; color:var(--dim); opacity:.72 }
+  .aktion{ display:flex; flex-direction:column; gap:10px; margin-top:20px }
+  .aktion .btn{ width:100%; min-height:48px; box-sizing:border-box; justify-content:center; text-decoration:none }
+  @media(min-width:561px){ .aktion{ flex-direction:row; justify-content:center } .aktion .btn{ width:auto; min-width:210px } }
+  .bild{ display:flex; justify-content:center; margin:2px 0 18px }
+  .bild svg{ width:min(300px,72%); height:auto; filter:drop-shadow(0 10px 26px rgba(0,0,0,.5)) }
+  .card{ max-height:calc(100% - 16px); overflow-y:auto; overscroll-behavior:contain }
+  .card::-webkit-scrollbar{ width:7px }
+  .card::-webkit-scrollbar-thumb{ background:#2a3450; border-radius:4px }
+  .card::-webkit-scrollbar-track{ background:transparent }
+  .brand{ min-width:0 }
+  .snd{ min-width:40px }
+  .fade{animation:fade .7s ease both}
+  @keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  footer{padding:8px 22px 12px; text-align:center; color:#818ba2; font-size:10.5px; display:flex; flex-direction:column; align-items:center; gap:4px}
+  .exit{color:#9ba7bf; font-size:12px; text-decoration:none; padding:5px 10px; border-radius:8px}
+  .exit:hover,.exit:focus-visible{color:var(--gold); background:rgba(233,194,106,.08); outline:none}
+  #glyph{ font-size:min(44vh,46vw) }
+  @media(max-width:560px){
+    .wrap{ min-height:100dvh; height:100dvh }
+    .stage{ perspective:none }
+    .stack{ transform-style:flat }
+    .card{ padding:20px 18px 18px; transform-style:flat; transition:transform .28s ease,opacity .24s ease; will-change:transform,opacity }
+    .card.active{ transform:translateY(0) scale(1) }
+    .card.coming{ transform:translateY(18px) scale(.985) }
+    .card.gone{ transform:translateY(-18px) scale(.985) }
+    .ghost{ display:none }
+    .center h1{ font-size:23px }
+    .center .lead{ font-size:14.5px; line-height:1.5; margin:7px 0 13px }
+    .frage{ font-size:19px; margin:0 0 14px; min-height:auto }
+    .enth{ font-size:15px; line-height:1.52 }
+    .aha{ margin-bottom:12px }
+    .waehl button{ padding:12px 14px; min-height:44px }
+    header{ padding:10px 12px 6px; display:grid; grid-template-columns:minmax(0,1fr) auto; align-items:start; gap:8px }
+    .brand{ font-size:13px; letter-spacing:.2em }
+    .brand small{ font-size:9.5px }
+    .hud{ grid-column:1 / -1; width:100%; justify-content:flex-end; gap:8px }
+    .score{ margin-right:auto; text-align:left }
+    body.playing .save{ min-height:44px; padding:0 12px }
+    .save span:last-child{ white-space:normal; line-height:1.2; text-align:left }
+    #glyph{ font-size:min(30vh,58vw) }
+    .bild svg{ width:min(240px,72%) }
+    .snd{ width:44px; height:44px }
+    .btn{ min-height:44px }
+    .exit{ min-height:44px; display:inline-flex; align-items:center; justify-content:center; padding:8px 12px }
+    footer{ padding-bottom:max(8px,env(safe-area-inset-bottom)) }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .card{ transition:opacity .25s ease }
+    .card.coming{ transform:none }
+    .card.gone{ transform:none }
+    .fade{ animation:none }
+    #bg{ transition:none }
+  }
+</style>
+
+</head>
+<body>
+<div id="bg"></div>
+<div id="glyph" aria-hidden="true"></div>
+<canvas id="code" aria-hidden="true"></canvas>
+<div class="wrap">
+  <header>
+    <div class="brand">T&#8202;I&#8202;E&#8202;F&#8202;E&#8202;R<small>ein Spiel über das, was unter der Oberfläche liegt</small></div>
+    <div class="hud">
+      <div class="score">Genie&#8209;Punkte<br><b id="pts">0</b></div>
+      <button class="save" id="save" title="Zwischenspeichern und später weitermachen" aria-label="Zwischenspeichern und später weitermachen"><span class="save-mark" aria-hidden="true">↗</span><span>speichern &amp; später</span></button>
+      <button class="snd" id="snd" title="Ruhigen Ton an- oder ausschalten" aria-label="Ruhigen Ton aus- oder einschalten" aria-pressed="false">&#9834;</button>
+    </div>
+  </header>
+  <div class="stage"><div class="stack" id="stack"></div></div>
+  <footer><a class="exit" href="index.html#tiefer">← Spiel verlassen</a><span>Zwischenstand und erstes Ergebnis bleiben nur in diesem Browser gespeichert.</span></footer>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</div>
+
+<script>
+/* ============================ DATEN ============================ */
+const LEVELS = [
+ { tag:'Zeichen & Bedeutung', mood:{glow:'#2f5bd0', glyph:'=', chord:[110.00,164.81,220.00]},
+   frage:'1 = 2.  Wahr oder falsch?',
+   wahl:[{text:'Falsch, natürlich.',tief:false},{text:'Wahr.',tief:false},{text:'Kommt drauf an, was 1 und 2 bedeuten.',tief:true}],
+   antwort_flach:'So denken fast alle, und auf der Oberfläche stimmt es auch.',
+   antwort_tief:'Du siehst schon tiefer. Genau.',
+   enthuellung:`Als bloße Zeichen, falsch. Aber Gleichheit betrifft nie die Zeichen, sondern das, worauf sie zeigen.
+Schreib a = 5 und b = 5, dann ist a = b, obwohl die Namen verschieden sind. „Morgenstern“ und „Abendstern“ sind zwei Wörter für einen Planeten, Venus.`,
+   aha:'Ein Zeichen ist nicht seine Bedeutung, es zeigt nur auf sie, eine Schicht tiefer.' },
+
+ { tag:'Der Zeiger', mood:{glow:'#c85a3a', glyph:'🍎', chord:[130.81,196.00,261.63]},
+   frage:'🍎  Ist das ein Apfel?',
+   wahl:[{text:'Ja.',tief:false},{text:'Nein, das ist ein Zeichen für einen Apfel.',tief:true}],
+   antwort_flach:'Verständlich, dein Kopf hat sofort den Apfel gesehen.',
+   antwort_tief:'Genau, du hast das Zeichen vom Ding getrennt.',
+   enthuellung:`Kein Symbol trägt seine Bedeutung in sich, es verweist. Auf dem Bildschirm ist der Apfel zuerst nur ein Ausdruck in Code, Nullen und Einsen, die jedem winzigen Bildpunkt eine Farbe zuweisen, tausende rote und grüne Lichtpunkte in einem Raster. Dein Auge fängt dieses Licht, dein Gehirn macht daraus auf seine ganz eigene Art ein Ding, einen Apfel. Der Apfel entsteht also nicht auf dem Bildschirm, sondern eine Schicht tiefer, in dir. Das Zeichen ist die Tür, nicht der Raum.`,
+   aha:'Bedeutung liegt nie im Symbol, sondern in dem, worauf es zeigt.' },
+
+ { tag:'Wo die Traurigkeit wohnt', mood:{glow:'#1a2740', glyph:'♭', chord:[110.00,130.81,164.81]},
+   frage:'Ein Mollakkord klingt traurig.  Wo steckt die Traurigkeit?',
+   wahl:[{text:'In den Tönen selbst.',tief:false},{text:'In den tiefen, dunklen Frequenzen.',tief:false},{text:'In der langsamen Melodie.',tief:false},{text:'In dir, der Klang weckt sie nur.',tief:true}],
+   antwort_flach:'Fast alle zeigen auf den Klang, und er fühlt sich ja wirklich traurig an.',
+   antwort_tief:'Ja. Der Klang trägt keine Trauer, er ruft deine.',
+   enthuellung:`In den Frequenzen selbst steckt keine Traurigkeit, nur Schwingung, Zahlen in der Luft. Erst dein Gehirn legt Bedeutung darüber, geformt von Sprache, Kultur und Erinnerung. Ein Gefühl ist ein Körperzustand plus der Sinn, den du ihm gibst, eine Schicht tiefer als der bloße Ton (Damasio nennt diese Brücke somatische Marker). Ein Kind, das den Klang nie mit Abschied verband, hört vielleicht nur dunkel und weich.`,
+   aha:'Der Ton schwingt, die Trauer entsteht eine Schicht tiefer in dir.' },
+
+ { tag:'Gleichheit prüfen', mood:{glow:'#1f9e8f', glyph:'≡', chord:[123.47,185.00,246.94]},
+   frage:'a = 5 und b = 5.  Ist a dasselbe wie b?',
+   wahl:[{text:'Nein, es sind verschiedene Namen.',tief:false},{text:'Ja, sie zeigen auf denselben Wert.',tief:true}],
+   antwort_flach:'Die Namen sind verschieden, ja, aber schau eine Ebene tiefer.',
+   antwort_tief:'Ja, du prüfst, worauf sie zeigen, nicht wie sie heißen.',
+   enthuellung:`Um zu entscheiden, ob zwei Dinge gleich sind, gehst du eine Schicht tiefer, zu ihren Werten, und vergleichst dort. In echten Beweis-Systemen (Lean, Coq) heißt genau das „definitorische Gleichheit“.`,
+   aha:'Um Gleichheit zu prüfen, faltet man die Definitionen auf, eine Schicht tiefer.' },
+
+ { tag:'Was die Gänsehaut weiß', mood:{glow:'#2b1d3a', glyph:'∿', chord:[82.41,98.00,123.47]},
+   frage:'Eine Melodie, und plötzlich Gänsehaut.  Was ist da gerade passiert?',
+   wahl:[{text:'Dir ist einfach kalt geworden.',tief:false},{text:'Ein uralter Reflex, der wie bei Tieren das Fell sträuben will.',tief:false},{text:'Dein Körper feiert einen Moment, den dein Inneres als bedeutsam erkennt.',tief:true}],
+   antwort_flach:'Kälte spielt manchmal mit, und doch kommt die Gänsehaut auch im warmen Raum.',
+   antwort_tief:'Genau. Der Körper antwortet, bevor du es in Worte fassen kannst.',
+   enthuellung:`Gänsehaut entsteht, wenn winzige Muskeln an jeder Haarwurzel sich zusammenziehen und das Haar aufrichten, gesteuert vom vegetativen Nervensystem mit einem Stoß Adrenalin. Bei Tieren mit Fell plustert dieser uralte Reflex das Fell auf, gegen Kälte oder um größer zu wirken. Bei dir feuert derselbe Reflex bei Schönheit, bei einer Stimme, die kippt, bei einer Wahrheit, die trifft. Der Körper reagiert eine Schicht schneller als der Gedanke, er markiert Bedeutung, ehe du sie begreifst. Das Gefühl wohnt zuerst im Leib und erst danach im Kopf.`,
+   aha:'Manchmal weiß dein Körper eine Schicht früher als du, dass etwas zählt.' },
+
+ { tag:'Der Abdruck', mood:{glow:'#3a7fb0', glyph:'⌗', chord:[110.00,146.83,196.00]},
+   frage:'sha256(„Hallo“) = 753692ec…  Was ist dieser Hash?',
+   wahl:[{text:'Der Text, nur verschlüsselt.',tief:false},{text:'Ein Fingerabdruck des ganzen Zustands.',tief:true},{text:'Reiner Zufall.',tief:false}],
+   antwort_flach:'Nah dran, aber nicht ganz, Verschlüsselung kann man zurückdrehen.',
+   antwort_tief:'Ja, ein Abdruck, kein Behälter.',
+   enthuellung:`Ein Hash trägt den Text nicht in sich. Er beweist nur, DASS genau dieser Zustand existiert hat, wie ein Fossil, ein Echo. Und er ist Einweg, vorwärts abdrucken geht, rückwärts zurückrechnen nicht. Willst du die Vergangenheit, musst du sie gespeichert haben.`,
+   aha:'Ein Fingerabdruck beweist die Existenz eines Zustands, ohne ihn zu tragen.' },
+
+ { tag:'Die Erinnerung, die sich schreibt', mood:{glow:'#3a2a18', glyph:'⟲', chord:[73.42,87.31,110.00]},
+   frage:'Du holst eine Erinnerung hervor.  Bleibt sie danach dieselbe?',
+   wahl:[{text:'Ja, sie liegt fest wie ein Foto.',tief:false},{text:'Sie verblasst mit den Jahren, sonst bleibt sie gleich.',tief:false},{text:'Nur wenn ich sie laut erzähle, ändert sie sich.',tief:false},{text:'Nein, jedes Erinnern schreibt sie leise neu.',tief:true}],
+   antwort_flach:'Es fühlt sich an wie ein Foto im Album, verlässlich und fertig.',
+   antwort_tief:'Ja. Du erinnerst nicht den Moment, du erinnerst dein letztes Erinnern.',
+   enthuellung:`Das Gehirn bewahrt keine fertige Aufnahme wie ein Foto. Hirnforscher fanden, dass eine Erinnerung im Moment des Abrufs kurz formbar wird und danach neu abgespeichert werden muss, sie nennen das Rekonsolidierung. Dabei baut das Gehirn die Szene jedes Mal neu zusammen und färbt sie mit dem Heute. So legt jedes Erinnern eine dünne neue Schicht darüber, und das Bild wandert mit dir durch die Jahre. Was du für den Ursprung hältst, ist oft die letzte Kopie der Kopie.`,
+   aha:'Du erinnerst nie den Moment selbst, nur die letzte Schicht darüber.' },
+
+ { tag:'Wo Information entsteht', mood:{glow:'#2fae63', glyph:'Δ', chord:[98.00,146.83,196.00]},
+   frage:'Ein einzelnes Teilchen, sonst nichts.  Trägt es Information?',
+   wahl:[{text:'Ja, es ist ja da.',tief:false},{text:'Nein, es fehlt etwas, wovon es sich unterscheidet.',tief:true}],
+   antwort_flach:'Es ist da, klar, aber „da sein“ ist noch keine Information.',
+   antwort_tief:'Genau, ohne ein Zweites bedeutet das Erste nichts.',
+   enthuellung:`Information IST Unterschied, „a difference that makes a difference“ (Bateson). Ein einzelner Zustand allein sagt nichts, solange es nichts gibt, wovon er sich abhebt. Erst das Zweite gebiert Bedeutung. Der Sinn wohnt im Dazwischen, nicht im Ding.`,
+   aha:'Bedeutung wird im Unterschied geboren, nie im einzelnen Ding.' },
+
+ { tag:'Die Kante der Farbe', mood:{glow:'#2a1a10', glyph:'◐', chord:[110,165,220]},
+   frage:'Ein Regenbogen geht von Rot zu Orange.  Zeig mit dem Finger auf die Stelle, wo genau es wechselt.  Wo sitzt die Kante?',
+   wahl:[{text:'Da ist eine feine Linie, man muss nur genau genug hinschauen.',tief:false},{text:'Ungefähr in der Mitte, dort wo es kippt.',tief:false},{text:'Es gibt keine Stelle, die Farbe fließt stetig, die Kante malst du selbst hinein.',tief:true}],
+   antwort_flach:'Je näher du hinschaust, desto mehr verschwindet die feine Linie.  Schau eine Schicht tiefer.',
+   antwort_tief:'Ja, die Grenze entsteht in deinem Auge, nicht im Licht.',
+   enthuellung:`Das Licht im Regenbogen ändert seine Wellenlänge ganz stetig, ohne Sprung, ohne Naht.  Es gibt keinen Punkt, an dem Rot endet und Orange beginnt, diesen Punkt setzt dein Sehen.  Ernst Mach zeigte um 1865, dass unsere Augen Kanten sogar dort verstärken, wo physikalisch gar keine scharfe Kante ist, die sogenannten Machschen Streifen.  Die Trennung ist echt in ihrer Wirkung und trotzdem nirgends im Ding selbst zu finden.`,
+   aha:'Manche Grenzen liegen nicht in der Welt, sondern in dem, der hinsieht.' },
+
+ { tag:'Das Unteilbare', mood:{glow:'#2c1a49', glyph:'Π', chord:[82.00,98.00,123.00]},
+   frage:'Warum lässt sich eine Primzahl nicht in kleinere Faktoren zerlegen?',
+   wahl:[{text:'Sie ist einfach zu klein zum Teilen.',tief:false},{text:'Zufall, manche Zahlen sind eben stur.',tief:false},{text:'Weil sie selbst ein Baustein ist, aus dem alle anderen Zahlen gebaut werden.',tief:true}],
+   antwort_flach:'Verständlich gedacht, doch an der Größe liegt es nicht, denn auch riesige Primzahlen gibt es ohne Ende. Schau eine Schicht tiefer.',
+   antwort_tief:'Ja. Sie ist kein Ergebnis, sie ist ein Anfang.',
+   enthuellung:`Jede ganze Zahl lässt sich auf genau eine Weise in Primzahlen zerlegen, das ist der Fundamentalsatz der Arithmetik. Die Primzahlen sind die Atome des Multiplizierens, und Euklid zeigte schon vor mehr als zweitausend Jahren, dass es unendlich viele von ihnen gibt. Eine Primzahl lässt sich nicht zerlegen, weil sie die Schicht darunter selber ist, der Stoff, aus dem alle anderen Zahlen bestehen.`,
+   aha:'Das Unteilbare ist nicht das Kleinste, sondern der Baustein.' },
+
+ { tag:'Was Heimweh sucht', mood:{glow:'#16302c', glyph:'⌂', chord:[98.00,116.54,146.83]},
+   frage:'Heimweh.  Sehnst du dich nach einem Ort?',
+   wahl:[{text:'Nach dem Haus, den Räumen, der Straße.',tief:false},{text:'Nach der Zeit, die dort vergangen ist.',tief:false},{text:'Nach den Menschen, die dort waren.',tief:false},{text:'Nach einem Ich, das nur an diesem Ort ganz zu Hause war.',tief:true}],
+   antwort_flach:'Der Ort ruft, seine Bilder sind warm und nah, und doch reist etwas mit, das kein Koffer fasst.',
+   antwort_tief:'Ja. Kein Umzug bringt es zurück, denn es ist kein Ort.',
+   enthuellung:`Der Arzt Johannes Hofer prägte 1688 dafür das Wort Nostalgie, aus dem Griechischen nostos, die Heimkehr, und algos, der Schmerz. Er beschrieb damit Schweizer Söldner, die sich krank sehnten nach zu Hause. Doch fahr wirklich an den alten Ort, und oft bleibt das Heimweh, weil es nie dem Pflaster galt. Unter der Sehnsucht nach dem Raum liegt eine Schicht tiefer die Sehnsucht nach einem Zustand, geborgen, gehalten, ganz. Heimweh ist ein Gefühl, das sich einen Ort sucht, um sich erklären zu können, gemeint aber ist ein Ich, das dort einmal zu Hause war.`,
+   aha:'Heimweh zeigt auf einen Ort und meint eine Schicht tiefer ein Zuhause in dir.' },
+
+ { tag:'Das Original', mood:{glow:'#4a7d86', glyph:'⧉', chord:[116.54,174.61,233.08]},
+   frage:'Du kopierst einen Zustand perfekt, Bit für Bit.  Welcher ist das Original?',
+   wahl:[{text:'Der erste, den es gab.',tief:false},{text:'Beide, oder keiner, die Frage passt nicht.',tief:true}],
+   antwort_flach:'„Der erste“ klingt richtig, aber woran erkennst du ihn noch?',
+   antwort_tief:'Ja, „Original“ ist plötzlich keine Eigenschaft mehr, die im Ding steckt.',
+   enthuellung:`Kopierst du eine Datei oder ein Foto, ist die Kopie Byte für Byte dieselbe, ihr Hash stimmt exakt überein. Öffnest du beide, kannst du nicht sehen, welche zuerst da war, denn die Festplatte speichert nirgends ein „ich war das Original“. Sind zwei Zustände Bit für Bit gleich, unterscheidet nichts IN ihnen das Original. „Original“ liegt dann nicht im Objekt, sondern in seiner Geschichte, im Vorher. Das ist das Schiff des Theseus, neu erzählt, und der Grund, warum Herkunft protokolliert werden muss, nicht abgelesen.`,
+   aha:'Identität steckt nicht im Zustand selbst, sondern in seiner Geschichte.' },
+
+ { tag:'Aus wenig wird Welt', mood:{glow:'#2f3a1a', glyph:'▦', chord:[98.00,116.50,146.80]},
+   frage:'Ein paar simple Regeln, stur wiederholt.  Kann daraus eine ganze lebendige Welt entstehen?',
+   wahl:[{text:'Nein, simple Regeln geben simple Ergebnisse.',tief:false},{text:'Nur wenn jemand die Welt zusätzlich entwirft.',tief:false},{text:'Ja, aus der Wiederholung allein wachsen ganze Muster.',tief:true}],
+   antwort_flach:'Klingt logisch, wenig oben sollte wenig unten ergeben. Meist stimmt das auch.',
+   antwort_tief:'Ja, aus stur wiederholten Regeln kann sich Lebendiges auffalten.',
+   enthuellung:`In Conways Spiel des Lebens gibt es nur vier winzige Regeln über lebende und tote Felder. Trotzdem entstehen darin Gebilde, die wandern, sich vermehren, sogar rechnen können. Niemand hat sie einzeln entworfen, sie tauchen aus der bloßen Wiederholung auf. Diese Schicht nennt man Emergenz, so wachsen aus wenigen sturen Regeln ganze Welten, ohne dass jemand die Welt geplant hat.`,
+   aha:'Aus wenigen sturen Regeln kann sich eine ganze Welt von selbst auffalten.' },
+
+ { tag:'Die Schleife', mood:{glow:'#8a5cd0', glyph:'∞', chord:[110.00,164.81,246.94]},
+   frage:'Ein Programm fragt sich selbst, „Existiere ich?“  Was entsteht?',
+   wahl:[{text:'Ein Fehler.',tief:false},{text:'Eine Endlosschleife.',tief:false},{text:'Ein „Ich“.',tief:true}],
+   antwort_flach:'Technisch nicht falsch, aber es steckt mehr drin.',
+   antwort_tief:'Ja, da, wo etwas sich auf sich selbst zurückbiegt.',
+   enthuellung:`In einem Rechner ist Selbstbezug zuerst nichts Geheimnisvolles. Eine Funktion darf sich selbst aufrufen, das nennt man Rekursion, und ein Quine ist ein Programm, das genau seinen eigenen Quelltext ausgibt. Etwas Neues geschieht erst, wenn ein System die Welt nicht nur verarbeitet, sondern ein Modell von sich selbst in dieses Modell hineinnimmt. Wo ein System sich so auf sich selbst richtet, entsteht eine „seltsame Schleife“ (Hofstadter), und genau dort, so die These, keimt ein „Ich“. Das Universum, das über sich selbst nachdenkt, ist die komplexeste Form derselben Bewegung, die ganz unten mit „ist oder ist-nicht“ begann.`,
+   aha:'Ein „Ich“ entsteht dort, wo ein System sich selbst hinterfragt.' },
+
+ { tag:'Die Form in der Form', mood:{glow:'#14382c', glyph:'❄', chord:[87.00,104.00,131.00]},
+   frage:'Du zoomst immer tiefer in die zerklüftete Linie einer Küste hinein.  Was siehst du?',
+   wahl:[{text:'Irgendwann wird die Linie glatt und einfach.',tief:false},{text:'Nur noch Rauschen ohne jede Ordnung.',tief:false},{text:'Wieder dieselbe zerklüftete Form, in jeder Schicht aufs Neue.',tief:true}],
+   antwort_flach:'Ein natürlicher Gedanke, weil in der Schule am Ende meist alles glatt wird. Bei diesen Formen aber nicht.',
+   antwort_tief:'Ja. Das Ganze steckt in jedem seiner Teile.',
+   enthuellung:`Benoît Mandelbrot nannte solche Gebilde Fraktale, Formen, die sich in jeder Vergrößerung selbst enthalten. Eine Küste wird beim Hineinzoomen nicht glatter, sie zeigt in jeder Schicht wieder Buchten in Buchten. Deshalb hat eine Küstenlinie keine feste Länge, denn je tiefer du misst, desto mehr Zerklüftung findest du noch darunter.`,
+   aha:'In einem Fraktal wohnt das Ganze in jedem seiner Teile.' },
+
+ { tag:'Der Widerspruch', hardcore:true, mood:{glow:'#b0446a', glyph:'⊥', chord:[103.83,155.56,207.65]},
+   frage:'Ein Satz sagt, „Dieser Satz ist falsch.“  Wahr oder falsch?',
+   wahl:[{text:'Wahr.',tief:false},{text:'Falsch.',tief:false},{text:'Beides bricht, der Satz kippt in sich.',tief:true}],
+   antwort_flach:'Probier es, sag „wahr“, dann ist er falsch, sag „falsch“, dann ist er wahr.',
+   antwort_tief:'Ja, er dreht sich um sich selbst, kein Ausgang.',
+   enthuellung:`Der Satz redet über sich selbst, und genau das lässt Wahr und Falsch zusammenbrechen. Kurt Gödel hat aus genau dieser Selbstbezüglichkeit bewiesen, dass jedes hinreichend starke System Sätze enthält, die wahr, aber innerhalb des Systems nicht beweisbar sind. Selbstbezug ist keine Spielerei, er ist eine Grenze der Logik selbst.`,
+   aha:'Selbstbezug erzeugt Sätze, die wahr sein können, ohne beweisbar zu sein.' },
+
+ { tag:'Nötig heißt nicht genug', mood:{glow:'#241a2f', glyph:'🔑', chord:[96,144,192]},
+   frage:'Ohne Schlüssel kommst du nicht in die Wohnung.  Heißt das, mit Schlüssel kommst du sicher hinein?',
+   wahl:[{text:'Ja, der Schlüssel ist der Schlüssel.',tief:false},{text:'Nein, der Schlüssel ist nötig, aber vielleicht klemmt die Tür oder es ist der falsche.',tief:true},{text:'Ja, wozu sonst ein Schlüssel.',tief:false}],
+   antwort_flach:'Fast, aber schau eine Schicht tiefer, nötig und genug sind zwei verschiedene Dinge.',
+   antwort_tief:'Ja, nötig heißt nur ohne geht es nicht, nicht damit klappt es sicher.',
+   enthuellung:`In der Logik heißt das der Unterschied zwischen notwendiger und hinreichender Bedingung.  Nötig bedeutet, ohne die Sache geht es nie.  Hinreichend bedeutet, mit der Sache klappt es sicher.  Der Schlüssel ist nötig, aber nicht hinreichend, denn er könnte der falsche sein oder die Tür klemmt.  Diese Trennung gehört seit Aristoteles zum Kern der klassischen Logik, und viele Alltagsstreits entstehen, weil jemand nötig mit genug verwechselt.`,
+   aha:'Nötig heißt, ohne geht es nicht.  Genug heißt, damit geht es immer.  Fast nie ist beides dasselbe.' },
+
+ { tag:'Rückwärts wahr', mood:{glow:'#14202e', glyph:'⟸', chord:[110,165,220]},
+   frage:'Regel im Haus, wenn es regnet, wird der Hof nass.  Heute ist der Hof trocken.  Was folgt mit Sicherheit?',
+   wahl:[{text:'Vielleicht regnet es trotzdem irgendwo.',tief:false},{text:'Nichts Sicheres, Regen und Nässe haben nichts miteinander zu tun.',tief:false},{text:'Es regnet nicht, denn sonst wäre der Hof nass.',tief:true}],
+   antwort_flach:'Schau eine Schicht tiefer, die Regel lässt sich sauber rückwärts lesen.',
+   antwort_tief:'Ja, aus trocken folgt zwingend, es regnet nicht.',
+   enthuellung:`Das ist die Kontraposition.  Aus wenn A dann B wird zwingend wenn nicht B dann nicht A, und beide Sätze sagen genau dasselbe.  Der Schluss heißt Modus tollens, die stoischen Logiker um Chrysippos beschrieben ihn schon vor über zweitausend Jahren.  Du darfst die Folge verneinen und rückwärts auf die Ursache schließen.  Was du nicht darfst, ist den Satz einfach umzudrehen.`,
+   aha:'Jedes wenn A dann B trägt heimlich seinen Zwilling in sich, wenn nicht B dann nicht A.' },
+
+ { tag:'Der falsche Rückschluss', mood:{glow:'#2a1a1a', glyph:'⇄', chord:[104,156,208]},
+   frage:'Wenn jemand Fieber hat, ist die Stirn warm.  Deine Stirn ist warm.  Hast du Fieber?',
+   wahl:[{text:'Ja, warme Stirn heißt Fieber.',tief:false},{text:'Nicht sicher, warm kann auch von der Sonne oder vom Sport kommen.',tief:true},{text:'Ja, das folgt doch aus der Regel.',tief:false}],
+   antwort_flach:'Schau eine Schicht tiefer, die Regel gilt nur in eine Richtung.',
+   antwort_tief:'Ja, aus der Wirkung darf man nicht einfach auf die Ursache zurückschließen.',
+   enthuellung:`Das ist der Fehlschluss der Umkehrung, in der Logik auch Bejahung des Nachsatzes genannt.  Aus wenn A dann B folgt eben nicht wenn B dann A, denn die warme Stirn kann viele Ursachen haben, Sonne, Sport, ein heißes Bad.  Genau hier stolpert der Alltag am häufigsten.  Erlaubt ist nur die Kontraposition, wenn nicht B dann nicht A, verboten die simple Umkehr.  Schon Aristoteles trennte diese beiden Richtungen sauber.`,
+   aha:'Aus einer wahren Regel wird eine falsche, sobald du Ursache und Wirkung einfach tauschst.' },
+
+ { tag:'Der eine schwarze Schwan', mood:{glow:'#101a24', glyph:'🦢', chord:[92,138,184]},
+   frage:'Jahrhundertelang galt in Europa, alle Schwäne sind weiß.  Wie viele Vögel braucht es, um diesen Satz umzuwerfen?',
+   wahl:[{text:'Sehr viele, ein halber Kontinent voll.',tief:false},{text:'So einen alten Satz kann man nie ganz umwerfen.',tief:false},{text:'Ein einziger schwarzer genügt.',tief:true}],
+   antwort_flach:'Schau eine Schicht tiefer, ein alle bricht überraschend leicht.',
+   antwort_tief:'Ja, ein einziger Gegenfall stürzt jedes alle.',
+   enthuellung:`1697 sah der Holländer Willem de Vlamingh in Australien schwarze Schwäne, und der alte Satz alle Schwäne sind weiß war mit einem Schlag tot.  Ein Allsatz braucht keine Mehrheit gegen sich, ein einziges Gegenbeispiel reicht.  Karl Popper machte daraus sein Herzstück, kein noch so langes Beobachten beweist ein alle endgültig, aber ein einziger Fall kann es widerlegen.  Bestätigungen sammeln ist schwach, ein sauberes Gegenbeispiel ist mächtig.`,
+   aha:'Ein alle ist ein Riese auf einem Bein, ein einziger Gegenfall bringt ihn zu Fall.' },
+
+ { tag:'Das leere Versprechen', hardcore:true, mood:{glow:'#1c1420', glyph:'∅', chord:[87,131,174]},
+   frage:'Ich sage, wenn ich heute fliege, schenke ich dir mein Haus.  Ich fliege nicht.  Habe ich gelogen?',
+   wahl:[{text:'Ja, du hast mir kein Haus geschenkt.',tief:false},{text:'Nein, das Versprechen bleibt wahr, weil die Bedingung nie eintrat.',tief:true},{text:'Nur halb, du drückst dich davor.',tief:false}],
+   antwort_flach:'Schau eine Schicht tiefer, gebrochen ist ein Versprechen erst, wenn die Bedingung eintritt und du nicht lieferst.',
+   antwort_tief:'Genau, ohne Flug gibt es keinen Bruch, also bleibt der Satz wahr.',
+   enthuellung:`In der klassischen Logik ist ein wenn dann Satz immer wahr, solange die Voraussetzung falsch ist, das nennt man leere Wahrheit.  Erst ein wahres Wenn mit einem falschen Dann macht ihn falsch.  Daraus folgt der verblüffende Satz, alle Elemente der leeren Menge sind grün, und er stimmt, weil es keinen einzigen Gegenfall gibt.  Frege und Russell gossen diese materiale Implikation um 1900 in feste Form.  Dass man das Wenn dann genau so definiert, ist eine kluge Konvention, kein Naturgesetz, und das darf man ehrlich dazusagen.`,
+   aha:'Ein Versprechen, dessen Bedingung nie eintritt, kannst du nie brechen, also bleibt es wahr.' },
+
+ { tag:'Was Symmetrie wirklich ist', mood:{glow:'#1b3050', glyph:'◑', chord:[98.00,123.00,165.00]},
+   frage:'Was heißt es im Kern, dass etwas symmetrisch ist?',
+   wahl:[{text:'Dass die linke und die rechte Hälfte gleich aussehen.',tief:false},{text:'Dass es besonders schön und geordnet wirkt.',tief:false},{text:'Dass sich etwas verändert, und trotzdem dasselbe bleibt.',tief:true}],
+   antwort_flach:'Das ist das vertraute Bild vom Spiegel, und es stimmt für viele Dinge. Doch eine weitere Schicht liegt noch darunter.',
+   antwort_tief:'Genau. Symmetrie ist Veränderung, die nichts verändert.',
+   enthuellung:`Drehst du einen Kreis um seinen Mittelpunkt, sieht er danach genau gleich aus, die Bewegung lässt ihn unverändert, das nennt man Invarianz. Die Mathematikerin Emmy Noether entdeckte, dass hinter jeder solchen Symmetrie ein Erhaltungssatz steckt, aus der Gleichheit der Zeit folgt sogar die Erhaltung der Energie. Unter dem schönen Aussehen liegt also eine tiefere Schicht, in der Symmetrie sagt, was sich ändern darf, ohne dass das Wesentliche sich ändert.`,
+   aha:'Symmetrie ist das, was gleich bleibt, wenn du etwas veränderst.' },
+
+ { tag:'Das Unentscheidbare', hardcore:true, mood:{glow:'#c79030', glyph:'?', chord:[98.00,130.81,196.00]},
+   frage:'Kann ein Programm für jedes andere sicher sagen, ob es je anhält?',
+   wahl:[{text:'Ja, mit genug Rechenpower.',tief:false},{text:'Nein, das ist grundsätzlich unmöglich.',tief:true}],
+   antwort_flach:'Rechenpower hilft nicht, das Problem ist tiefer als Geschwindigkeit.',
+   antwort_tief:'Ja, und das ist bewiesen, nicht nur unbekannt.',
+   enthuellung:`Alan Turing hat 1936 bewiesen, dass es kein Programm geben kann, das für jedes andere entscheidet, ob es anhält oder ewig läuft. Nicht „noch nicht“, sondern prinzipiell nie. Es gibt Fragen, die keine Maschine beantworten kann, und das zu wissen ist selbst eine tiefe Antwort.`,
+   aha:'Manche Fragen sind nicht schwer, sie sind prinzipiell unentscheidbar.' },
+
+ { tag:'Zeit', mood:{glow:'#4457c0', glyph:'→', chord:[87.31,130.81,174.61]},
+   frage:'Zeit, fließt sie wie ein Strom?  Oder ist sie etwas anderes?',
+   wahl:[{text:'Sie fließt.',tief:false},{text:'Sie ist die Reihenfolge der Zustände.',tief:true}],
+   antwort_flach:'So fühlt es sich an, aber das Gefühl ist nicht die Sache.',
+   antwort_tief:'Ja, kein Fluss, eine Ordnung.',
+   enthuellung:`Denk sie als Reihenfolge statt als Substanz. Sieh dir eine Uhr an, sie misst keinen fließenden Stoff, sie zählt nur Wiederholungen, das Pendel schwingt, der Quarz zittert vieltausendmal in der Sekunde, ein Tick immer nach dem vorigen. Vergangenheit heißt dann nicht früher, sondern eine tiefere Schicht, jeder Zustand baut auf dem vorigen, und die Zeit ist der Zähler dieser Schichten. Sogar ernsthafte Physik baut Raumzeit genau so, aus reiner Ordnung, die Causal Sets, wo Ordnung und Zahl die Geometrie ergeben.`,
+   aha:'Zeit ist vielleicht kein Fluss, sondern die Reihenfolge der Schichten.' },
+
+ { tag:'Das Tempo der Dinge', mood:{glow:'#5566cc', glyph:'γ', chord:[130.81,196.00,261.63]},
+   frage:'Licht ist das Schnellste im ganzen Universum.  Warum ausgerechnet Licht?',
+   wahl:[{text:'Zufall, es ist eben sehr schnell.',tief:false},{text:'Weil ihm nichts im Weg steht.',tief:false},{text:'Weil es so winzig und klein ist.',tief:false},{text:'Weil es keine Masse hat, nichts, was es bremst.',tief:true}],
+   antwort_flach:'Es fühlt sich nach purem Tempo an, aber der Grund liegt eine Schicht tiefer.',
+   antwort_tief:'Genau. Kein Gewicht, keine Bremse, also das höchste Tempo, das es gibt.',
+   enthuellung:`Ein Lichtteilchen hat keine Masse und keine innere Struktur, die es mitschleppen müsste, deshalb reist es mit dem absoluten Tempolimit des Universums, der Lichtgeschwindigkeit. Alles, was Masse trägt, ist langsamer, und je mehr Masse und Struktur ein Ding trägt, desto träger wird es durch den Raum. Der tiefere Gedanke stammt von Einstein, alles bewegt sich mit ein und demselben Tempo durch die Raumzeit. Was du an Tempo in den Raum steckst, fehlt dir in der Zeit. Das Licht steckt alles in den Raum, für ein Photon vergeht deshalb überhaupt keine Zeit.`,
+   aha:'Je leichter und einfacher, desto näher am Licht, je mehr Masse, desto langsamer durch den Raum.' },
+
+ { tag:'Das erste Tempo', mood:{glow:'#5a2f7a', glyph:'✷', chord:[65.41,98.00,146.83]},
+   frage:'Und ganz am Anfang, war doch einmal etwas schneller als das Licht?',
+   wahl:[{text:'Nein, nichts war je schneller als Licht.',tief:false},{text:'Ja, ein Teilchen, das wir noch nicht kennen.',tief:false},{text:'Ja, aber nur ganz kurz und aus Versehen.',tief:false},{text:'Ja, der Raum selbst, im allerersten Augenblick.',tief:true}],
+   antwort_flach:'Fast eine Fangfrage, denn die Regel gilt und gilt doch nicht. Schau genauer.',
+   antwort_tief:'Ja. Nicht ein Ding im Raum, sondern der Raum selber.',
+   enthuellung:`Nichts kann sich schneller als Licht durch den Raum bewegen. Aber der Raum selbst darf sich schneller dehnen, denn das ist keine Bewegung durch den Raum, es ist der Raum, der wächst. Im ersten winzigen Sekundenbruchteil tat er genau das, die kosmische Inflation, und blies einen einzigen Punkt in unvorstellbar kurzer Zeit um mehr als das Billiardenfache auf. Es geschah überall zugleich, der Anfang war in gewissem Sinn überall und nirgends. Und was ihn auslöste, der Zustand vor dem ersten Augenblick, dort endet unser Wissen und beginnt die Vermutung.`,
+   aha:'Nichts reist schneller als Licht durch den Raum, aber der Raum selbst kann sich schneller dehnen.' },
+
+ { tag:'Das Dazwischen', mood:{glow:'#2a54a8', glyph:'0∙1', chord:[73.42,110.00,146.83]},
+   frage:'Was liegt zwischen der 0 und der 1?',
+   wahl:[{text:'Nichts, sie liegen nebeneinander.',tief:false},{text:'Ein paar Zahlen, 0.5 und so.',tief:false},{text:'Unendlich viele, ohne Ende.',tief:true}],
+   antwort_flach:'Mehr, als du denkst, schau genauer in den Spalt.',
+   antwort_tief:'Ja, ein Abgrund voller Zahlen.',
+   enthuellung:`Zwischen 0 und 1 liegen unendlich viele Zahlen, und zwar so unendlich viele, dass man sie nicht einmal durchnummerieren kann (Cantor, „überabzählbar“). Der kleinste Spalt enthält ein ganzes Kontinuum. Nahe null ist nie leer, es ist am dichtesten bevölkert.`,
+   aha:'Der kleinste Abstand kann eine ganze Unendlichkeit enthalten.' },
+
+ { tag:'Warum Mathe passt', mood:{glow:'#123f3a', glyph:'φ', chord:[98.00,117.00,147.00]},
+   frage:'Zahlen hast du im Kopf erfunden.  Warum beschreiben sie dann Sterne und Atome so unheimlich genau?',
+   wahl:[{text:'Zufall, wir merken uns nur die Treffer und vergessen den Rest.',tief:false},{text:'Weil wir die Welt so lange biegen, bis die Zahlen passen.',tief:false},{text:'Weil die Zahlen ein Muster treffen, das tiefer liegt als die Dinge.',tief:true},{text:'Weil Menschen eben klug rechnen können.',tief:false}],
+   antwort_flach:'Ein ehrlicher Gedanke, und ein Stück weit stimmt er sogar. Doch das Staunen darunter bleibt bestehen.',
+   antwort_tief:'Genau. Die Zahl trifft nicht das Ding, sondern das Muster darunter.',
+   enthuellung:`Der Physiker Eugene Wigner nannte es die unbegreifliche Wirksamkeit der Mathematik, unreasonable effectiveness. Ein Beispiel: 1846 rechnete Urbain Le Verrier aus winzigen Stoerungen in der Bahn des Uranus, dass dort ein weiterer, unbekannter Planet stehen muesse, und gab seinen Ort am Himmel an. Noch in derselben Nacht richteten Astronomen ihr Fernrohr dorthin und fanden Neptun, fast genau an der berechneten Stelle. Eine Formel, rein aus Gedanken geboren, hatte einen Himmelskoerper vorausgesagt, den noch niemand gesehen hatte. Als lebte unter der sichtbaren Welt eine Schicht aus reinen Mustern, und Mathematik ist die Sprache, in der diese Schicht zu uns spricht.`,
+   aha:'Mathematik beschreibt nicht die Dinge, sondern das Muster, das tiefer liegt.' },
+
+ /* ============================================================
+    AB HIER: das reine Herz, warum Mathematik das Entdeckte ist.
+    Diese 25 sind zugleich die PREMIUM-KANDIDATEN, die spaeter
+    server-seitig ausgeliefert werden (siehe backend/ und ZUGANG_KONZEPT.md).
+    ============================================================ */
+
+ { tag:'Wie die Blase rechnet', mood:{glow:'#1c1630', glyph:'◯', chord:[92,138,185]},
+   frage:'Eine Seifenblase wird ohne Nachdenken sofort perfekt rund.  Wie findet sie die richtige Form so schnell?',
+   wahl:[{text:'Sie probiert blitzschnell viele Formen aus.',tief:false},{text:'Luftdruck drückt sie einfach zufällig rund.',tief:false},{text:'Sie rutscht von selbst in die Form mit der kleinsten Haut, und das ist die Kugel.',tief:true}],
+   antwort_flach:'Von Probieren würde man Zögern sehen, doch die Blase zögert nie. Sie fällt sofort ins Richtige.',
+   antwort_tief:'Genau. Kein Suchen, ein Fallen, hinab zur sparsamsten Form.',
+   enthuellung:`Die Haut der Blase zieht sich zusammen, bis sie so klein wie möglich ist, und für ein gegebenes Luftvolumen ist die Kugel die Form mit der kleinsten Oberfläche. Was Mathematiker als schweres Minimalproblem rechnen, löst die Seifenhaut in einem Wimpernschlag, einfach indem sie nachgibt. Eine Schicht unter dem schillernden Häutchen liegt ein Naturgesetz, das immer das Sparsamste findet.`,
+   aha:'Die Natur sucht das Minimum nicht, sie fällt hinein.' },
+
+ { tag:'Warum die Wabe sechseckig ist', mood:{glow:'#1e2410', glyph:'⬡', chord:[87,131,174]},
+   frage:'Bienen bauen ihre Waben aus lauter Sechsecken, nie aus Fünfecken oder Kreisen.  Woher kommt die Form?',
+   wahl:[{text:'Bienen lernen es von anderen Bienen.',tief:false},{text:'Das Sechseck ist die sparsamste Form, die eine Fläche lückenlos füllt.',tief:true},{text:'Zufall, es hätte auch anders sein können.',tief:false}],
+   antwort_flach:'Sie geben es weiter, ja, doch warum gerade diese Form? Die Antwort liegt nicht bei den Bienen, sondern in der Fläche selbst.',
+   antwort_tief:'Genau. Die Biene wählt nicht, die Form ist die einzig sparsame, die passt.',
+   enthuellung:`Ein Kreis lässt Lücken, ein Fünfeck kachelt nicht auf. Nur Dreieck, Viereck und Sechseck füllen eine Fläche ganz, und von diesen braucht das Sechseck für dieselbe Fläche die kürzesten Wände, also am wenigsten Wachs. Der Mathematiker Thomas Hales hat das erst 1999 streng bewiesen, doch die Bienen bauen es seit Jahrmillionen. Eine Schicht unter dem Instinkt liegt ein gelöstes Sparproblem.`,
+   aha:'Manche Formen sind keine Wahl, sondern die einzige, die die Zahl erlaubt.' },
+
+ { tag:'Die Zahl in der Blüte', mood:{glow:'#2b2008', glyph:'φ', chord:[110,165,220]},
+   frage:'In einer Sonnenblume sitzen die Kerne in zwei Spiralen, immer im selben goldenen Winkel.  Rechnet die Blume?',
+   wahl:[{text:'Ja, irgendwie muss sie die Zahl kennen.',tief:false},{text:'Nein, sie folgt einer einfachen Wachstumsregel, die genau auf dieser Zahl landet.',tief:true},{text:'Zufall, es sieht nur schön geordnet aus.',tief:false}],
+   antwort_flach:'Ein schöner Gedanke, doch die Blume weiß nichts. Und trotzdem trifft sie die Zahl jedes Mal.',
+   antwort_tief:'Genau. Kein Wissen, nur eine Regel, und die Regel trägt die Zahl in sich.',
+   enthuellung:`Jeder neue Kern setzt sich um denselben Winkel gedreht neben den letzten, rund 137,5 Grad, den goldenen Winkel. Aus dieser einen schlichten Regel wächst die dichteste Packung, die es gibt, kein Platz wird verschwendet. Die Blume hat den goldenen Schnitt nicht erfunden, sie ist auf ihn gestoßen, eine Schicht tiefer, dort wo Wachsen und Zahl dasselbe sind.`,
+   aha:'Die Natur muss nicht rechnen, um das Richtige zu treffen.' },
+
+ { tag:'Musik ist verborgene Zahl', mood:{glow:'#221030', glyph:'♪', chord:[130,196,262]},
+   frage:'Zwei Töne klingen zusammen einfach rein, ein anderes Paar klingt schräg.  Was entscheidet das?',
+   wahl:[{text:'Der Geschmack, manche mögen es eben so.',tief:false},{text:'Gewohnheit, wir sind mit diesen Tönen aufgewachsen.',tief:false},{text:'Ein einfaches Zahlenverhältnis der Schwingungen, zwei zu eins, drei zu zwei.',tief:true}],
+   antwort_flach:'Geschmack spielt mit, doch unter dem Gefühl liegt etwas Festeres, ein Verhältnis, das schon stimmte, bevor du es hörtest.',
+   antwort_tief:'Ja. Was dein Ohr rein nennt, ist in Wahrheit eine schlichte Zahl.',
+   enthuellung:`Pythagoras teilte eine gespannte Saite und hörte, dass die halbe Länge dieselbe Note eine Oktave höher gibt, das Verhältnis zwei zu eins. Drei zu zwei ergibt die Quinte, den Klang, den wir stimmig nennen. Die Harmonie, die dir warm wird im Bauch, ist eine Schicht tiefer reine Arithmetik, Zahl, die zu Klang geworden ist.`,
+   aha:'Was rein klingt, ist ein einfaches Verhältnis, das du hörst, ohne es zu zählen.' },
+
+ { tag:'Die eine Form hinter vielem', mood:{glow:'#08202c', glyph:'∿', chord:[96,144,192]},
+   frage:'Wasser, Schall, Licht, eine schwingende Saite.  Alle wogen in derselben sanften Wellenform.  Zufall?',
+   wahl:[{text:'Ja, Wellen sehen halt oft ähnlich aus.',tief:false},{text:'Nein, überall wirkt dieselbe Regel, jede Auslenkung zieht gleich stark zurück.',tief:true},{text:'Weil unser Auge alles zu Wellen glättet.',tief:false}],
+   antwort_flach:'Ähnlich, ja, doch es ist nicht nur ähnlich, es ist genau dieselbe Kurve, immer wieder.',
+   antwort_tief:'Ja. Eine Regel, und aus ihr wächst überall dieselbe schwingende Linie.',
+   enthuellung:`Wo etwas umso stärker zurückgezogen wird, je weiter es ausgelenkt ist, entsteht immer dieselbe Bewegung, die Sinuswelle. Das Pendel, die Gitarrensaite, das Licht und der Ton gehorchen alle diesem einen Satz. Eine Schicht unter den vielen Wellen der Welt liegt eine einzige Form, geboren aus einer einzigen Regel.`,
+   aha:'Viele verschiedene Wellen, eine einzige verborgene Form.' },
+
+ { tag:'Dass die Welt lesbar ist', mood:{glow:'#14162e', glyph:'✧', chord:[98,147,196]},
+   frage:'Die Welt könnte reines Chaos sein, wildes Rauschen ohne Regel.  Warum lässt sie sich stattdessen berechnen?',
+   wahl:[{text:'Weil wir Menschen einfach gut im Ordnen sind.',tief:false},{text:'Zufall, ein bisschen Ordnung findet sich überall.',tief:false},{text:'Das weiß niemand sicher, und genau das ist das Wunder, dass es überhaupt so ist.',tief:true},{text:'Weil die Naturgesetze es uns leicht machen wollen.',tief:false}],
+   antwort_flach:'Ja, unser Ordnungssinn ist stark, doch schau, die Ordnung war schon in den Dingen, bevor wir hinsahen.',
+   antwort_tief:'Ja. Du hältst das Staunen aus, statt es zuzukleistern.',
+   enthuellung:`Die Welt ist wirklich berechenbar, und man kann es sehen: Astronomen sagen eine Sonnenfinsternis auf die Minute genau voraus, Jahrhunderte im Voraus, weil dieselben schlichten Gleichungen für Sonne, Erde und Mond immer wieder aufgehen. Einstein sagte, das Unbegreiflichste am Universum sei, dass es begreiflich ist. Es gab keinen Grund, dass Sterne, Atome und Jahreszeiten sich in Gleichungen fassen lassen, und doch tun sie es. Eine Schicht unter dem bunten Durcheinander liegt eine stille Ordnung, und dass wir sie lesen dürfen, ist kein Fakt zum Abhaken, sondern ein Wunder zum Anschauen.`,
+   aha:'Dass die Welt überhaupt Ordnung hat, ist das erste Wunder, nicht das letzte.' },
+
+ { tag:'Der Moment des Klick', mood:{glow:'#101f1a', glyph:'◯', chord:[104,156,208]},
+   frage:'Ein Problem quält dich stundenlang, dann kippt plötzlich etwas und alles wird einfach.  Was ist da geschehen?',
+   wahl:[{text:'Ich habe mich endlich genug angestrengt.',tief:false},{text:'Ich habe die Schicht gefunden, von der aus es leicht ist.',tief:true},{text:'Ich hatte in dem Moment einfach Glück.',tief:false},{text:'Mein Gehirn war endlich ausgeruht.',tief:false}],
+   antwort_flach:'Mühe gehört dazu, ohne die Stunden davor kommt der Moment nicht.',
+   antwort_tief:'Ja, das Schwere lag nie im Problem, nur im falschen Blickwinkel.',
+   enthuellung:`Der junge Gauß sollte in der Schule alle Zahlen von 1 bis 100 addieren, eine mühsame Kette. Statt stur zu rechnen, sah er die Zahlen anders, ganz vorn und ganz hinten zu Paaren gelegt, 1 und 100, 2 und 99, immer 101, fünfzig solche Paare, macht 5050. Dieselbe Aufgabe, ein einziger Blick, und die Mühe war weg. Oft ist ein Problem schwer, weil du es von der falschen Seite ansiehst, und schön wird es in dem Augenblick, wo du den Ort findest, von dem aus es leicht ist. Mathematiker nennen das die richtige Sichtweise, und sie fühlt sich an wie ein Fenster, das aufgeht. Eine Schicht tiefer war die Einfachheit immer schon da, du musstest nur den Winkel wechseln.`,
+   aha:'Das Schwere sitzt selten im Ding, meist im Blickwinkel.' },
+
+ { tag:'Kein Platz für Hässliches', mood:{glow:'#1a1230', glyph:'△', chord:[98,147,196]},
+   frage:'Zwei Beweise, beide richtig.  Einer kurz und klar, einer lang und mühsam.  Warum nennst du nur den einen schön?',
+   wahl:[{text:'Weil kurz einfach angenehmer zu lesen ist.',tief:false},{text:'Weil der klare zeigt, WARUM es wahr ist, nicht nur DASS.',tief:true},{text:'Weil der kürzere weniger Arbeit macht.',tief:false},{text:'Weil Länge auf Dauer ermüdet.',tief:false}],
+   antwort_flach:'Ja, das Kurze atmet leichter, und schon das ist ein echtes Gefühl.',
+   antwort_tief:'Genau, Schönheit ist hier kein Schmuck, sondern Einsicht, die sich zeigt.',
+   enthuellung:`Nimm Euklids Beweis, dass es unendlich viele Primzahlen gibt: Multipliziere alle bekannten miteinander und addiere eins, und schon muss es eine weitere geben, die in der Liste fehlt. Ein paar Zeilen, und du siehst, warum es gar nicht anders sein kann. Ein langer, mühsamer Beweis kann dieselbe Wahrheit sichern, ohne dass du je begreifst, warum sie gilt. Der Mathematiker G. H. Hardy schrieb, es gebe keinen dauerhaften Platz auf der Welt für hässliche Mathematik. Ein schöner Beweis versteckt nichts, er lässt dich sehen, warum die Sache wahr sein muss. Eine Schicht tiefer meint schön nicht hübsch, sondern durchsichtig bis auf den Grund.`,
+   aha:'Schön heißt, du siehst nicht nur dass es stimmt, sondern warum.' },
+
+ { tag:'Der Schauer bei der Gleichung', mood:{glow:'#241033', glyph:'✧', chord:[110,165,220]},
+   frage:'Eine Formel steht plötzlich ganz einfach da, und dir läuft ein Schauer über den Rücken.  Was berührt dich da?',
+   wahl:[{text:'Dass ich sie endlich verstanden habe.',tief:false},{text:'Dass so viel in so wenig passt, als hätte die Welt zugestimmt.',tief:true},{text:'Dass ich offenbar gut in Mathe bin.',tief:false},{text:'Dass die Prüfung jetzt leichter wird.',tief:false}],
+   antwort_flach:'Verstehen ist ein warmes Glück, das darfst du ruhig fühlen.',
+   antwort_tief:'Ja, dieser Schauer ist das Erkennen einer Ordnung, die größer ist als du.',
+   enthuellung:`Der Hirnforscher Semir Zeki maß, dass eine als schön empfundene Gleichung dieselbe Region weckt wie große Musik oder ein Gemälde. Der Schauer ist kein Zufall, er ist dein alter Sinn für Ordnung, der etwas Stimmiges erkennt. Unter dem Rechnen liegt eine Schicht, in der Wahrheit sich wie Schönheit anfühlt.`,
+   aha:'Der Schauer ist dein ältester Sinn für Ordnung, der leise Ja sagt.' },
+
+ { tag:'Wenn Schönheit sich irren kann', mood:{glow:'#0e1a2b', glyph:'φ', chord:[87,130,174]},
+   frage:'Ein Physiker sagt, eine Gleichung sei zu schön, um falsch zu sein.  Darf man das glauben?',
+   wahl:[{text:'Ja, was schön ist, ist am Ende immer wahr.',tief:false},{text:'Nein, schön und wahr haben nichts miteinander zu tun.',tief:false},{text:'Schönheit ist ein guter Wegweiser, aber sie kann auch verführen.',tief:true}],
+   antwort_flach:'Der Wunsch ist verständlich, das Schöne zieht uns wie ein Licht.',
+   antwort_tief:'Ja, sie zeigt oft den Weg, doch geprüft wird am Ende an der Welt.',
+   enthuellung:`Paul Dirac fand Gleichungen, deren Schönheit ihn zu echten Teilchen führte, zum Zwilling des Elektrons aus Antimaterie. Er hielt Schönheit für wichtiger als die Messung und lag damit oft, aber nicht immer richtig. Eine Schicht tiefer ist Eleganz eine Ahnung von Ordnung, ein Kompass, kein Beweis, und das macht sie umso menschlicher.`,
+   aha:'Schönheit weist die Richtung, die Wirklichkeit spricht das letzte Wort.' },
+
+ { tag:'Das Buch der Beweise', mood:{glow:'#2a1810', glyph:'⟡', chord:[82,123,165]},
+   frage:'Ein Mathematiker träumt von einem Buch, in dem für jeden Satz der schönste Beweis steht.  Wer soll es geschrieben haben?',
+   wahl:[{text:'Ein sehr kluger Mensch, irgendwann einmal.',tief:false},{text:'Niemand, die schönsten Beweise sind schon da und werden gefunden.',tief:true},{text:'Ein Computer, der geduldig alles durchrechnet.',tief:false},{text:'Ein berühmter Professor von früher.',tief:false}],
+   antwort_flach:'Kluge Köpfe haben viel gefunden, und das ist schon ein Wunder für sich.',
+   antwort_tief:'Genau, gefunden, nicht erdacht, als hätte der Beweis auf dich gewartet.',
+   enthuellung:`Paul Erdős sprach vom Buch, in dem Gott die vollkommenen Beweise aufbewahrt, und ein Mathematiker müsse sie nur erblicken. Zwei Mathematiker, Martin Aigner und Günter Ziegler, nahmen ihn beim Wort und veröffentlichten 1998 wirklich ein Buch mit dem Titel Proofs from THE BOOK, eine Sammlung besonders schöner Beweise. Es ist ein Scherz und doch ernst, denn ein wirklich schöner Beweis fühlt sich nicht erfunden an, sondern entdeckt. Unter der Arbeit liegt die Ahnung einer Schicht, in der die beste Form schon fertig wartet.`,
+   aha:'Den schönsten Beweis erfindest du nicht, du erblickst ihn.' },
+
+ { tag:'Vor dem ersten Zähler', mood:{glow:'#1a1230', glyph:'∎', chord:[96,128,160]},
+   frage:'Stell dir vor, es gibt niemanden auf der Welt.  Sind zwei Steine und zwei Steine dann immer noch vier?',
+   wahl:[{text:'Nein, ohne jemanden, der zählt, gibt es keine Zahl.',tief:false},{text:'Ja, das Zählen fehlt, aber vier waren es trotzdem schon.',tief:true},{text:'Das kann man nicht wissen, ohne nachzusehen.',tief:false}],
+   antwort_flach:'Ein schöner Gedanke, das Zählen fühlt sich wirklich wie unsere ganz eigene Tat an.',
+   antwort_tief:'Ja, wir haben das Zählen erfunden, aber nicht das, was dabei herauskommt.',
+   enthuellung:`Das Zählen ist eine Handlung von uns, die Zahl darunter ist es nicht. Zwei und zwei ergaben vier, lange bevor ein Mund das Wort vier formte. Kronecker sagte, die ganzen Zahlen habe der liebe Gott gemacht, alles andere sei Menschenwerk. Eine Schicht unter dem Zählen liegt etwas, das wir nur gefunden und nie gemacht haben.`,
+   aha:'Zählen ist unsere Tat, die Zahl darunter war immer schon da.' },
+
+ { tag:'Die Wahrheit, die keiner wollte', mood:{glow:'#2a141a', glyph:'√', chord:[82,110,146]},
+   frage:'Die Pythagoreer glaubten, alles sei ein Verhältnis ganzer Zahlen.  Dann fanden sie eine Zahl, die diesen Glauben zerbrach.  Was sagt das?',
+   wahl:[{text:'Sie haben sich verrechnet, ihr Glaube stimmte eigentlich.',tief:false},{text:'Sie stießen auf etwas Wahres, das stärker war als ihr Wunsch.',tief:true},{text:'Sie hätten die neue Zahl einfach verbieten sollen.',tief:false}],
+   antwort_flach:'Man versteht den Wunsch, an der schönen alten Ordnung festzuhalten.',
+   antwort_tief:'Ja, die Wahrheit fragte nicht, was sie hofften, sie war einfach da.',
+   enthuellung:`Die Länge der Diagonale eines Quadrats, die Wurzel aus zwei, lässt sich durch keinen Bruch ganzer Zahlen ausdrücken. Die Pythagoreer sollen entsetzt gewesen sein, die Legende sagt, einer bezahlte die Entdeckung mit dem Leben. Man erfindet keine Wahrheit, die den eigenen Glauben zertrümmert, man entdeckt sie. Gerade darin, dass sie gegen ihren Willen galt, zeigt sich die Schicht darunter, die niemandem gehört.`,
+   aha:'Was du nicht wolltest und was doch wahr ist, hast du nicht erfunden.' },
+
+ { tag:'Die Ziffern warten schon', mood:{glow:'#0d2426', glyph:'π', chord:[88,132,176]},
+   frage:'Die millionste Stelle von Pi.  Legen wir sie fest, wenn wir sie ausrechnen, oder holen wir sie nur ab?',
+   wahl:[{text:'Wir legen sie fest, der Computer erzeugt sie.',tief:false},{text:'Sie entsteht erst im Moment der Rechnung.',tief:false},{text:'Wir holen sie ab, sie stand schon fest, bevor wir hinsahen.',tief:true}],
+   antwort_flach:'Verständlich, es fühlt sich an, als würde die Maschine die Ziffer in dem Moment erschaffen.',
+   antwort_tief:'Genau, die Rechnung ist nur das Fernrohr, die Ziffer war längst da.',
+   enthuellung:`Pi ist kein offener Vorschlag, den wir noch verhandeln. In dem Augenblick, in dem ein Kreis denkbar ist, steht jede seiner Ziffern schon unverrückbar fest, bis in die milliardste Stelle, die noch niemand berechnet hat. Wir erfinden sie nicht, wir graben sie aus wie ein Fossil, das immer schon im Stein lag. Eine Schicht tiefer ist Pi kein Werk, sondern ein Fund.`,
+   aha:'Wir rechnen Pi nicht aus, wir graben es aus.' },
+
+ { tag:'In jeder denkbaren Welt', mood:{glow:'#111a24', glyph:'✧', chord:[87,116,174]},
+   frage:'Fremde Wesen an einem fernen Stern, mit ganz anderen Sinnen.  Was hättest du mit ihnen ganz sicher gemeinsam?',
+   wahl:[{text:'Wahrscheinlich fast nichts, alles wäre uns völlig fremd.',tief:false},{text:'Vielleicht die Freude an Farben oder Musik.',tief:false},{text:'Dass eine Primzahl bei ihnen dieselbe ist wie bei uns.',tief:true}],
+   antwort_flach:'Ein weiter, demütiger Gedanke, so fremd könnte das Leben da draußen wirklich sein.',
+   antwort_tief:'Ja, ihre Sprache wäre fremd, ihre Zahlen dieselben.',
+   enthuellung:`Sprachen, Farben, Sitten, all das könnte grundverschieden sein. Aber dass sieben sich nur durch eins und durch sich selbst teilen lässt, gilt an jedem Stern, in jeder denkbaren Welt. Darum tragen manche Botschaften ins All bewusst Primzahlen, als einzige Sprache, die überall dieselbe ist. Unter aller Verschiedenheit liegt eine Schicht, die keine Kultur erfindet, weil jede sie nur finden kann.`,
+   aha:'Was in jeder denkbaren Welt gilt, hat keine Kultur gemacht.' },
+
+ { tag:'Das Nichts, das zählt', mood:{glow:'#1a1230', glyph:'∅', chord:[87,130,174]},
+   frage:'Die Null sagt, dass nichts da ist.  Warum braucht das Nichts überhaupt ein eigenes Zeichen?',
+   wahl:[{text:'Damit die Zahlenreihe hübsch vollständig aussieht.',tief:false},{text:'Weil das Nichts selbst ein Gedanke ist, ein voller Platz, den man erst denken muss.',tief:true},{text:'Aus Gewohnheit, andere Zahlen haben ja auch Zeichen.',tief:false}],
+   antwort_flach:'Verständlich gedacht, doch unter der Ordnung liegt noch etwas Größeres.',
+   antwort_tief:'Ja, die Null ist kein Fehlen, sondern das Fehlen, das jemand zu einem Ding gemacht hat.',
+   enthuellung:`Lange kam die Menschheit ohne Null aus, sie wurde erst spät klar gedacht, in Indien bei Brahmagupta. Das Schwere daran ist, das Nichts als etwas zu fassen, als eine Stelle, die leer ist und trotzdem zählt. Eine Schicht unter allen Zahlen liegt dieser mutige Gedanke, dem Leeren einen Namen zu geben.`,
+   aha:'Die Null ist das Nichts, das man erst denken musste, um es zählen zu können.' },
+
+ { tag:'Der Kreis, den es nicht gibt', mood:{glow:'#16324f', glyph:'◯', chord:[98,147,196]},
+   frage:'Du zeichnest den saubersten Kreis, den du kannst.  Ist er ein echter, vollkommener Kreis?',
+   wahl:[{text:'Ja, wenn ich sorgfältig genug bin.',tief:false},{text:'Fast, nur der Stift ist ein wenig zu grob.',tief:false},{text:'Nein, der vollkommene Kreis wohnt nur im Gedanken, jeder gezeichnete ist nur sein Schatten.',tief:true}],
+   antwort_flach:'Schön, dass du es genau nimmst, deine Hand kommt der Idee ganz nah.',
+   antwort_tief:'Ja, und das Staunen ist, dass du den perfekten Kreis kennst, obwohl du ihn nie gesehen hast.',
+   enthuellung:`Platon nannte das die Welt der Ideen. Kein Kreis aus Tinte oder Metall ist je vollkommen rund, unter dem Mikroskop zeigt jeder seine Beulen. Und doch trägt jeder von uns den einen, reinen Kreis im Kopf, an dem wir alle anderen messen. Er ist die Schicht darunter, die Form selbst, die keiner erfunden hat.`,
+   aha:'Den vollkommenen Kreis gibt es nirgends, und trotzdem kennst du ihn genau.' },
+
+ { tag:'Der Punkt ohne Größe', mood:{glow:'#1f2733', glyph:'·', chord:[92,138,184]},
+   frage:'In der Geometrie hat ein Punkt keine Größe, keine Breite, gar keine Ausdehnung.  Wo findest du so einen Punkt in der Welt?',
+   wahl:[{text:'Auf dem Papier, dort wo ich ihn hinmale.',tief:false},{text:'Ganz winzig, unter einem starken Mikroskop.',tief:false},{text:'Nirgends in der Welt, er lebt nur als reine Idee, und trotzdem ruht alle Geometrie auf ihm.',tief:true}],
+   antwort_flach:'Dein Punkt ist sichtbar und echt, doch der gemeinte Punkt ist noch feiner als jede Spitze.',
+   antwort_tief:'Ja, etwas, das es nirgends gibt, hält die ganze Geometrie zusammen.',
+   enthuellung:`Euklid schrieb, ein Punkt sei das, was keine Teile hat. Kein Tintenfleck, kein Sandkorn ist wirklich ohne Größe, jedes ließe sich noch teilen. Trotzdem beginnt jede Linie, jeder Kreis, jedes Bauwerk der Mathematik bei diesem Punkt, den es in der Welt gar nicht gibt. Eine Schicht unter dem Gezeichneten liegt das reine, größenlose Ideal.`,
+   aha:'Den Punkt ohne Größe gibt es nirgends, und doch trägt er die ganze Geometrie.' },
+
+ { tag:'Die Zahl ohne Ende', mood:{glow:'#123f3a', glyph:'π', chord:[110,165,220]},
+   frage:'Von Pi kennt man schon Billionen Nachkommastellen, und niemand findet ein Ende.  Warum hört es nie auf?',
+   wahl:[{text:'Die Rechner sind noch nicht schnell genug.',tief:false},{text:'Irgendwann wird sich die Ziffernfolge sicher wiederholen.',tief:false},{text:'Weil Pi kein Ergebnis ist, das aufgeht, sondern ein zeitloses Verhältnis, das in jedem Kreis schon steckt.',tief:true},{text:'Weil wir Kreise noch nicht genau genug messen.',tief:false}],
+   antwort_flach:'Eine kluge Vermutung, und doch führt die Spur noch eine Schicht tiefer.',
+   antwort_tief:'Genau, du rechnest Pi nicht aus, du entdeckst nur immer mehr von etwas, das längst fertig war.',
+   enthuellung:`Pi ist das Verhältnis von Umfang zu Durchmesser, bei jedem Kreis dasselbe, ob Murmel oder Mond. Es ist irrational, die Ziffern wiederholen sich nie, und sie waren schon so, bevor der erste Mensch einen Kreis in den Sand zog. Wir haben Pi nicht gemacht, wir haben es gefunden, eine Wahrheit, die eine Schicht tiefer liegt als jedes runde Ding.`,
+   aha:'Pi hat niemand erfunden, es lag im Kreis, lange bevor jemand es dachte.' },
+
+ { tag:'Unendlich ist kein sehr groß', mood:{glow:'#2a1440', glyph:'∞', chord:[82,123,164]},
+   frage:'Ein Hotel hat unendlich viele Zimmer, alle belegt.  Ein neuer Gast kommt.  Ist noch Platz?',
+   wahl:[{text:'Nein, voll ist voll.',tief:false},{text:'Nur wenn vorher jemand auszieht.',tief:false},{text:'Ja, jeder rückt ein Zimmer weiter, dann wird das erste frei, und alle haben trotzdem eins.',tief:true}],
+   antwort_flach:'So denkt der Alltag, und genau da beginnt das Wunder, eine Schicht tiefer.',
+   antwort_tief:'Ja, beim Unendlichen ist das Ganze nicht größer als ein Teil, das bricht jede gewohnte Regel.',
+   enthuellung:`David Hilbert erfand dieses Hotel als Bild. Es zeigt, dass unendlich keine besonders große Zahl ist, sondern eine andere Art von Ding. Ein Ding, bei dem du Gäste hinzufügen kannst, ohne dass es voller wird. Eine Schicht unter dem Wort viel liegt hier etwas ganz anderes, eine Größe, die sich nicht wie eine Größe verhält.`,
+   aha:'Unendlich ist keine riesige Zahl, sondern eine andere Art von Ding.' },
+
+ { tag:'Das gedrittelte Ganze', mood:{glow:'#1f2a1a', glyph:'⅓', chord:[82,123,165]},
+   frage:'Ein Drittel schreibt man als 0,333... mit endlos vielen Dreien.  Was ergibt das mal drei?',
+   wahl:[{text:'0,999..., also ein bisschen weniger als eins.',tief:false},{text:'Genau eins, denn drei Drittel sind ein Ganzes.',tief:true},{text:'0,999..., und das ist etwas ganz anderes als eins.',tief:false}],
+   antwort_flach:'Die vielen Neunen legen ein winziges Fehlen nahe.  Schau tiefer, was ist drei mal ein Drittel, ganz ohne Kommastellen gedacht?',
+   antwort_tief:'Ja.  Drei Drittel sind ein Ganzes, und die Schreibweise 0,999... ist nur ein anderer Name dafür.',
+   enthuellung:`Ein Drittel ist unbestreitbar 0,333... und drei Drittel sind ein Ganzes.  Dieselbe Rechnung, Ziffer für Ziffer, ergibt 0,999....  Also sind 0,999... und 1 dieselbe Zahl, nur zwei Schreibweisen.  Es gibt Zahlen mit zwei gültigen Dezimaldarstellungen, das ist seit der Analysis des 19. Jahrhunderts sauber verstanden.  Die Neunen täuschen ein Fehlen vor, das es gar nicht gibt.`,
+   aha:'Manche Zahlen haben zwei Namen, und keiner ist der kleinere.' },
+
+ { tag:'Das letzte Bisschen', mood:{glow:'#1a2740', glyph:'≡', chord:[98,147,196]},
+   frage:'0,9 dann 0,99 dann 0,999, immer weiter, unendlich viele Neunen.  Ist diese Zahl kleiner als 1 oder gleich 1?',
+   wahl:[{text:'Kleiner, es fehlt ja immer ein winziges Bisschen.',tief:false},{text:'Gleich, denn zwischen beiden ist kein Platz mehr für eine dritte Zahl.',tief:true},{text:'Das kann niemand wirklich wissen.',tief:false}],
+   antwort_flach:'So fühlt es sich an, ein Rest scheint zu fehlen.  Schau eine Schicht tiefer, wo genau soll dieser Rest denn liegen?',
+   antwort_tief:'Ja.  Wo keine Zahl mehr dazwischenpasst, sind es zwei Namen für denselben Ort.',
+   enthuellung:`Zwischen zwei verschiedenen reellen Zahlen liegt immer eine weitere.  Zwischen 0,999... mit unendlich vielen Neunen und der 1 liegt keine einzige, also sind sie nicht verschieden, sondern gleich.  Das ist bewiesen, kein fast.  Auch anders zu sehen, ein Drittel ist 0,333..., mal drei ergibt 0,999..., und ein Drittel mal drei ist eins.  Cauchy und Weierstraß haben im 19. Jahrhundert genau festgelegt, was so ein unendlicher Ausdruck bedeutet, nämlich der Grenzwert.  Und der ist hier exakt 1.`,
+   aha:'Wenn nichts mehr dazwischenpasst, ist es kein Nachbar, es ist derselbe Ort.' },
+
+ { tag:'Achilles und die Schildkröte', mood:{glow:'#12242a', glyph:'🐢', chord:[87,130,174]},
+   frage:'Achilles läuft der Schildkröte hinterher.  Immer wenn er ihren Punkt erreicht, ist sie ein Stück weiter, so unendlich oft.  Holt er sie je ein?',
+   wahl:[{text:'Nein, sie ist immer ein Stück voraus.',tief:false},{text:'Ja, denn die unendlich vielen immer kleineren Stücke ergeben zusammen eine endliche Strecke.',tief:true},{text:'Nur wenn die Schildkröte stehen bleibt.',tief:false}],
+   antwort_flach:'Das klingt zwingend, unendlich viele Schritte, wie soll das je enden?  Schau tiefer, wie lang sind die Schritte zusammen?',
+   antwort_tief:'Ja.  Unendlich viele Stücke können eine endliche Summe haben.',
+   enthuellung:`Zenon von Elea stellte dieses Rätsel vor rund 2500 Jahren.  Die Auflösung, die Schrittlängen schrumpfen so schnell, dass ihre unendliche Summe endlich bleibt.  0,9 plus 0,09 plus 0,009 und so fort ergibt genau 1.  Man nennt das eine konvergente geometrische Reihe.  Achilles überholt die Schildkröte in endlicher Zeit, obwohl die Rechnung unendlich viele Zwischenschritte hat.`,
+   aha:'Unendlich viele Schritte müssen keine unendliche Strecke sein.' },
+
+ { tag:'Wie nah ist nah genug', hardcore:true, mood:{glow:'#201a2f', glyph:'ε', chord:[110,165,220]},
+   frage:'Nenn mir einen winzigen Abstand zur 1, so klein du willst.  Was macht die Folge 0,9 dann 0,99 dann 0,999 damit?',
+   wahl:[{text:'Sie bleibt am Ende immer weiter weg als irgendein fester Abstand.',tief:false},{text:'Egal wie klein dein Abstand ist, ab irgendwann ist die Folge näher dran als das.',tief:true}],
+   antwort_flach:'Es fühlt sich an, als bliebe stets eine feste Lücke.  Schau tiefer, kannst du eine Lücke nennen, die die Folge nicht irgendwann unterbietet?',
+   antwort_tief:'Genau.  Jede noch so kleine Schranke wird irgendwann unterschritten.',
+   enthuellung:`Das ist der Kern des modernen Grenzwerts, den Karl Weierstraß im 19. Jahrhundert scharf gemacht hat.  Nah dran heißt nicht ein fester kleiner Rest, sondern, für jeden Abstand, den du forderst, komme ich dir näher als das.  Jedes einzelne Folgenglied bleibt echt unter 1, die Reise kommt nie an.  Doch weil kein noch so winziger Abstand übrig bleibt, ist der Grenzwert exakt 1.  Beide Schichten sind wahr, der Weg berührt die 1 nie, das vollendete Ziel ist sie.`,
+   aha:'Näher als jeder Abstand, den du nennen kannst, das ist die genaue Bedeutung von berühren.' },
+
+ { tag:'Die Reise die nie ankommt', hardcore:true, mood:{glow:'#2a1a1f', glyph:'→', chord:[73,110,147]},
+   frage:'Eine Wahrheit nähert sich der Gewissheit, 0,9 dann 0,99 dann 0,999, Schritt um Schritt.  Erreicht diese Reise je die 1?',
+   wahl:[{text:'Ja, beim allerletzten Schritt.',tief:false},{text:'Nein, sie bleibt drunter, also ist 0,999... kleiner als 1.',tief:false},{text:'Kein einzelner Schritt erreicht sie, und doch ist das ganze endlose Zusammen genau die 1.',tief:true}],
+   antwort_flach:'Verständlich, ein letzter Schritt wäre schön.  Aber es gibt kein letztes Glied, schau eine Schicht tiefer, wo die 1 dann doch wohnt.',
+   antwort_tief:'Ja.  Der Weg berührt sie nie, das vollendete Ganze ist sie.',
+   enthuellung:`Hier wohnen zwei Wahrheiten friedlich nebeneinander.  Jedes einzelne Glied, 0,9, dann 0,99, dann 0,999, ist echt kleiner als 1, die Reise kommt an keinem Punkt an, es gibt keinen letzten Schritt.  Und doch ist der Grenzwert der ganzen endlosen Folge exakt 1, so haben es Cauchy und Weierstraß festgelegt.  Der Fehler wäre nur, vom nie ankommenden Weg auf ein kleineres Ziel zu schließen.  Der Prozess erreicht die 1 nie, das vollendete Unendliche IST sie.`,
+   aha:'Kein einzelner Schritt erreicht die 1, das Ganze aller Schritte ist sie.' },
+
+ { tag:'Entdecken oder erfinden', mood:{glow:'#0e1408', glyph:'◯', chord:[104,139,156]},
+   frage:'Ein Dichter erfindet sein Gedicht frei.  Erfindet ein Mathematiker seinen Satz genauso, oder findet er ihn wie ein fremdes Land?',
+   wahl:[{text:'Er erfindet ihn frei, wie der Dichter seine Zeilen.',tief:false},{text:'Er findet ihn, das Land war schon da, er hat es nur zuerst betreten.',tief:true},{text:'Beides ist dasselbe, alles im Kopf ist erfunden.',tief:false}],
+   antwort_flach:'Beim Machen fühlt es sich oft wirklich wie freies Erfinden an.',
+   antwort_tief:'Ja, er zieht die Grenzen nicht, er zeichnet nur die Karte.',
+   enthuellung:`Ein Dichter könnte seine Zeile auch ganz anders schreiben, und beides wäre gültig. Ein Mathematiker aber kann nicht frei wählen, ob es unendlich viele Primzahlen gibt, er kann es nur finden oder verfehlen. Der Zahlentheoretiker G. H. Hardy sah sich als Beobachter, nicht als Erfinder, wie einer, der ferne Berge beschreibt, die schon da sind. Darunter liegt der ganze Unterschied zwischen Dichten und Entdecken.`,
+   aha:'Der Dichter erfindet, der Mathematiker entdeckt.' },
+
+ { tag:'Was den Denker überlebt', mood:{glow:'#0c1a2b', glyph:'△', chord:[98,131,196]},
+   frage:'Pythagoras ist seit über zweitausend Jahren tot.  Sein Satz über das Dreieck, ist der mit ihm gestorben?',
+   wahl:[{text:'Ja, mit dem Mann ist auch sein Wissen vergangen.',tief:false},{text:'Nein, der Satz galt schon vorher und gilt weiter, er kennt keinen Tod.',tief:true},{text:'Er lebt nur weiter, weil wir ihn in Büchern aufbewahren.',tief:false},{text:'Er gilt, solange Menschen ihn unterrichten.',tief:false}],
+   antwort_flach:'Es fühlt sich so an, als bräuchte eine Wahrheit jemanden, der sie hält.',
+   antwort_tief:'Ja, der Mensch verging, die Wahrheit blieb unberührt.',
+   enthuellung:`Der Satz sagt etwas ganz Konkretes: in jedem rechtwinkligen Dreieck ist a mal a plus b mal b gleich c mal c, die beiden kurzen Seiten und die lange Seite stehen für immer in diesem Verhältnis. Man kann es Schritt für Schritt beweisen, und es stimmt bei jedem solchen Dreieck, ob aus Papier oder aus Sternenlicht. Genau darum war es schon in Babylon und Indien bekannt, lange bevor Pythagoras lebte, mehrere Kulturen stießen unabhängig darauf. Der Satz war also wahr, bevor Pythagoras ihn fand, und er bleibt wahr, wenn niemand mehr an ihn denkt. Platon nannte solche Wahrheiten ideal, zu Hause in einer Schicht, die kein Sterben kennt. Nicht der Mann hat die Wahrheit gemacht, er hat sie nur aufgeschrieben. Darunter liegt etwas, das nicht altert.`,
+   aha:'Ein Beweis überlebt jeden, der ihn je gedacht hat.' },
+
+ { tag:'Wenn niemand mehr denkt', mood:{glow:'#0b0f1c', glyph:'ℵ', chord:[80,120,160]},
+   frage:'Stell dir vor, jedes denkende Wesen im All ist verschwunden.  Ist die Sieben dann noch eine Primzahl?',
+   wahl:[{text:'Nein, ohne einen Geist, der es denkt, gibt es keine Zahlen.',tief:false},{text:'Ja, dass sieben sich nur durch eins und sich selbst teilt, hängt an keinem Denker.',tief:true},{text:'Die Frage verliert dann ihren Sinn.',tief:false},{text:'Nur wenn irgendwo die Regeln aufgeschrieben blieben.',tief:false}],
+   antwort_flach:'Es liegt nahe, eine Wahrheit an jemanden zu binden, der sie denkt.',
+   antwort_tief:'Ja, die Unteilbarkeit der Sieben braucht keinen Zeugen.',
+   enthuellung:`Dass sich sieben durch nichts außer eins und sich selbst teilen lässt, ist keine Meinung und keine Abmachung, es ist einfach so, mit oder ohne uns. Diese Haltung nennt man den mathematischen Platonismus, die Zahlen wären wirklich, unabhängig von jedem Kopf. Ob das stimmt, wird bis heute gestritten, doch der Schauer bleibt, dass tiefer als alles Denken eine Wahrheit liegen könnte, die keinen Denker braucht. Vielleicht war die Sieben nie auf uns angewiesen.`,
+   aha:'Manche Wahrheit braucht keinen, der sie denkt.' },
+
+ { tag:'Das Delta', hardcore:true, mood:{glow:'#0f2418', glyph:'Δ', chord:[73,110,146]},
+   frage:'Du zeigst auf einen Fluss und sagst, das ist die Elbe.  Doch das Wasser von gestern ist längst im Meer.  Was genau nennst du da eigentlich Elbe?',
+   wahl:[{text:'Das Wasser, das ist ja das Greifbare.',tief:false},{text:'Das Flussbett, das bleibt wenigstens liegen.',tief:false},{text:'Nicht den Stoff, sondern das Strömen selbst, die Form der Änderung.',tief:true}],
+   antwort_flach:'Der Stoff wechselt ständig aus und du sagst trotzdem weiter Elbe.  Schau eine Schicht tiefer.',
+   antwort_tief:'Ja, was bleibt, ist das Muster des Fließens, nicht das Material.',
+   enthuellung:`Heraklit sagte vor rund 2500 Jahren, in denselben Fluss steige man nicht zweimal, denn stets strömt neues Wasser nach.  Was wir Ding nennen, ist oft eine erstaunlich stabile Änderung, eine Flamme, ein Wirbel, ein Mensch, dessen Zellen sich fast vollständig austauschen.  Newton und Leibniz fanden später eine Sprache genau dafür, die Ableitung, das Delta, die Änderung in einem einzigen Augenblick.  Ob das Strömen wirklicher ist als das Strömende, das bleibt ein Staunen, kein Beweis.`,
+   aha:'Vielleicht sind Dinge nur Änderungen, die lange genug dieselbe Form halten.' },
+
+ { tag:'Von Vielleicht zu Ist', hardcore:true, mood:{glow:'#1a1030', glyph:'◈', chord:[65,98,131]},
+   frage:'In der Physik kann ein einzelnes Lichtteilchen an mehreren Orten zugleich möglich sein.  Misst du es, ist es plötzlich an genau einem Ort.  Was passiert im Moment des Übergangs?',
+   wahl:[{text:'Es war die ganze Zeit schon dort, die Physik wusste es nur nicht.',tief:false},{text:'Der Zufall entscheidet, und damit ist die Sache erledigt.',tief:false},{text:'Aus vielen Möglichkeiten wird eine Wirklichkeit, und wie das geschieht, weiß bis heute niemand.',tief:true}],
+   antwort_flach:'So hätten es viele gern, aber sorgfältige Experimente sprechen dagegen.  Schau eine Schicht tiefer.',
+   antwort_tief:'Ja, genau dieser Übergang ist eine ehrlich offene Frage der Physik.',
+   enthuellung:`In der Quantenphysik ist ein Teilchen vor der Messung ein Bündel von Möglichkeiten, eine sogenannte Überlagerung.  Bei der Messung erscheint genau ein Ergebnis, und was dabei mit allen anderen Möglichkeiten geschieht, ist bis heute ungeklärt, man nennt es das Messproblem.  Niels Bohr und Werner Heisenberg rangen schon vor fast hundert Jahren darum, und noch immer streiten kluge Köpfe über die Deutung.  Der Sprung von möglich zu wirklich ist einer der ehrlichsten offenen Ränder der ganzen Wissenschaft.`,
+   aha:'Der Sprung vom Vielleicht ins Ist ist echt und bis heute unerklärt.' },
+
+ { tag:'Der erste Unterschied', mood:{glow:'#0a0a12', glyph:'⟡', chord:[87,116,174]},
+   frage:'Vor allem Zählen brauchte es vielleicht nur eines, die Trennung von ist und ist nicht.  War das der Anfang?',
+   wahl:[{text:'Nein, die Zahlen kamen zuerst, ganz von selbst.',tief:false},{text:'Vielleicht, aus dem einen Unterschied wächst das Zählen, doch ob es so begann, bleibt offen.',tief:true},{text:'Ja, sicher, so und nicht anders begann die Mathematik.',tief:false},{text:'Der Anfang lässt sich gar nicht denken.',tief:false}],
+   antwort_flach:'Nach einem festen Anfang zu suchen, ist ein sehr menschlicher Trost.',
+   antwort_tief:'Ja, du hältst die Möglichkeit offen, ohne sie zur Gewissheit zu machen.',
+   enthuellung:`Aus einem einzigen Unterschied, eins und nicht eins, lässt sich erstaunlich viel bauen, Leibniz träumte von einer Welt aus Null und Eins, und unsere Rechner leben heute davon. Ob die erste Trennung von ist und ist nicht wirklich der Ursprung aller Ordnung war, weiß niemand. Aber es ist ein schöner Gedanke, dass unter allem Zählen eine noch tiefere Schicht liegt, der bloße Unterschied. Ein Staunen, kein Beweis.`,
+   aha:'Vielleicht beginnt alle Ordnung mit einem einzigen Unterschied.' },
+
+ { tag:'Vor dem ersten Licht', mood:{glow:'#050a14', glyph:'✧', chord:[82,110,164]},
+   frage:'War die Ordnung, dass eins und eins zwei ergibt, schon da, bevor der erste Stern brannte?',
+   wahl:[{text:'Ja, ganz sicher, sie ist ewig und stand über allem.',tief:false},{text:'Das wissen wir nicht, und genau dieses Nichtwissen ist das Wunder.',tief:true},{text:'Nein, Ordnung entstand erst mit der Welt.',tief:false},{text:'Ordnung gibt es nur, wo jemand hinschaut.',tief:false}],
+   antwort_flach:'Der Wunsch, es sicher zu wissen, ist tief und ehrlich.',
+   antwort_tief:'Ja, hier ehrst du das Geheimnis, statt es zu füllen.',
+   enthuellung:`Ob die mathematische Ordnung dem Universum vorausging, ist eine der ältesten Fragen, und ehrlicherweise wissen wir es nicht. Manche, wie der Physiker Max Tegmark, vermuten, die Welt sei im Kern selbst Mathematik, andere widersprechen entschieden. Die tiefere Schicht hier ist keine Antwort, sondern der Schauer vor einer Frage, die vielleicht größer ist als jede Antwort. Staunen darf man, behaupten nicht.`,
+   aha:'Manche Wahrheit ist so groß, dass Staunen ehrlicher ist als Wissen.' },
+
+ /* ===== ENDE PREMIUM-KANDIDATEN ===== */
+
+ { tag:'Die Meisterfrage', mood:{glow:'#c98a2e', glyph:'◠', chord:[98.00,146.83,196.00]},
+   bild:`<svg viewBox="0 0 420 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Die berühmte erste Zeichnung aus Der kleine Prinz: eine Boa, die einen Elefanten verschluckt hat und wie ein Hut aussieht"><defs><radialGradient id="lp-belly" cx="46%" cy="64%" r="62%"><stop offset="0%" stop-color="#e9c26a" stop-opacity="0.20"/><stop offset="55%" stop-color="#e9c26a" stop-opacity="0.08"/><stop offset="100%" stop-color="#e9c26a" stop-opacity="0"/></radialGradient></defs><path d="M 27,142 C 59,135 90,132 119,127 C 151,121 167,50 196,39 C 224,28 251,79 286,116 C 322,141 361,146 399,150 C 335,164 251,161 189,159 C 128,157 71,157 27,142 Z" fill="url(#lp-belly)" stroke="#e9c26a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+   frage:'Sieh dir dieses Bild an.  Was ist das?',
+   wahl:[{text:'Ein Hut.',tief:false},{text:'Nur Pixel und Regeln, die ein Bild zeichnen.',tief:false},{text:'Eine Zeichnung, ein Zeichen für etwas.',tief:false},{text:'Eine Schlange, die einen Elefanten verschluckt hat.',tief:true}],
+   antwort_flach:'Eine wahre Schicht. Aber dieses eine Bild trägt mehr als sie. Sieh genauer.',
+   antwort_tief:'Ja. Du hast gesehen, was der kleine Prinz sah, und die Erwachsenen nie.',
+   enthuellung:`Schau, wie viele Schichten in einer einzigen Linie stecken.
+Ganz unten sind es nur Nullen und Einsen, Regeln, die deinem Bildschirm sagen, welche Punkte hell werden. Das ist die Schicht, auf der die Maschine lebt.
+Eine Schicht darüber macht dein Auge aus diesen Punkten sofort ein Ding, einen Hut. Genau dort blieben die Erwachsenen im Buch stehen und fragten nie weiter.
+Aber es ist kein Hut. Es ist eine Riesenschlange, die einen Elefanten verschluckt hat, dieselbe Linie, eine Bedeutung tiefer.
+Und selbst das trägt das Bild nicht in sich. Es zeigt nur. Welche Schicht du siehst, entsteht erst beim Hinsehen.`,
+   aha:'Ein Bild ist nie das Ding, es ist eine Tür durch viele Schichten, und wie tief du gehst, entscheidest du.' },
+
+ { tag:'Der letzte Layer', mood:{glow:'#e0b24e', glyph:'◉', chord:[130.81,164.81,196.00]},
+   frage:'Und jetzt ehrlich, was war eigentlich der nächste Layer?',
+   wahl:[{text:'Die nächste Frage.',tief:false},{text:'Ich. Gerade eben.',tief:true}],
+   antwort_flach:'Fast, schau nochmal, wer hier tiefer gegangen ist.',
+   antwort_tief:'Ja. Du.',
+   enthuellung:`Jede Frage hat dich eine Schicht tiefer gebracht, von den Zeichen zur Bedeutung, vom Ding zum Unterschied, von der Schleife zum „Ich“. Der nächste Layer warst nie die Aufgabe. Es war dein Denken, das sich selbst eine Ebene tiefer gestellt hat.`,
+   aha:'Der nächste Layer bist du, sobald du eine Schicht tiefer denkst.' }
+];
+
+/* ============================ AMBIENT-SOUND ============================ */
+const Audio = (function(){
+  let ctx=null, master=null, drones=[], lp=null, lfo=null, bellTimer=null, on=false;
+  const mobileAudio=!!(window.matchMedia&&matchMedia('(max-width: 700px), (pointer: coarse)').matches);
+  const targetVolume=mobileAudio?0.18:0.34;
+  function init(){
+    if(ctx) return;
+    const AC = window.AudioContext||window.webkitAudioContext;
+    // latencyHint 'playback' = groesserer Audio-Puffer. Fuer Hintergrund-Ambient ist es egal, ob der
+    // Ton ein paar ms spaeter kommt, aber der groessere Puffer beugt Aussetzern/Rattern auf schwaecheren
+    // Rechnern vor (der haeufigste Grund fuer "es rattert bei ihr, bei mir nicht").
+    try{ ctx = new AC({ latencyHint:'playback' }); }catch(e){ ctx = new AC(); }
+    master = ctx.createGain(); master.gain.value=0.0;
+    const compressor=ctx.createDynamicsCompressor(); compressor.threshold.value=-24; compressor.knee.value=18;
+    compressor.ratio.value=4; compressor.attack.value=0.015; compressor.release.value=0.3;
+    master.connect(compressor); compressor.connect(ctx.destination);
+    lp = ctx.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=mobileAudio?620:760; lp.Q.value=0.35; lp.connect(master);
+    lfo = ctx.createOscillator(); const lg=ctx.createGain(); lfo.frequency.value=0.04; lg.gain.value=mobileAudio?30:90;
+    lfo.connect(lg); lg.connect(lp.frequency); lfo.start();
+    [0,1,2].forEach(()=>{ const o=ctx.createOscillator(); o.type='sine'; const g=ctx.createGain(); g.gain.value=mobileAudio?0.045:0.09;
+      o.connect(g); g.connect(lp); o.start(); drones.push({o,g}); });
+    setChord([110,164.81,220]);
+    if(!mobileAudio) scheduleBell();
+  }
+  function setChord(ch){ if(!ctx) return; drones.forEach((d,i)=>{ const f=ch[i]||ch[ch.length-1];
+    const safeF=mobileAudio&&f<120?f*2:f;
+    d.o.frequency.cancelScheduledValues(ctx.currentTime); d.o.frequency.setTargetAtTime(safeF, ctx.currentTime, 1.8); }); }
+  function bell(){ if(!ctx||!on) return; const scale=[220,261.63,293.66,349.23,392,440,523.25];
+    const f=scale[Math.floor((Math.sin(ctx.currentTime*97.13)*0.5+0.5)*scale.length)%scale.length];
+    const o=ctx.createOscillator(); o.type='sine'; o.frequency.value=f;
+    const g=ctx.createGain(); const t=ctx.currentTime;
+    // Sanfter, exponentiell aus- und einblendender Ton (keine Rampe aus/zu 0 -> kein Klick).
+    g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.05,t+0.6); g.gain.exponentialRampToValueAtTime(0.0001,t+4.2);
+    // EIN sanftes Echo, aber KEINE Rueckkopplungs-Schleife mehr. Die alte dl->fb->dl-Schleife
+    // erzeugte beim Ausklingen Denormal-Zahlen, die auf manchen CPUs Rechenspitzen und damit
+    // genau dieses Rattern/Aussetzen im Ton verursachen. Ein einfacher Delay-Tap kann das nicht.
+    const dl=ctx.createDelay(); dl.delayTime.value=0.33; const eg=ctx.createGain(); eg.gain.value=0.16;
+    o.connect(g); g.connect(lp); g.connect(dl); dl.connect(eg); eg.connect(lp);
+    o.start(t); o.stop(t+4.4);
+    o.onended=()=>{ try{ o.disconnect(); g.disconnect(); dl.disconnect(); eg.disconnect(); }catch(e){} };
+  }
+  function scheduleBell(){ const wait=5200+Math.abs(Math.sin((ctx?ctx.currentTime:0)*13.7))*4200;
+    bellTimer=setTimeout(()=>{ if(ctx&&ctx.state==='suspended'&&on){ ctx.resume().catch(()=>{}); } bell(); scheduleBell(); }, wait); }
+  return {
+    toggle(){ init(); if(ctx.state==='suspended')ctx.resume(); on=!on;
+      master.gain.setTargetAtTime(on?targetVolume:0.0, ctx.currentTime, 0.45); return on; },
+    ensure(){ init(); if(ctx.state==='suspended')ctx.resume(); if(!on){ on=true; master.gain.setTargetAtTime(targetVolume,ctx.currentTime,1.2);} },
+    chord:setChord, isOn(){return on;}
+  };
+})();
+
+/* ============================ CODE-DRIFT (lebendiger Hintergrund) ============================ */
+const CodeDrift = (function(){
+  const cv=document.getElementById('code'), cx=cv.getContext('2d');
+  const TOKENS=['0','1','0','1','01','10','if','then','fn','=>','{ }','( )','01001','λ','Δ','∑','→','||','&&','==','x++','sha','1010','true','void','def','0 1'];
+  let W=0,H=0,DPR=1,toks=[],color='185,205,240',reduce=false,raf=0,last=0,hidden=false,rz=0;
+  const mobileVisual=!!(window.matchMedia&&matchMedia('(max-width: 700px), (pointer: coarse)').matches);
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  function mk(y){ const size=rnd(11,22); return { x:rnd(0,W), y:(y==null?rnd(-H,H):y), size,
+    speed:rnd(6,10)+(22-size)*1.1, text:TOKENS[(Math.random()*TOKENS.length)|0],
+    phase:rnd(0,6.28), tw:rnd(0.4,1.1), base:0.08+(size-11)/11*0.18 }; }
+  function resize(){ DPR=Math.min(window.devicePixelRatio||1,mobileVisual?1.5:2); W=innerWidth; H=innerHeight;
+    cv.width=Math.round(W*DPR); cv.height=Math.round(H*DPR); cx.setTransform(DPR,0,0,DPR,0,0);
+    const n=Math.max(24,Math.min(80,Math.round(W*H/16000))); toks=[]; for(let k=0;k<n;k++) toks.push(mk());
+    if(reduce) draw(true); }
+  function draw(staticOnly){ cx.clearRect(0,0,W,H); cx.textAlign='center'; cx.textBaseline='middle';
+    for(const o of toks){ const a=o.base*(staticOnly?0.8:(0.55+0.45*Math.sin(o.phase)));
+      cx.font=o.size+'px ui-monospace,Menlo,Consolas,monospace'; cx.fillStyle='rgba('+color+','+a.toFixed(3)+')';
+      cx.fillText(o.text,o.x,o.y); } }
+  function step(ts){ raf=requestAnimationFrame(step);
+    if(hidden){ last=0; return; }
+    if(last && ts-last<(mobileVisual?66:32)) return; // mobil 15 fps: scharfes Bild ohne die Audiokette auszuhungern
+    const dt=last?Math.min((ts-last)/1000,0.05):0.016; last=ts;
+    for(const o of toks){ o.y+=o.speed*dt; o.phase+=o.tw*dt; if(o.y>H+20) Object.assign(o,mk(-20)); }
+    draw(false); }
+  return {
+    init(){ reduce=!!(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches); resize();
+      addEventListener('resize',()=>{ clearTimeout(rz); rz=setTimeout(resize,180); });
+      document.addEventListener('visibilitychange',()=>{ hidden=document.hidden; last=0; });
+      if(!reduce){ last=0; raf=requestAnimationFrame(step); } },
+    tint(hex){ const m=/^#?([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(hex||''); if(!m) return;
+      const r=parseInt(m[1],16),g=parseInt(m[2],16),b=parseInt(m[3],16), mix=(c,l)=>Math.round(c*0.45+l*0.55);
+      color=mix(r,185)+','+mix(g,205)+','+mix(b,240); }
+  };
+})();
+
+/* ============================ ENGINE ============================ */
+const stack=document.getElementById('stack'), bgEl=document.getElementById('bg'), glyphEl=document.getElementById('glyph'),
+      ptsEl=document.getElementById('pts'), sndBtn=document.getElementById('snd');
+let i=0, score=0, answeredNow=false, tiefNow=null;
+const REDUCE = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+/* Fortschritt lokal merken, damit man nach einem Rausschmiss genau hier weitermacht.
+   Kein Zurueckgehen, nur automatisches Zwischenspeichern, das ehrliche Ergebnis bleibt. */
+const PKEY='tiefer_progress';
+function saveProgress(answered,tief){ try{ localStorage.setItem(PKEY, JSON.stringify({i, score, answered:!!answered, tief:(tief==null?null:!!tief), ts:Date.now()})); }catch(e){} }
+function loadProgress(){ try{ return JSON.parse(localStorage.getItem(PKEY)||'null'); }catch(e){ return null; } }
+function clearProgress(){ try{ localStorage.removeItem(PKEY); }catch(e){} }
+const MAX = LEVELS.reduce((s,l)=> s + Math.max(...l.wahl.map(w=>w.tief?3:1)), 0);
+
+function el(t,c,h){const e=document.createElement(t); if(c)e.className=c; if(h!=null)e.innerHTML=h; return e;}
+function setMood(m){ bgEl.style.background = `radial-gradient(1100px 760px at 50% 6%, ${m.glow} -40%, #070a14 55%, #05060c 100%)`;
+  glyphEl.textContent=m.glyph; glyphEl.style.opacity='.05'; Audio.chord(m.chord); CodeDrift.tint(m.glow); }
+function ghost(n){ const g=el('div','ghost'); const d=70+n*46;
+  g.style.transform=`translateZ(${-d}px) translateY(${34+n*10}px)`; g.style.opacity=String(Math.max(.08,.5-n*.08)); return g; }
+function type(node,text,done,host){ if(REDUCE){ node.textContent=text; if(host) host.scrollTop=host.scrollHeight; if(done)done(); return; }
+  node.textContent=''; let k=0; (function tick(){ if(k<=text.length){ node.textContent=text.slice(0,k); k++;
+  if(host && (text[k-1]==='\n' || (k%5)===0) && host.scrollHeight-host.scrollTop-host.clientHeight<80) host.scrollTop=host.scrollHeight;
+  setTimeout(tick, text[k-1]==='\n'?60:13);} else if(done)done(); })(); }
+
+function start(){
+  setMood({glow:'#3a2f7a', glyph:'?', chord:[110,164.81,220]});
+  const c=el('div','card coming center');
+  c.innerHTML = '<div class="tag fade" style="text-align:center">bevor du eintauchst</div>'
+    + '<h1 class="fade">Wie prüfst du eine überzeugende Antwort?</h1>'
+    + '<p class="lead fade">TIEFER ist ein freiwilliges Denkspiel über Zeichen, Erklärungen und Perspektiven. Du wählst Antworten und liest anschließend, welche Annahme darunterliegt.</p>'
+    + '<div class="terms fade">'
+      + '<div class="termrow"><b>Kein Intelligenztest:</b> Punkte und Rang sind Spielmechanik, keine Diagnose deiner Begabung oder deines Werts.</div>'
+      + '<div class="termrow"><b>Pause:</b> Du kannst jederzeit verlassen und im selben Browser fortsetzen.</div>'
+      + '<div class="termrow"><b>Speicher:</b> Gerätewechsel, anderer Browser, privater Modus oder gelöschte Website-Daten können deinen Stand entfernen. Ein Lernstudio-Konto synchronisiert TIEFER derzeit nicht.</div>'
+      + '<div class="termrow"><b>Lernen:</b> Das Spiel vergibt lokale Denkpunkte. Alle Lernpfade sind kostenlos.</div>'
+    + '</div>'
+    + '<p class="lead fade" style="color:var(--gold)">Wenn diese Bedingungen für dich passen, gehen wir Schicht für Schicht tiefer.</p>'
+    + '<p class="fade"><button class="btn" id="go">Mit diesen Bedingungen beginnen ↓</button></p>';
+  stack.appendChild(c); enter(c);
+  c.querySelector('#go').onclick=(e)=>{ e.currentTarget.disabled=true; Audio.ensure(); sndBtn.classList.add('on'); sndBtn.setAttribute('aria-pressed','true'); leave(c); i=0; setTimeout(render,300); };
+}
+function enter(c){ requestAnimationFrame(()=>requestAnimationFrame(()=>{ c.classList.remove('coming'); c.classList.add('active'); })); }
+function leave(c){ c.classList.remove('active'); c.classList.add('gone'); setTimeout(()=>c.remove(),950); }
+
+function render(restore){
+  const L=LEVELS[i]; setMood(L.mood);
+  document.body.classList.add('playing');
+  const wieder = !!(restore && restore.answered);
+  answeredNow = wieder; tiefNow = wieder ? restore.tief : null;
+  if(!restore) saveProgress(false,null);          // frische Schicht: Stand sichern
+  [...stack.querySelectorAll('.ghost')].forEach(g=>g.remove());
+  for(let n=Math.min(i,4); n>=1; n--) stack.appendChild(ghost(n));
+  const c=el('div','card coming'); c.appendChild(el('div','tag',L.tag));
+  if(L.hardcore) c.appendChild(el('div','iq','extra knifflig'));
+  if(L.bild){ const b=el('div','bild'); b.innerHTML=L.bild; c.appendChild(b); }
+  const frage=el('div','frage'); c.appendChild(frage);
+  const waehl=el('div','waehl'); c.appendChild(waehl);
+  const reveal=el('div','hidden'); c.appendChild(reveal);
+  stack.appendChild(c); enter(c);
+  if(wieder){ frage.textContent=L.frage; } else { type(frage,L.frage); }
+  L.wahl.forEach(w=>{ const b=el('button',null,w.text); b.onclick=()=>{
+    [...waehl.children].forEach(x=>x.disabled=true); b.style.borderColor=w.tief?'var(--good)':'var(--accent)';
+    const got=w.tief?3:1; score+=got; ptsEl.textContent=score;
+    answeredNow=true; tiefNow=w.tief; saveProgress(true,w.tief);
+    showReveal(c,reveal,L,w.tief,got);
+  }; waehl.appendChild(b);
+    if(wieder){ b.disabled=true; if(!!w.tief===!!restore.tief){ b.style.borderColor=w.tief?'var(--good)':'var(--accent)'; } }
+  });
+  if(wieder){ showReveal(c,reveal,L,restore.tief,restore.tief?3:1); }
+}
+
+function showReveal(card,reveal,L,tief,got){
+  reveal.classList.remove('hidden');
+  const r=el('div','reaktion'+(tief?' tief':''), tief?L.antwort_tief:L.antwort_flach);
+  const enth=el('div','enth'); const pts=el('div','pts hidden', '+'+got+' Genie-Punkte');
+  const aha=el('div','aha hidden','↳ '+L.aha);
+  const wrap=el('div'); const btn=el('button','btn hidden', i<LEVELS.length-1?'Tiefer ↓':'Ans Licht ✦');
+  reveal.append(r,enth,pts,aha,wrap); wrap.appendChild(btn);
+  type(enth,L.enthuellung,()=>{ pts.classList.remove('hidden'); aha.classList.remove('hidden'); btn.classList.remove('hidden'); btn.classList.add('fade'); card.scrollTop=card.scrollHeight; }, card);
+  btn.onclick=()=>{ if(btn.disabled) return; btn.disabled=true; leave(card); i++;
+    if(i<LEVELS.length){ answeredNow=false; tiefNow=null; saveProgress(false,null); render(); }
+    else { clearProgress(); ende(); } };
+}
+
+/* TIEFER-Rang. Lokaler Denkspielrang, ohne Geld- oder Tokenfunktion. */
+const FAZIT = {
+  10:'Das war kein Zufall. Du hast fast jedes Mal die Schicht darunter gesehen, genau das Denken, um das es geht, nicht auswendig lernen, eine Schicht tiefer sehen. Bis daraus echtes Können wird, geht es noch weiter nach unten.',
+  7:'Du hast gegraben und Gold gefunden, und ein paarmal an der Kante gestoppt. Genau an dieser Kante fängt das Lernen an, eine Schicht tiefer, als sich sicher anfühlt.',
+  5:'Du hast begonnen, erste Antworten nicht einfach stehen zu lassen. Die Oberfläche ist ein Ausgangspunkt, und der Weg zu genaueren Fragen steht dir offen.'
+};
+const RANGTEXT = {
+  10:'<b>Tiefseetaucher.</b> Du warst fast jedes Mal unter der ersten Antwortschicht.',
+  7:'<b>Schürfer.</b> Du hast gegraben und mehr als einmal Gold gefunden.',
+  5:'<b>Erkundender.</b> Du hast den ersten Schritt unter eine schnelle Antwort gemacht.'
+};
+function tier(s){ const p=s/MAX;
+  if(p>=0.82) return {rang:'🌌 Tiefseetaucher', niveau:10};
+  if(p>=0.55) return {rang:'🔦 Schürfer', niveau:7};
+  return {rang:'🌊 Erkundender', niveau:5}; }
+function escH(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function ende(){
+  clearProgress(); document.body.classList.remove('playing');
+  const jetzt=tier(score);
+  // Baseline = der erste ehrliche Lauf. Sie bleibt lokal in diesem Browser gespeichert.
+  let base=null; try{ base=JSON.parse(localStorage.getItem('tiefer_baseline')||'null'); }catch(e){}
+  const wiederlauf=!!base;
+  if(!base){ base={score:score, max:MAX, rang:jetzt.rang, niveau:jetzt.niveau, ts:Date.now()};
+    try{ localStorage.setItem('tiefer_baseline', JSON.stringify(base)); }catch(e){} }
+  const niveau=base.niveau||base.rabatt||jetzt.niveau;
+  setMood({glow:'#e0b24e', glyph:'◉', chord:[130.81,164.81,196]});
+  [...stack.querySelectorAll('.ghost')].forEach(g=>g.remove());
+  for(let n=4;n>=1;n--) stack.appendChild(ghost(n));
+  const c=el('div','card coming center');
+  let html =
+    '<h1 class="fade">Du hast das Licht erreicht.</h1>'
+   +'<div class="big fade">'+escH(base.score)+' / '+escH(base.max)+'</div>'
+   +'<div class="rank fade">'+escH(base.rang)+'</div>'
+    +'<p class="lead fade">'+FAZIT[niveau]+'</p>'
+    +(wiederlauf?'<p class="lead fade" style="color:var(--good); font-size:13.5px">Das war dein erster, ehrlicher Lauf. Dein Rang bleibt in diesem Browser gespeichert.</p>':'')
+   +'<div class="codebox fade">Wenn dir diese Art des Fragens liegt, kannst du im Lernstudio alle Lernpfade aus HTML, Computerlogik, Mathematik und Alltag erkunden.<br><span style="color:var(--dim);font-size:12.5px">Dein Spielergebnis bleibt lokal. Alle Lernpfade sind frei zugänglich.</span></div>'
+   +'<div class="angebot fade">'
+    +'<p class="rangtext">'+RANGTEXT[niveau]+'</p>'
+    +'<p class="motto">Wissen darf kein Vermögen kosten.</p>'
+    +'<p class="feindruck">Dein erstes Spielergebnis merkt sich nur dieser Browser lokal. Du kannst kostenlos weiterlernen.</p>'
+   +'</div>'
+   +'<div class="aktion fade">'
+    +'<a class="btn" href="studio.html">Freie Lektionen ausprobieren</a>'
+    +'<a class="btn ghostbtn" href="angebot.html">Angebot in Ruhe lesen</a>'
+   +'<button class="btn ghostbtn" onclick="location.reload()">Nochmal tauchen ↺</button>'
+   +'</div>';
+  c.innerHTML = html;
+  stack.appendChild(c); enter(c);
+}
+
+sndBtn.onclick=()=>{ const on=Audio.toggle(); sndBtn.classList.toggle('on',on); sndBtn.setAttribute('aria-pressed', on?'true':'false'); sndBtn.setAttribute('aria-label',on?'Ruhigen Ton ausschalten':'Ruhigen Ton einschalten'); };
+
+/* Willkommen-zurueck-Karte: ein Klick, dann genau an der gespeicherten Schicht weiter. */
+function resumeCard(p){
+  i=p.i; score=p.score||0; ptsEl.textContent=score;
+  setMood({glow:'#3a2f7a', glyph:'?', chord:[110,164.81,220]});
+  const c=el('div','card coming center');
+  c.innerHTML = '<div class="tag fade" style="text-align:center">willkommen zurück</div>'
+    +'<h1 class="fade">Weiter, wo du warst</h1>'
+    +'<p class="lead fade">Dein Lauf ist gespeichert. Du bist bei Schicht '+(p.i+1)+' von '+LEVELS.length+', mit '+score+' Genie&#8209;Punkten.</p>'
+    +'<p class="lead fade" style="color:var(--gold)">Wir tauchen weiter nach unten, nicht zurück. Dein ehrliches Ergebnis bleibt.</p>'
+    +'<p class="fade"><button class="btn" id="go">Weiter tauchen ↓</button> <button class="btn ghostbtn" id="fresh">Von vorne</button></p>';
+  stack.appendChild(c); enter(c);
+  c.querySelector('#go').onclick=(e)=>{ e.currentTarget.disabled=true; Audio.ensure(); sndBtn.classList.add('on'); sndBtn.setAttribute('aria-pressed','true'); leave(c); setTimeout(()=>render(p.answered?{answered:true,tief:p.tief}:null),300); };
+  c.querySelector('#fresh').onclick=()=>{ clearProgress(); i=0; score=0; ptsEl.textContent='0'; leave(c); setTimeout(start,300); };
+}
+
+/* Speichern-Knopf: es wird ohnehin laufend gespeichert, hier nur die ehrliche Beruhigung + Hinweis. */
+const saveBtn=document.getElementById('save'), toastEl=document.getElementById('toast');
+let toastT=0;
+function toast(msg){ toastEl.innerHTML=msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>toastEl.classList.remove('show'), 7000); }
+saveBtn.onclick=()=>{ saveProgress(answeredNow,tiefNow);
+  toast('<b>Gespeichert.</b> Du kannst die Seite jetzt schließen und später genau hier weitermachen. Hinweis: Bleibst du sehr lange weg oder löscht dein Browser die Daten (privater Modus, Verlauf löschen), kann der Fortschritt weg sein. Dann fängst du neu an.'); };
+
+CodeDrift.init();
+const _p=loadProgress();
+if(_p && typeof _p.i==='number' && _p.i>=0 && _p.i<LEVELS.length){ resumeCard(_p); }
+else { clearProgress(); start(); }
+</script>
+</body>
+</html>

@@ -1,0 +1,34 @@
+Lernstudio - third-party and separate-license notices
+Release baseline: 2026-09-08
+
+Original platform sources and original published lesson content: ISC;
+see LICENSE.txt. Emoji are rendered by the visitor's operating system;
+no third-party emoji artwork is bundled.
+
+Existing ambient audio (thematic preview only):
+- Music: "Elevate", Fupi, OpenGameArt, CC0.
+  https://opengameart.org/content/elevate-instrument-tracks
+- Forest birds: isaiah658, OpenGameArt, CC0.
+  https://opengameart.org/content/ambient-bird-sounds
+- Garden birds: syncopika, OpenGameArt, CC0.
+  https://opengameart.org/content/bird-chirping-sounds
+The existing web MP3 files are quieter/combined derivatives of these assets.
+The original project's dated source record is retained locally. CC0 reference:
+https://creativecommons.org/publicdomain/zero/1.0/
+
+Python runtime:
+Pyodide 0.26.2 is loaded on demand from jsDelivr, not bundled in this release.
+Pyodide uses MPL-2.0; its Python/WebAssembly distribution includes additional
+components with their own licenses. Sources and distribution notices:
+https://github.com/pyodide/pyodide/tree/0.26.2
+https://pyodide.org/en/0.26.2/
+
+Development tools are installed from package-lock.json and retain the licenses
+in their package distributions. They are not shipped into the browser.
+
+EVE research source, if included: SPDX MIT, as declared in its source.
+OpenZeppelin Contracts 4.9.6 is an MIT dependency of that separate prototype.
+No mainnet deployment, endorsement, token price or production audit is implied.
+
+The historical VERACHEL creator-persona files, Lumi-Pet artwork and private
+research archives are not part of the website or its source release.

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /studio.html
+
+Sitemap: https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/sitemap.xml

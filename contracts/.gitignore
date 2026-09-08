@@ -1,0 +1,8 @@
+node_modules/
+evidence/
+latest-receipt.json
+*.log
+.env
+.env.*
+!.env.example
+coverage/

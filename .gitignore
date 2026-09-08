@@ -1,0 +1,8 @@
+node_modules/
+dist/
+website/
+contracts/evidence/
+contracts/test-output/
+.env
+.env.*
+*.log

@@ -1,0 +1,1 @@
+/* Legacy contact form retired. Current contact.html offers an explicit email link. */
