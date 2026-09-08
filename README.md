@@ -2,7 +2,7 @@
 
 Kostenlose Lernplattform mit interaktiven Lektionen, selbst gestaltbaren Tier-Avataren und lokalem Lernfortschritt. Der gesamte veröffentlichte Lerninhalt ist ohne Kauf, Konto oder Wallet zugänglich.
 
-- [Lernstudio öffnen](https://lernstudio-wissen-fuer-alle.famous-shore-0820.chatgpt.site/)
+- [Lernstudio öffnen](https://lernstudio-wissen-fuer-alle.juri-janovski.chatgpt.site/)
 - [Community](https://github.com/Juri-Halveth/lernstudio/discussions)
 - [EVE-Forschung](contracts/README.md)
 
