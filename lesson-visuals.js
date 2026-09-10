@@ -25,6 +25,7 @@
   });
 
   const BEGINNER_SCENES = {
+    ki: "Du schreibst einem Helfer eine klare Bitte. Du schaust dir seinen Vorschlag an und prüfst selbst, ob er zu deiner Frage und deinen Quellen passt.",
     einstieg: "Du möchtest am Handy oder Computer etwas tun. Wir gehen dabei nur einen Klick, eine Taste oder eine Entscheidung nach der anderen.",
     machine: "Stell dir eine winzige Werkstatt vor: Ein Zettel kommt hinein, wird gelesen und löst genau eine kleine Handlung aus.",
     html: "Eine Webseite ist wie ein Blatt mit Überschrift, Bildern und Kästen. HTML sagt dem Browser zuerst nur, was davon was ist.",
@@ -163,6 +164,15 @@
         node("Rückmeldung", "Vergleiche Antwort und Erklärung."),
         node("Neu erklären", "Formuliere den Zusammenhang mit eigenen Worten.")
       ], "Kannst du auch erklären, warum die anderen Möglichkeiten nicht tragen?", [[0,1],[1,2],[2,3],[3,0]]);
+    }
+
+    if (id === "ki") {
+      return model("sequence", "Vom Auftrag zur geprüften Antwort", "Ein Modellvorschlag wird erst durch eine passende Prüfung zur brauchbaren Grundlage für deine eigene Entscheidung.", [
+        node("Auftrag", "Beschreibe die konkrete Aufgabe und das erlaubte Material."),
+        node("Vorschlag", "Das Modell erzeugt einen noch zu prüfenden Antwortkandidaten."),
+        node("Prüfung", "Vergleiche die Aussage mit Quellen und vorher festgelegten Kriterien."),
+        node("Entscheidung", "Übernimm belegte Teile und halte offene Fragen sichtbar.")
+      ], "Welche konkrete Prüfung würde einen Fehler in diesem Vorschlag sichtbar machen?");
     }
 
     if (id === "machine") {

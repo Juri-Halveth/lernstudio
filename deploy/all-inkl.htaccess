@@ -1,0 +1,23 @@
+# Lernstudio: kostenlose Fassung, Zielverzeichnis /mein-lernstudio.com/
+DirectoryIndex index.html
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^index\.htm$ / [R=302,L]
+  RewriteRule ^brand-kit\.html$ /quellcode.html [R=302,L]
+  # Alte Verkaufslader werden von der neuen Fassung nicht mehr verwendet.
+  RewriteRule ^(?:content-(?:public|fns|loader)|analytics)\.js$ - [G,L]
+</IfModule>
+
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  <FilesMatch "\.(html?|js|css|webmanifest)$">
+    Header set Cache-Control "no-cache, must-revalidate"
+  </FilesMatch>
+</IfModule>
+
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/plain text/css text/javascript application/javascript application/json application/xml
+</IfModule>

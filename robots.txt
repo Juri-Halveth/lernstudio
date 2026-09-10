@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /studio.html
 
-Sitemap: https://lernstudio-wissen-fuer-alle.juri-janovski.chatgpt.site/sitemap.xml
+Sitemap: https://www.mein-lernstudio.com/sitemap.xml

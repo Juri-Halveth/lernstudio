@@ -23,11 +23,14 @@ for(const file of files.filter(f=>f.endsWith(".html"))){
 }
 for(const file of ["index.html","studio.html"]){
   const text=read(file);assert.match(text,/src="curriculum\.js/);assert.match(text,/learning-profile\.js/);
-  assert.doesNotMatch(text,/content-public|content-loader|account-progress|ls-messung/);
+  assert.match(text,/account-auth\.js/);assert.match(text,/account-progress\.js/);
+  assert.doesNotMatch(text,/content-public|content-loader|ls-messung/);
 }
-assert.doesNotMatch(read("app.js"),/SUPABASE_URL|buy\.stripe|renderPaywall|has_active_access|auth\/v1|signTransaction|eth_sendTransaction/);
+for(const file of ["app.js","account-auth.js","account-progress.js"])assert.doesNotMatch(read(file),/buy\.stripe|renderPaywall|has_active_access|purchase_intent|\/entitlements|signTransaction|eth_sendTransaction/);
+assert.match(read("account-auth.js"),/auth\/v1\/token\?grant_type=password/);
+assert.match(read("account-progress.js"),/rpc\/sync_user_progress/);
 assert.doesNotMatch(read("wallet.js"),/eth_sendTransaction|personal_sign|eth_sign|wallet_switchEthereumChain/);
 assert.doesNotMatch(read("ls-messung.js"),/fetch\(|googletagmanager|gtag\(/);
 assert(!files.some(f=>/secret|credentials|keyhashes|backend-|\.md$|\.zip$/.test(f)));
 const z=zahlen();assert(z.lektionen>0&&z.pfadeAnzahl>0);
-console.log("Öffentliche Seiten: Metadaten, JSON-LD, Release-Links, kostenlose Inhalte und fehlende Auth-/Kauf-/Trackingpfade bestanden. Curriculum: "+z.lektionen+" Lektionen / "+z.pfadeAnzahl+" Pfade.");
+console.log("Öffentliche Seiten: Metadaten, JSON-LD, Release-Links, E-Mail-Konto, kostenlose Inhalte ohne Kauf-/Trackingpfade bestanden. Curriculum: "+z.lektionen+" Lektionen / "+z.pfadeAnzahl+" Pfade.");

@@ -1,7 +1,7 @@
 {
   "name": "lernstudio",
-  "version": "2.0.0",
-  "description": "Kostenlose offene Lernplattform mit lokalen Profilen und freiwilliger Wallet-Anzeige",
+  "version": "2.1.0",
+  "description": "Kostenlose Lernplattform mit E-Mail-Konten, KI-Lernpfad und synchronisiertem Lernfortschritt",
   "main": "app.js",
   "scripts": {
     "test": "node werkzeug/test.js",

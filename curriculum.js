@@ -7268,5 +7268,150 @@ Object.entries(SEO_FOUNDATION_EXTENSION).forEach(([stageId, lessons]) => {
   stage.lessons.push(...lessons);
 });
 
+/* Kostenlose KI-Grundlagen und organisches Marketing, redaktioneller Stand 2026-09-10.
+   Sämtliche Beispiele sind lokal. Kein Modellkonto, API-Key oder Werbebudget nötig. */
+{
+  const lesson = (id, title, paragraphs, question, options, answer, explanation) => ({
+    id, type: "lesson", title, minutes: 6,
+    beats: [
+      ...paragraphs.map(html => ({kind: "text", html})),
+      {kind: "predict", frage: question, optionen: options, antwort: answer,
+       enthuellung: "<p>" + explanation + "</p>"}
+    ]
+  });
+  const quiz = (id, title, questions) => ({id, type: "quiz", title, minutes: 5, questions});
+  const ki = {
+    id: "ki", name: "KI verstehen & anwenden", icon: "✳", color: "#d9fa59",
+    subtitle: "Modelle verstehen, bessere Prompts schreiben und Ergebnisse selbst prüfen. Ohne kostenpflichtige KI-Tools.",
+    stages: [
+      {id:"ki-0", stage:0, title:"Was eine KI eigentlich macht", goal:"Du unterscheidest feste Regeln, gelernte Muster und eine überprüfte Antwort.", lessons:[
+        lesson("ki-0-1", "Regel, Muster oder Zufall?", [
+          "<p>Stell dir zwei Sortierhilfen vor. Die erste bekommt eine feste Regel: <b>Alles unter zehn Euro kommt in Fach A.</b> Die zweite sieht viele bereits sortierte Beispiele und soll daraus eine passende Zuordnung lernen. Beide helfen beim Sortieren, aber ihre Arbeitsweise unterscheidet sich.</p>",
+          "<p>Bei regelbasierter Software legt ein Mensch die Regeln ausdrücklich fest. Beim <b>maschinellen Lernen</b> werden Modellparameter anhand von Beispielen angepasst. Das Modell kann anschließend auch bei neuen Eingaben eine Vorhersage machen. Ob sie brauchbar ist, musst du mit neuen, passenden Fällen prüfen.</p>",
+          "<p>Das Wort KI bezeichnet eine große Familie von Verfahren. Nicht jede Automatisierung benötigt maschinelles Lernen. Für eine exakt festgelegte Berechnung kann ein kleines Programm mit klaren Regeln leichter zu prüfen sein.</p>"
+        ], "Eine Tabelle soll jede Zahl mit zwei multiplizieren. Was passt am besten?", ["Eine einfache Rechenregel", "Zwingend ein Sprachmodell", "Eine zufällige Antwort"], 0, "Die Aufgabe ist vollständig definiert: y = 2 × x. Dafür genügt eine einfache, überprüfbare Regel."),
+        lesson("ki-0-2", "Training und Anwenden sind zwei Schritte", [
+          "<p>Du übst mit beschrifteten Fotos, Äpfel und Birnen zu unterscheiden. Später siehst du ein neues Foto. Üben und Einordnen sind verschiedene Schritte. Beim Modell heißen sie <b>Training</b> und <b>Inferenz</b>.</p>",
+          "<p>Im Training werden Parameter angepasst. Bei der Inferenz berechnet das Modell mit seinem aktuellen Parameterstand eine Ausgabe. Eine neue Eingabe verändert diese Parameter nicht automatisch. Ein Dienst kann Gespräche zusätzlich speichern oder später für Training verwenden; das ist eine eigene Frage seiner Datenverarbeitung.</p>",
+          "<p>Ein langer Chatverlauf kann als Kontext in die nächste Antwort eingehen. Das ist noch kein Beweis für dauerhaftes Lernen. Prüfe getrennt, was gerade im Kontext liegt, was gespeichert wird und ob später ein Training stattfindet.</p>"
+        ], "Eine Antwort berücksichtigt den Satz, den du gerade geschrieben hast. Was ist damit gezeigt?", ["Das Modell wurde dauerhaft neu trainiert", "Die Antwort kann den aktuellen Kontext verwenden", "Alle anderen Nutzer sehen deinen Satz"], 1, "Die Verwendung des aktuellen Kontexts belegt weder dauerhaftes Training noch eine Veröffentlichung an andere Nutzer."),
+        lesson("ki-0-3", "Warum flüssiger Text falsch sein kann", [
+          "<p>Ein Text kann gut klingen und trotzdem eine erfundene Jahreszahl enthalten. Sprachmodelle erzeugen Text anhand gelernter Muster und des gegebenen Kontexts. Flüssige Sprache ist deshalb kein Wahrheitsnachweis.</p>",
+          "<p>Ein <b>Token</b> ist eine Verarbeitungseinheit wie ein Wortteil, Wort oder Satzzeichen. Viele Sprachmodelle berechnen schrittweise mögliche Fortsetzungen. Ein passend aussehender Name oder Quellenhinweis kann dabei entstehen, ohne dass die behauptete Quelle existiert.</p>",
+          "<p>Mach aus einer wichtigen Antwort eine prüfbare Aussage: Welche Person, welcher Zeitpunkt, welche Quelle? Öffne die Originalquelle selbst. Prüfe, ob sie tatsächlich die konkrete Behauptung trägt. Eine selbstbewusst formulierte Antwort und eine überprüfte Antwort bleiben zwei verschiedene Zustände.</p>"
+        ], "Die KI nennt ein Buch samt Seitenzahl. Was ist der nächste sinnvolle Schritt?", ["Die Seitenzahl ungeprüft übernehmen", "Die Antwort in Großbuchstaben bestätigen lassen", "Existenz des Buchs und Inhalt der Stelle überprüfen"], 2, "Die Originalquelle kann die Aussage prüfen. Ein zweiter selbstbewusster Satz desselben Modells ersetzt diese Prüfung nicht."),
+        quiz("ki-0-q", "Grundlagen: dein kurzer Check", [
+          {q:"Was beschreibt Inferenz?",options:["Die Anwendung eines Modells auf eine Eingabe","Immer ein neues Training","Den Kauf eines KI-Abos"],answer:0,why:"Inferenz berechnet eine Ausgabe mit dem aktuellen Modellstand."},
+          {q:"Was beweist eine sprachlich überzeugende Antwort?",options:["Alle Fakten sind korrekt","Zunächst nur, dass ein überzeugender Text vorliegt","Die Quelle wurde gelesen"],answer:1,why:"Fakten und Quellen benötigen ihre eigene Prüfung."},
+          {q:"Wann ist eine feste Regel besonders geeignet?",options:["Wenn die gewünschte Berechnung vollständig definiert ist","Wenn Antworten zufällig sein sollen","Nur bei bezahlten Anwendungen"],answer:0,why:"Klare Regeln lassen sich direkt prüfen und benötigen nicht automatisch ein lernendes Modell."}
+        ])
+      ]},
+      {id:"ki-1", stage:1, title:"Aus einer Idee wird ein brauchbarer Auftrag", goal:"Du schreibst klare Prompts und vergleichst Ergebnisse mit einer vorher festgelegten Aufgabe.", lessons:[
+        lesson("ki-1-1", "Ein Prompt mit Ziel und Material", [
+          "<p>Du bittest jemanden: <b>Mach das besser.</b> Die Person muss raten, was besser bedeutet. Eine genaue Aufgabe benennt Ziel, Zielgruppe, Ausgangsmaterial und gewünschte Form.</p>",
+          "<pre>Aufgabe: Vereinfache den folgenden Absatz.\nZielgruppe: Menschen ohne Vorwissen.\nMaterial: [Hier steht mein eigener Absatz.]\nAusgabe: Drei kurze Sätze.\nRegel: Erhalte die Aussage. Erfinde keine Fakten.</pre>",
+          "<p>Diese Struktur ist kein Zauberspruch. Sie macht deine Erwartungen sichtbar und das Ergebnis prüfbar. Lies anschließend beide Fassungen: Ist eine Einschränkung verschwunden? Hat die Antwort eine neue Behauptung hinzugefügt?</p>"
+        ], "Welcher Teil des Beispiels begrenzt neu erfundene Inhalte ausdrücklich?", ["Die Zielgruppe", "Die Regel, keine Fakten zu erfinden", "Die eckigen Klammern"], 1, "Die Regel benennt die Anforderung. Ob sie eingehalten wird, prüfst du anschließend am Ergebnis."),
+        lesson("ki-1-2", "Beispiele zeigen, was du meinst", [
+          "<p>Du möchtest aus Notizen kurze Überschriften machen. Ein Beispiel kann den gewünschten Stil klarer zeigen als eine lange Liste von Adjektiven.</p>",
+          "<pre>Beispiel:\nNotiz: Der Browser legt besuchte Dateien kurz ab.\nÜberschrift: Was der Browser zwischenspeichert\n\nNeue Notiz: Ein Backup bewahrt eine zusätzliche Kopie.\nAufgabe: Schreibe eine passende Überschrift.</pre>",
+          "<p>Wähle Beispiele, die zur Aufgabe passen. Ein einzelnes Beispiel beschreibt aber nur einen Ausschnitt. Prüfe zusätzlich eine lange Notiz, einen leeren Text und eine mehrdeutige Formulierung. Lege fest, wann die Antwort nachfragen soll.</p>"
+        ], "Was ergänzt ein gutes Beispiel sinnvoll?", ["Eine Prüfung an verschiedenen neuen Eingaben", "Das Versprechen, dass jede Antwort stimmt", "Eine Aufforderung, unbekannte Fakten zu raten"], 0, "Neue Fälle zeigen, ob der gewünschte Stil auch außerhalb des Beispiels funktioniert."),
+        lesson("ki-1-3", "Ein Ergebnis verbessern, ohne blind zu drehen", [
+          "<p>Du erhältst eine verständliche Erklärung, aber sie ist zu lang. Ändere zunächst nur eine Anforderung: <b>Kürze auf drei Sätze und erhalte die Ausnahme im letzten Satz.</b></p>",
+          "<p>Wenn du gleichzeitig Zielgruppe, Ton, Länge, Inhalt und Format veränderst, lässt sich ein Unterschied schwer zuordnen. Bewahre Ausgangstext, Prompt und Ausgabe. Vergleiche beide Fassungen mit derselben Prüffrage.</p>",
+          "<p>Eine praktische Bewertung hat drei Spalten: <b>Anforderung, Beobachtung, nächste Änderung.</b> Beispiel: maximal drei Sätze; beobachtet fünf Sätze; als Nächstes die Längenanforderung präzisieren. Das Ergebnis ist ein begrenzter Vergleich, keine Garantie für jede zukünftige Antwort.</p>"
+        ], "Du willst wissen, ob deine neue Längenanweisung hilft. Was hältst du gleich?", ["Nichts, du änderst alles", "Ausgangstext und übrige Anforderungen", "Nur die Farbe des Fensters"], 1, "Gleicher Ausgangstext und gleiche übrige Anforderungen machen den Vergleich aussagekräftiger."),
+        quiz("ki-1-q", "Prompts: dein kurzer Check", [
+          {q:"Welche Aufgabe lässt sich klarer prüfen?",options:["Mach es genial","Fasse diesen Absatz in drei Sätzen zusammen und erhalte seine Einschränkungen","Sei eine allwissende Maschine"],answer:1,why:"Material, Form und Erhaltungsregel sind konkret benannt."},
+          {q:"Ein Formatbeispiel garantiert …",options:["jede künftige Antwort","keine fehlerfreie Verallgemeinerung","die Wahrheit aller Inhalte"],answer:1,why:"Das Beispiel hilft bei der Beschreibung. Neue Fälle bleiben zu prüfen."},
+          {q:"Warum änderst du beim Vergleich möglichst eine Sache?",options:["Um Unterschiede besser zuordnen zu können","Um das Modell kostenlos zu trainieren","Um die Prüfung zu vermeiden"],answer:0,why:"Ein begrenzter Vergleich reduziert konkurrierende Erklärungen."}
+        ])
+      ]},
+      {id:"ki-2", stage:2, title:"Antworten prüfen und Daten bewusst wählen", goal:"Du erkennst Beleglücken, wählst geeignetes Material und baust einen kleinen Prüfplan.", lessons:[
+        lesson("ki-2-1", "Eine Quelle ist mehr als ein Link", [
+          "<p>Ein Absatz behauptet: <b>Die Bibliothek öffnet jeden Sonntag.</b> Daneben steht ein Link zur Stadtverwaltung. Der Link allein beweist die Öffnungszeit nicht.</p>",
+          "<p>Prüfe die konkrete Stelle, den Geltungsbereich und das Datum. Steht dort jeder Sonntag oder nur ein besonderer Veranstaltungstag? Bezieht sich die Aussage auf dieselbe Bibliothek? Ist die Information noch gültig?</p>",
+          "<p>Notiere bei wichtigen Fakten die genaue Behauptung und eine passende Originalquelle. Wenn die Stelle fehlt, markiere die Behauptung als offen. Recherchieren, Zusammenfassen und Belegen sind getrennte Arbeitsschritte.</p>"
+        ], "Die Quelle nennt einen offenen Sonntag beim Sommerfest. Was trägt sie?", ["Alle Sonntage im Jahr", "Den genannten Veranstaltungstag", "Auch die Öffnungszeit einer anderen Stadt"], 1, "Die Quelle trägt nur den beschriebenen Tag und den benannten Ort."),
+        lesson("ki-2-2", "Mit erfundenen Übungsdaten arbeiten", [
+          "<p>Du möchtest eine Tabelle von einem externen Dienst zusammenfassen lassen. Für das Erlernen des Ablaufs genügt häufig eine kleine erfundene Tabelle.</p>",
+          "<pre>Projekt A | 3 Aufgaben | 1 erledigt\nProjekt B | 5 Aufgaben | 4 erledigt\nProjekt C | 2 Aufgaben | 2 erledigt</pre>",
+          "<p>Verwende für Übungen keine Passwörter, vertraulichen Akten oder Daten anderer Personen. Namen durch Rollen zu ersetzen entfernt nicht jede mögliche Wiedererkennung. Entscheide vor einer Übertragung, welche Informationen benötigt werden und ob der gewählte Dienst dafür geeignet und freigegeben ist.</p>",
+          "<p>In diesem Lernpfad werden deine Antworten lokal ausgewertet. Es wird kein externer KI-Dienst aufgerufen. Du kannst die Denk- und Prüfschritte vollständig mit den bereitgestellten Beispielen lernen.</p>"
+        ], "Welche Daten eignen sich für einen ersten Zusammenfassungsversuch?", ["Echte Passwörter", "Private Personalakten", "Eine selbst erfundene Tabelle ohne echte Personen"], 2, "Für den Ablauf reichen synthetische Daten. Dadurch werden keine echten vertraulichen Informationen benötigt."),
+        lesson("ki-2-3", "Ein kleiner Prüfplan statt Bauchgefühl", [
+          "<p>Du willst ein Modell später für kurze Produktbeschreibungen einsetzen. Vorher legst du fest, was eine brauchbare Beschreibung enthalten muss: vorhandene Eigenschaften, verständliche Sprache und keine erfundene Zertifizierung.</p>",
+          "<p>Dein kleiner Testsatz enthält einen einfachen Artikel, einen Artikel mit fehlenden Angaben und einen mit einer wichtigen Einschränkung. Bewerte jede Ausgabe nach derselben Regel. Lege die Regel vor dem Vergleich fest, damit du sie nicht dem Lieblingsmodell anpasst.</p>",
+          "<p>Bei drei gelungenen Beispielen kannst du sagen: <b>Diese drei Beispiele erfüllten die benannten Anforderungen.</b> Für eine allgemeine Zuverlässigkeitsquote brauchst du einen dafür geeigneten, größeren und beschriebenen Testsatz. Auch unklare Ergebnisse bleiben sichtbar.</p>"
+        ], "Drei von drei Beispielen sind gelungen. Welche Aussage ist belastbar?", ["Die Anwendung ist immer fehlerfrei", "Die drei getesteten Beispiele erfüllten die Kriterien", "Alle möglichen Produktdaten wurden geprüft"], 1, "Die Aussage bleibt an den tatsächlich geprüften Beispielen und Kriterien gebunden."),
+        quiz("ki-2-q", "Prüfen: dein kurzer Check", [
+          {q:"Woran misst du eine Quellenangabe?",options:["Ob sie die konkrete Aussage zum passenden Zeitpunkt trägt","An der Länge der URL","An der Sicherheit des Tons"],answer:0,why:"Referent, Inhalt und Zeitpunkt müssen zur Aussage passen."},
+          {q:"Was verwendest du zum Üben mit einem unbekannten Dienst?",options:["Vertrauliche Originalakten","Geeignete synthetische Beispiele","Zugangsdaten"],answer:1,why:"Synthetische Daten ermöglichen die Übung ohne echte vertrauliche Datensätze."},
+          {q:"Wann legst du Bewertungskriterien fest?",options:["Erst nachdem du deinen Favoriten gewählt hast","Vor dem Vergleich","Gar nicht"],answer:1,why:"Vorher festgelegte Kriterien machen den Vergleich nachvollziehbarer."}
+        ])
+      ]},
+      {id:"ki-3", stage:3, title:"Vom Vorschlag zur eigenen Anwendung", goal:"Du prüfst KI-Code, verstehst Quellenkontext und planst einen überschaubaren eigenen Helfer.", lessons:[
+        lesson("ki-3-1", "Code lesen, bevor du ihn benutzt", [
+          "<p>Ein generierter Codevorschlag sieht ordentlich aus. Bevor du ihn übernimmst, formuliere zuerst die gewünschte Funktion in eigenen Worten. Welche Eingabe bekommt das Programm? Welche Ausgabe erwartest du?</p>",
+          "<pre>function doppelt(x) {\n  return x * 2;\n}\n// Eingabe 3: Ausgabe 6\n// Eingabe 0: Ausgabe 0\n// Eingabe -2: Ausgabe -4</pre>",
+          "<p>Die drei Beispiele prüfen Zahlen. Sie sagen noch nichts über leere Eingaben oder Text. Definiere deshalb den erlaubten Eingabetyp. Führe unbekannten Code erst in einer dafür vorgesehenen isolierten Übungsumgebung aus und gib ihm keine echten Zugangsdaten.</p>"
+        ], "Was ist für diesen Vorschlag zuerst festzulegen?", ["Welche Eingaben erlaubt und welche Ausgaben erwartet sind", "Wie teuer ein Abo ist", "Ob der Funktionsname beeindruckend klingt"], 0, "Ein klarer Funktionsvertrag macht konkrete Tests möglich."),
+        lesson("ki-3-2", "Eigene Texte als Quellenkontext", [
+          "<p>Du möchtest Fragen zu einer selbst geschriebenen Anleitung beantworten. Statt das Modell raten zu lassen, gibst du die passende Stelle der Anleitung als Kontext mit.</p>",
+          "<p>Bei <b>Retrieval-Augmented Generation</b>, kurz RAG, sucht ein System zunächst relevante Inhalte und gibt sie dem generierenden Modell als Kontext. Die Suche, die Auswahl der Stelle und die formulierte Antwort können jeweils Fehler enthalten.</p>",
+          "<p>Ein brauchbarer Versuch zeigt die verwendeten Textstellen neben der Antwort. Fehlt eine passende Stelle, sollte die Anwendung die Lücke benennen. Eine Quellenanzeige verbessert die Nachprüfbarkeit, garantiert aber allein noch keine richtige Antwort.</p>"
+        ], "Die Anwendung findet keine passende Textstelle. Welche Reaktion passt?", ["Eine Quelle erfinden", "Die Lücke benennen und gezielt nach weiterem Material fragen", "Eine beliebige Stelle zitieren"], 1, "Die offene Stelle bleibt sichtbar. So kannst du Material ergänzen oder die Frage enger fassen."),
+        lesson("ki-3-3", "Dein erstes Projekt auf einem Blatt", [
+          "<p>Plane einen kleinen Helfer für deine eigenen Lernnotizen. Sein Auftrag lautet: <b>Aus einer selbst geschriebenen Notiz drei Übungsfragen entwerfen.</b> Für den Plan brauchst du noch keinen Dienst und keinen API-Key.</p>",
+          "<p>Schreibe vier Felder auf: <b>Eingabe</b> – meine eigene Notiz; <b>Ausgabe</b> – drei Fragen; <b>Prüfung</b> – jede Frage lässt sich aus der Notiz beantworten; <b>Umgang mit Lücken</b> – unklare Stellen werden als offen markiert.</p>",
+          "<p>Spiele den Ablauf zuerst selbst durch. Erst wenn Nutzen und Prüfregel verständlich sind, lohnt sich eine technische Umsetzung. Ein externer Modellbetrieb kann Kosten verursachen; die Übungen hier bleiben kostenlos und funktionieren ohne ihn.</p>"
+        ], "Was zeigt dein erster Versuch auf Papier?", ["Dass ein Produkt bereits live betrieben wird", "Dass die geplanten Eingaben, Ausgaben und Prüfregeln durchgespielt wurden", "Dass jeder externe Dienst kostenlos ist"], 1, "Ein durchgespielter Plan ist ein prüfbarer Anfang. Ein produktiver Dienst benötigt zusätzlich Umsetzung und Betrieb."),
+        quiz("ki-3-q", "Dein KI-Werkzeugkasten", [
+          {q:"Was prüfst du bei einem Codevorschlag?",options:["Nur die Formatierung","Vertrag, verständliche Funktion und passende Testfälle","Nur die Länge"],answer:1,why:"Die gewünschte Wirkung und die tatsächlich getesteten Fälle tragen die Bewertung."},
+          {q:"Was leistet eine RAG-Suche zunächst?",options:["Sie stellt ausgewählte Inhalte als Kontext bereit","Sie beweist automatisch jede Antwort","Sie veröffentlicht immer ein neues Modell"],answer:0,why:"Suchen, Auswählen und Antworten bleiben getrennte Schritte."},
+          {q:"Was kostet dieser Lernpfad?",options:["Ein verpflichtendes KI-Abo","Eine Gebühr pro Antwort","0 Euro; alle Übungen laufen mit den bereitgestellten Inhalten"],answer:2,why:"Für diese Übungen brauchst du weder ein bezahltes Tool noch einen API-Key."}
+        ])
+      ]}
+    ]
+  };
+  CURRICULUM.tracks.splice(1, 0, ki);
+  const marketing = CURRICULUM.tracks.find(t => t.id === "mktg");
+  if (!marketing) throw new Error("Marketing-Lernpfad fehlt.");
+  marketing.subtitle = "Menschen mit hilfreichen Inhalten erreichen. Starte mit Marketing ohne Werbebudget.";
+  marketing.stages.unshift({id:"mktg-organisch", stage:0, title:"Marketing ohne Werbebudget", goal:"Du planst einen hilfreichen Beitrag und einen freiwilligen, passenden Verbreitungsweg. Keine Anzeigenbuchung nötig.", lessons:[
+    lesson("mktg-organisch-1", "Eine echte Frage finden", [
+      "<p>Stell dir jemanden vor, der sein erstes Backup machen möchte. Eine konkrete Frage wie <b>Wie sichere ich meine Fotos auf einer zweiten Festplatte?</b> ist ein besserer Anfang als ein allgemeines Versprechen, alles über Computer zu erklären.</p>",
+      "<p>Notiere eine Zielgruppe, eine Situation und eine Frage. Verwende dafür eigene Erfahrung, freiwillige Rückmeldungen oder öffentliche, für diesen Zweck geeignete Quellen. Du brauchst keine gekaufte Kontaktliste.</p>",
+      "<p>Dein erster Beitrag beantwortet genau diese Frage. Er benennt Voraussetzungen, erklärt einen überschaubaren Weg und zeigt einen passenden nächsten Lernschritt. Hilfreich sein ist ein prüfbares Ziel; eine bestimmte Reichweite ist damit noch nicht garantiert.</p>"
+    ], "Welcher Start ist konkret genug für einen ersten Beitrag?", ["Alle Menschen über alles informieren", "Anfängern eine bestimmte Backup-Frage beantworten", "Ungefragt viele fremde Postfächer anschreiben"], 1, "Zielgruppe, Situation und Frage geben dem Beitrag einen klaren Gegenstand."),
+    lesson("mktg-organisch-2", "Eine Überschrift, die ihr Versprechen hält", [
+      "<p><b>Dein erstes Backup: Fotos auf einer zweiten Festplatte sichern</b> sagt, was der Leser bekommt. Eine Überschrift wie <b>Dieser Trick macht dich sofort zum IT-Profi</b> verspricht eine Wirkung, die ein kurzer Artikel kaum belegen kann.</p>",
+      "<p>Schreibe erst den Kern der Antwort, dann die Überschrift. Prüfe jedes Wirkungswort: Was wird gezeigt, was bleibt eine mögliche Folge? Gerade ein kostenloses Angebot darf klar und selbstbewusst sein.</p>",
+      "<p>Übung: Schreibe eine Überschrift für eine Erklärung von Browser-Tabs. Nenne den konkreten Lernschritt und verzichte auf ein unbelegtes Erfolgsversprechen.</p>"
+    ], "Welche Überschrift passt zu einer kurzen Erklärung von Browser-Tabs?", ["Browser-Tabs öffnen, wechseln und schließen", "In fünf Minuten garantiert zum Entwickler", "Alle anderen machen es falsch"], 0, "Die Überschrift benennt den tatsächlich vermittelten Handgriff."),
+    lesson("mktg-organisch-3", "Aus einem Beitrag mehrere passende Formen", [
+      "<p>Du hast eine gute Anleitung geschrieben. Daraus kann eine kurze Zusammenfassung für die Community, eine Frage für eine Diskussion und eine kleine bebilderte Schrittfolge entstehen.</p>",
+      "<p>Jede Form braucht eigenen Nutzen. Eine kurze Zusammenfassung beantwortet die Kernfrage bereits im Beitrag. Der Link führt zu Details. Passe Sprache und Umfang an den jeweiligen Ort an und beachte dessen Regeln.</p>",
+      "<p>Veröffentliche über eigene Kanäle oder dort, wo Beiträge dieser Art willkommen sind. Eigene Urheberschaft, Lizenzen und die freiwillige Teilnahme anderer bleiben wichtig. Bloßes Kopieren in viele Gruppen ist kein Ersatz für Relevanz.</p>"
+    ], "Wie wird eine Kurzfassung hilfreich?", ["Sie enthält nur einen Werbelink", "Sie beantwortet bereits die Kernfrage und verlinkt passende Details", "Sie wird ungefragt identisch überall gepostet"], 1, "Die Kurzfassung gibt direkt Nutzen. Der weiterführende Link bleibt eine freiwillige Vertiefung."),
+    lesson("mktg-organisch-4", "Kostenlos heißt nicht ohne Aufwand", [
+      "<p>Du kannst einen hilfreichen Beitrag auf einem vorhandenen Kanal veröffentlichen, ohne eine Anzeige zu buchen. Trotzdem brauchst du Zeit für Recherche, Schreiben, Rückfragen und Pflege.</p>",
+      "<p>Trenne Geldbudget, Zeitbudget und vorhandene Infrastruktur. Plane zum Beispiel eine kleine eigene Arbeitsphase und einen Beitrag, dessen Inhalt du überprüfen kannst. Neue kostenpflichtige Werkzeuge sind dafür nicht automatisch erforderlich.</p>",
+      "<p>Organische Sichtbarkeit entsteht ohne eingekaufte Anzeigenplätze. Ihre Höhe lässt sich nicht garantieren. Beurteile zunächst, ob der Beitrag verständlich ist und einer realen Frage hilft.</p>"
+    ], "Was bedeutet ein Plan ohne Werbebudget?", ["Es fällt keine Arbeit an", "Es gibt automatisch große Reichweite", "Es werden keine bezahlten Anzeigen eingeplant; Zeitaufwand bleibt sichtbar"], 2, "Geld für Anzeigen und eigene Arbeitszeit sind verschiedene Ressourcen."),
+    lesson("mktg-organisch-5", "Rückmeldung statt bloßer Zahlenjagd", [
+      "<p>Ein Beitrag hat viele Aufrufe, aber niemand findet die nächste Lektion. Ein anderer wird seltener gelesen, löst aber eine konkrete Frage. Die Aufrufzahl allein beschreibt den Lernerfolg nicht.</p>",
+      "<p>Wähle eine passende Frage: Verstehen Leser den ersten Schritt? Finden sie die kostenlose Übung? Welche Stelle bleibt unklar? Freiwillige Rückmeldungen können dafür wertvoller sein als immer mehr Tracking.</p>",
+      "<p>Halte Zeitraum, Beobachtung und Änderung fest. Beispiel: Zwei Personen fanden den Übungslink schwer; du formulierst ihn genauer und lässt den Weg erneut freiwillig ausprobieren. Behaupte nur die beobachtete Verbesserung.</p>"
+    ], "Welche Beobachtung passt zur Frage, ob der Übungslink verständlich ist?", ["Ob freiwillige Testleser die Übung finden", "Nur die Zahl aller Seitenaufrufe", "Der Preis eines Analyse-Abos"], 0, "Das beobachtete Finden der Übung passt direkt zur untersuchten Frage."),
+    quiz("mktg-organisch-q", "Dein Plan ohne Werbebudget", [
+      {q:"Womit beginnt der Plan?",options:["Mit einer konkreten Frage einer benannten Zielgruppe","Mit dem Kauf einer Kontaktliste","Mit einer garantierten Reichweitenzahl"],answer:0,why:"Eine konkrete Frage bindet Inhalt und Nutzen."},
+      {q:"Wie verbreitest du den Beitrag sinnvoll?",options:["Ungefragt in allen Kanälen","Über passende eigene oder ausdrücklich offene Kanäle","Mit erfundenen Empfehlungen"],answer:1,why:"Relevanz, Regeln und freiwillige Teilnahme zählen auch bei kostenlosem Marketing."},
+      {q:"Welche Ressource bleibt ohne Anzeigenbudget relevant?",options:["Keine","Eigene Zeit für Inhalt und Pflege","Ein Pflichtabo"],answer:1,why:"Ohne Anzeigenkosten bedeutet nicht ohne Arbeitsaufwand."}
+    ])
+  ]});
+}
+
 /* Für app.js global verfügbar machen */
 window.CURRICULUM = CURRICULUM;

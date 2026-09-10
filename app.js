@@ -12,24 +12,105 @@
     document.getElementById("app").textContent = "Die Lerninhalte konnten nicht geladen werden. Bitte lade die Seite neu.";
     return;
   }
-  const deviceStorage = {
-    getItem: key => window.localStorage.getItem(key),
-    setItem: (key, value) => window.localStorage.setItem(key, value)
-  };
-  const profileStore = window.LearningProfile.createStore(deviceStorage, C);
+  if (!window.LearningAccount || !window.LSAccountProgress) {
+    document.getElementById("app").textContent = "Die Kontofunktionen konnten nicht geladen werden. Bitte lade die Seite neu."; return;
+  }
+  const LS_ACCOUNT_PREFIX = "lernstudio_account_";
+  const auth = window.LearningAccount.createClient({ storage: {
+    getItem: key => localStorage.getItem(key), setItem: (key, value) => localStorage.setItem(key, value), removeItem: key => localStorage.removeItem(key)
+  }, fetchImpl: (...args) => fetch(...args) });
+  let activeUser = null, accountReady = false, accountBusy = true, accountEpoch = 0, syncTimer = null, syncChain = Promise.resolve(), extraState = {};
+  let accountMessage = "Konto wird geladen …", authMode = "login", authMessage = "";
+  function scopedStore(userId) {
+    const memory = new Map();
+    return window.LearningProfile.createStore({
+      getItem(key) {
+        if (!userId) return memory.get(key) || null;
+        // Only the cache explicitly bound to this verified account is imported.
+        const scoped = key === "lernstudio_v1" ? "lernstudio_v2_account_" + userId : LS_ACCOUNT_PREFIX + userId + ":" + key;
+        return localStorage.getItem(scoped);
+      },
+      setItem(key, value) { if (userId) localStorage.setItem(LS_ACCOUNT_PREFIX + userId + ":" + key, value); else memory.set(key, value); }
+    }, C);
+  }
+  let profileStore = scopedStore(null);
   let state = profileStore.read();
   try { const theme = localStorage.getItem(THEME_KEY); if (["dark", "light"].includes(theme)) state.theme = theme; } catch (error) {}
   function save() {
     state = profileStore.write(state);
     const notice = document.getElementById("storageNotice");
     if (notice) { notice.hidden = profileStore.canPersist(); notice.textContent = "Dein Browser erlaubt gerade keine dauerhafte Speicherung. Sichere deinen Lernstand als Datei."; }
+    planeFortschrittSync();
   }
-  function planeFortschrittSync() { /* Learning projects remain local; no account endpoint. */ }
+  const progressClient = window.LSAccountProgress.createClient({ baseUrl: window.LearningAccount.URL, apiKey: window.LearningAccount.KEY,
+    fetchImpl: (...args) => fetch(...args), getSession: auth.getSession, refreshSession: auth.refreshSession });
+  function setAccountMessage(message) {
+    accountMessage = message;
+    document.querySelectorAll("[data-account-status]").forEach(node => { node.textContent = message; });
+  }
+  function extraForSync() { return { ...extraState, appearance: { color: state.color, accessory: state.accessory } }; }
+  function saveExtraCache() {
+    if (activeUser) { try { localStorage.setItem(LS_ACCOUNT_PREFIX + activeUser + ":extra", JSON.stringify(extraForSync())); } catch (_) {} }
+  }
+  function planeFortschrittSync() {
+    if (!accountReady || !activeUser || auth.getSession()?.user_id !== activeUser) return;
+    saveExtraCache(); setAccountMessage("Änderungen werden gespeichert …"); clearTimeout(syncTimer);
+    syncTimer = setTimeout(syncFortschrittJetzt, 350);
+  }
+  function syncFortschrittJetzt() {
+    clearTimeout(syncTimer);
+    if (!accountReady || !activeUser || auth.getSession()?.user_id !== activeUser) return syncChain;
+    const user = activeUser, run = accountEpoch, snapshot = structuredClone(state), extra = structuredClone(extraForSync());
+    syncChain = syncChain.catch(() => {}).then(async () => {
+      if (user !== auth.getSession()?.user_id || run !== accountEpoch) return;
+      const result = await progressClient.save(snapshot, extra);
+      if (run === accountEpoch) setAccountMessage(result.ok ? "Im Konto gespeichert." : "Noch nicht im Konto gespeichert. Dein Gerätecache bleibt erhalten; bei Verbindung erneut versuchen.");
+    }).catch(() => setAccountMessage("Speichern gerade nicht möglich. Dein Gerätecache bleibt erhalten."));
+    return syncChain;
+  }
+  async function activateAccount() {
+    const run = ++accountEpoch, session = auth.getSession();
+    accountReady = false; activeUser = session?.user_id || null; extraState = {};
+    profileStore = scopedStore(activeUser); state = profileStore.read();
+    if (!activeUser) { accountBusy = false; setAccountMessage(""); render(); return; }
+    accountBusy = true; setAccountMessage("Dein Lernstand wird geladen …"); render();
+    try { extraState = window.LSAccountProgress.cleanExtraState(JSON.parse(localStorage.getItem(LS_ACCOUNT_PREFIX + activeUser + ":extra") || "{}")); } catch (_) {}
+    const result = await progressClient.load(state, extraState);
+    if (run !== accountEpoch || session.user_id !== auth.getSession()?.user_id) return;
+    accountBusy = false;
+    if (result.ok) {
+      extraState = result.extraState;
+      const appearance = extraState.appearance || {};
+      state = profileStore.validate({ ...state, ...result.state, avatar: safeAvatar(result.state.avatar),
+        color: window.LearningProfile.COLORS.includes(appearance.color) ? appearance.color : state.color,
+        accessory: window.LearningProfile.ACCESSORIES.includes(appearance.accessory) ? appearance.accessory : state.accessory }, true);
+      state = profileStore.replace(state); accountReady = true; saveExtraCache();
+      setAccountMessage("Im Konto gespeichert.");
+    } else setAccountMessage("Dein Lernstand konnte nicht geladen werden. Bitte versuche es erneut; vorhandene Daten bleiben erhalten.");
+    render();
+  }
+  async function bootAccount(callbackHash) {
+    accountBusy = true; accountReady = false;
+    document.querySelector(".profile-dialog")?.close();
+    try {
+      await auth.restore(callbackHash);
+      if (auth.isRecovery()) { authMode = "password"; current = { view: "login", arg: null }; accountBusy = false; render(); }
+      else await activateAccount();
+    } catch (error) { activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); accountBusy = false; authMessage = error.message; current = {view:"login",arg:null}; render(); }
+  }
+  async function logout() {
+    await syncFortschrittJetzt();
+    ++accountEpoch; clearTimeout(syncTimer); accountReady = false; activeUser = null;
+    const pending = auth.signOut(); profileStore = scopedStore(null); state = profileStore.read(); extraState = {};
+    document.querySelector(".profile-dialog")?.close(); go("home");
+    const revoked = await pending;
+    if (!revoked) { authMessage = "Auf diesem Gerät abgemeldet. Die serverseitige Abmeldung konnte nicht bestätigt werden."; go("login"); }
+  }
 
 
   function themeSwitchMarkup(id) {
     return `
-      <button class="theme-switch" id="${id}" type="button" role="switch" aria-checked="${state.theme === "dark" ? "true" : "false"}" title="Farbschema umschalten (Gelb-auf-Schwarz ⇄ Hell)" aria-label="Farbschema umschalten zwischen Gelb-auf-Schwarz und Hell">
+      <button class="theme-switch" id="${id}" type="button" role="switch" aria-checked="${state.theme === "dark" ? "true" : "false"}" title="Helles oder dunkles Farbschema" aria-label="Dunkles Farbschema">
         <span class="ts-star ts-star1" aria-hidden="true"></span>
         <span class="ts-star ts-star2" aria-hidden="true"></span>
         <span class="ts-star ts-star3" aria-hidden="true"></span>
@@ -54,6 +135,7 @@
   const RUBRIKEN = [
     { id: "einstieg",  icon: "🧭", name: "Einstieg & Alltag",        tracks: ["einstieg"] },
     { id: "logik",     icon: "🧠", name: "Logik & Mathe",            tracks: ["machine", "math", "matheanfassen"] },
+    { id: "ki",        icon: "✳", name: "Künstliche Intelligenz",   tracks: ["ki"] },
     { id: "coding",    icon: "💻", name: "Programmieren",            tracks: ["html", "python", "js"] },
     { id: "security",  icon: "🛡️", name: "Digitale Sicherheit",       tracks: ["sec"] },
     { id: "projekte",  icon: "🎮", name: "Projekte",                 tracks: ["proj"] },
@@ -156,10 +238,10 @@
   function renderHeader() {
     const head = el(`<header class="app universe-header">
       <button class="iconbtn mobile-nav-btn" id="mobileNavBtn" type="button" aria-controls="studioSidebar" aria-expanded="false" aria-label="Lernpfade öffnen">☰</button>
-      <button class="brand brand-button" id="brandHome" type="button"><span class="universe-mark" aria-hidden="true">✳</span><span><b>Lernstudio</b><small>Wissen gehört allen.</small></span></button>
-      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="index.html">Lernen</a><a href="community.html">Gemeinschaft</a><a href="eve.html">EVE-Labor</a></nav>
-      <span class="spacer"></span><span class="xp" title="Lokale Erfahrungspunkte">✦ <b>${totalXp()}</b> XP</span>
-      <button class="account" id="acctBtn" type="button" aria-label="Tierchen und lokales Profil gestalten">${buddyMarkup("buddy-small")}<span class="aname">${esc(state.name)}</span></button>
+      <button class="brand-button" id="brandHome" type="button"><span class="universe-mark" aria-hidden="true">LS<span>↗</span></span><span><b>Lernstudio</b><small>Die freie Lernbörse.</small></span></button>
+      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="index.html">Entdecken</a><a href="studio.html#roadmap/ki">KI lernen</a><a href="wissen.html">Wissen</a><a href="community.html">Community</a></nav>
+      <span class="spacer"></span>${accountReady ? `<span class="xp" title="Deine Erfahrungspunkte">✦ <b>${totalXp()}</b> XP</span>` : ""}
+      <button class="account" id="acctBtn" type="button" aria-label="${accountReady ? "Konto und Lernprofil öffnen" : "Mit E-Mail anmelden"}">${accountReady ? buddyMarkup("buddy-small") : ""}<span class="aname">${accountReady ? esc(state.name === "Lernender" ? "Mein Konto" : state.name) : "Anmelden ↗"}</span></button>
       ${themeSwitchMarkup("themeBtn")}
     </header>`);
     head.querySelector("#mobileNavBtn").addEventListener("click", () => setMobileNav(!document.body.classList.contains("mobile-nav-open")));
@@ -208,39 +290,58 @@
   }
 
   /* ---------- Profil auf diesem Gerät ---------- */
+  function profileInitials(name) {
+    return String(name).trim().split(/\s+/u).filter(Boolean).slice(0, 2).map(part => Array.from(part)[0]).join("").toLocaleUpperCase("de") || "LS";
+  }
   function openProfile() {
+    if (!accountReady) { go("login"); return; }
     if (document.querySelector(".profile-dialog")) return;
     const colorLabels = { violet: "Violett", mint: "Mint", sun: "Sonne", rose: "Rosa", ocean: "Ozean" };
     const animalLabels = ["Fuchs", "Panda", "Eule", "Frosch", "Katze", "Hund", "Hase", "Bär", "Schmetterling", "Schildkröte", "Oktopus", "Pinguin"];
     const dialog = el(`<dialog class="profile-dialog" aria-labelledby="profileTitle">
       <form method="dialog"><button class="profile-close" aria-label="Profil schließen">×</button></form>
-      <h2 id="profileTitle">Dein kleines Gegenüber</h2><p class="muted">Ein Tierchen, dein Name, dein Tempo.</p>
+      <h2 id="profileTitle">Dein Lernprofil</h2><p class="muted">${esc(auth.getSession()?.email || "")} · Kostenloses Konto</p>
       <div class="buddy-preview">${buddyMarkup("buddy-large")}</div>
       <label class="field-label" for="profileName">Dein Anzeigename</label><input id="profileName" maxlength="28" value="${esc(state.name)}" autocomplete="off">
+      <p>Deine Initialien <span id="profileInitials" class="profile-initials">${esc(profileInitials(state.name))}</span></p>
       <fieldset><legend>Wähle dein Tierchen</legend><div class="emoji-row">${AVATARS.map((a,i) => `<button type="button" data-animal="${a}" aria-label="${animalLabels[i]}" aria-pressed="${a === state.avatar}">${a}</button>`).join("")}</div></fieldset>
       <fieldset><legend>Deine Farbe</legend><div class="choice-row">${window.LearningProfile.COLORS.map(c => `<button type="button" data-color="${c}" class="swatch buddy-${c}" aria-label="${colorLabels[c]}" aria-pressed="${c === state.color}"></button>`).join("")}</div></fieldset>
       <fieldset><legend>Ein kleines Extra</legend><div class="emoji-row">${window.LearningProfile.ACCESSORIES.map((a,i) => `<button type="button" data-accessory="${a}" aria-label="${["Kein Extra", "Pflänzchen", "Stern", "Blume", "Kopfhörer", "Krone"][i]}" aria-pressed="${a === state.accessory}">${a || "–"}</button>`).join("")}</div></fieldset>
-      <p class="local-note">Dein Profil und dein Fortschritt gehören zu diesem Browser. Sichere sie vor einem Gerätewechsel oder dem Löschen deiner Browserdaten.</p>
+      <p class="local-note">Dein Lernstand wird in deinem Konto gespeichert. Auf einem anderen Gerät meldest du dich mit derselben E-Mail-Adresse an.</p>
       <div class="profile-actions"><button class="btn" id="pp-export" type="button">Sicherung herunterladen</button><button class="btn" id="pp-import" type="button">Sicherung laden</button></div>
-      <p id="profileMessage" role="status"></p><button class="text-button" id="pp-reset" type="button">Lernfortschritt auf diesem Gerät zurücksetzen</button>
+      <p id="profileMessage" data-account-status role="status">${esc(accountMessage)}</p>
+      <button class="text-button" id="pp-sync" type="button">Speicherung erneut versuchen</button>
+      <button class="btn primary profile-primary" id="profileReady" type="button">Profil fertig · Weiterlernen</button>
+      <button class="btn" id="pp-logout" type="button">Abmelden</button>
+      <p><button class="text-button" id="pp-delete" type="button">Konto löschen</button></p>
     </dialog>`);
     function update() {
       save(); dialog.querySelector(".buddy-preview").innerHTML = buddyMarkup("buddy-large");
+      dialog.querySelector("#profileInitials").textContent = profileInitials(state.name);
       dialog.querySelectorAll("[data-animal]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.animal === state.avatar)));
       dialog.querySelectorAll("[data-color]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.color === state.color)));
       dialog.querySelectorAll("[data-accessory]").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.accessory === state.accessory)));
-      dialog.querySelector("#profileMessage").textContent = profileStore.canPersist() ? "Auf diesem Gerät gespeichert." : "Nur für diese Sitzung verfügbar. Bitte lade eine Sicherung herunter.";
       refreshHeaderRing();
     }
     dialog.querySelector("#profileName").addEventListener("input", e => { state.name = e.target.value; update(); });
+    dialog.querySelector("#profileReady").addEventListener("click", () => dialog.close());
     dialog.querySelectorAll("[data-animal]").forEach(b => b.addEventListener("click", () => { state.avatar = b.dataset.animal; update(); }));
     dialog.querySelectorAll("[data-color]").forEach(b => b.addEventListener("click", () => { state.color = b.dataset.color; update(); }));
     dialog.querySelectorAll("[data-accessory]").forEach(b => b.addEventListener("click", () => { state.accessory = b.dataset.accessory; update(); }));
     dialog.querySelector("#pp-export").addEventListener("click", exportProgress);
     dialog.querySelector("#pp-import").addEventListener("click", importProgress);
-    dialog.querySelector("#pp-reset").addEventListener("click", () => {
-      if (!confirm("Deine Abschlüsse und XP auf diesem Gerät zurücksetzen? Eine vorher heruntergeladene Sicherung kannst du wieder laden.")) return;
-      state.done = {}; state.perfect = {}; state.lastLesson = null; state = profileStore.replace(state); dialog.close(); go("home");
+    dialog.querySelector("#pp-sync").addEventListener("click", syncFortschrittJetzt);
+    dialog.querySelector("#pp-logout").addEventListener("click", logout);
+    dialog.querySelector("#pp-delete").addEventListener("click", async event => {
+      if (!confirm("Dein Konto und den gespeicherten Lernstand endgültig löschen? Lade vorher bei Bedarf eine Sicherung herunter.")) return;
+      event.target.disabled = true;
+      await syncFortschrittJetzt(); clearTimeout(syncTimer); ++accountEpoch; accountReady = false;
+      try {
+        await auth.deleteAccount();
+        const prefix = LS_ACCOUNT_PREFIX + activeUser + ":";
+        try { Object.keys(localStorage).filter(key => key.startsWith(prefix) || key === "lernstudio_v2_account_" + activeUser).forEach(key => localStorage.removeItem(key)); } catch (_) {}
+        activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); extraState = {}; dialog.close(); go("home");
+      } catch (error) { accountReady = true; event.target.disabled = false; setAccountMessage(error.message + " Bei weiteren Problemen nutze bitte unsere Kontaktseite."); }
     });
     dialog.addEventListener("close", () => { dialog.remove(); if (current.view === "home") render(); const opener = document.getElementById("acctBtn") || document.getElementById("focusExit"); if (opener) opener.focus(); });
     document.body.appendChild(dialog); dialog.showModal();
@@ -260,8 +361,8 @@
       try {
         if (file.size > 262144) throw new Error("Die Sicherung ist zu groß (maximal 256 KB).");
         const candidate = profileStore.importText(await file.text());
-        if (!confirm("Diese Sicherung ersetzt dein aktuelles Lernprofil auf diesem Gerät. Fortfahren?")) return;
-        state = profileStore.replace(candidate); applyTheme();
+        if (!confirm("Die Abschlüsse dieser Sicherung werden mit deinem Konto zusammengeführt. Anzeigename und Gestaltung werden übernommen. Fortfahren?")) return;
+        state = profileStore.write({ ...candidate, generation: state.generation, done: { ...state.done, ...candidate.done }, perfect: { ...state.perfect, ...candidate.perfect } }); applyTheme(); planeFortschrittSync();
         const dialog = document.querySelector(".profile-dialog"); if (dialog) dialog.close();
         go("home");
       } catch (error) { window.alert("Sicherung nicht übernommen: " + error.message); }
@@ -406,27 +507,65 @@
   function routeFor(view, arg) { return view === "home" ? "#home" : "#" + view + "/" + encodeURIComponent(arg || ""); }
   function go(view, arg) {
     current = { view, arg: arg || null };
-    if (view === "lesson" && findLesson(arg)) { state.lastLesson = arg; save(); }
+    if (accountReady && view === "lesson" && findLesson(arg)) { state.lastLesson = arg; save(); }
     history.pushState(null, "", routeFor(view,arg));
     render(); window.scrollTo(0,0);
     const main = document.getElementById("main-content"); if (main) main.focus({ preventScroll: true });
   }
   function readRoute() {
     const raw = location.hash.slice(1);
-    if (/access_token=|refresh_token=|type=recovery/.test(raw)) { history.replaceState(null,"",location.pathname); current = {view:"home",arg:null}; return; }
     const parts = raw.split("/");
-    const views = ["home","lesson","roadmap","cert","reference","basics","article"];
+    const views = ["home","lesson","roadmap","cert","reference","basics","article","login"];
     try { current = {view:views.includes(parts[0]) ? parts[0] : "home",arg:parts[1] ? decodeURIComponent(parts[1]) : null}; }
     catch (error) { current = {view:"home",arg:null}; }
   }
 
+  function renderAuth(main) {
+    if (accountBusy) { main.appendChild(el(`<section class="auth-card"><p class="eyebrow">DEIN LERNSTUDIO</p><h1>Einen Moment …</h1><p role="status">Dein Konto und Lernstand werden geladen.</p></section>`)); return; }
+    if (activeUser && !accountReady && !auth.isRecovery()) {
+      const card = el(`<section class="auth-card"><h1>Dein Konto ist angemeldet.</h1><p data-account-status role="status">${esc(accountMessage)}</p><button class="btn primary" id="accountRetry">Lernstand erneut laden</button><button class="btn" id="accountLogout">Abmelden</button></section>`);
+      card.querySelector("#accountRetry").onclick = activateAccount; card.querySelector("#accountLogout").onclick = logout; main.appendChild(card); return;
+    }
+    const mode = authMode, signup = mode === "signup", recover = mode === "recover", password = mode === "password";
+    const title = signup ? "Dein kostenloses Konto." : recover ? "Zurück in dein Konto." : password ? "Dein neues Passwort." : "Schön, dass du da bist.";
+    const button = signup ? "Kostenlos registrieren" : recover ? "E-Mail anfordern" : password ? "Passwort speichern" : "Anmelden und lernen";
+    const card = el(`<section class="auth-card"><p class="eyebrow">EIN KONTO. ALLE LERNPFADE. 0 €.</p><h1>${title}</h1>
+      <p>${recover ? "Wir senden dir einen Link, mit dem du dein Passwort neu setzen kannst." : password ? "Wähle ein neues Passwort mit mindestens 8 Zeichen." : "Nutze dein bestehendes Lernstudio-Konto oder lege kostenlos eines an. Dein Fortschritt bleibt bei dir – auch auf einem anderen Gerät."}</p>
+      <form id="accountForm">
+        ${password ? "" : `<label for="accountEmail">E-Mail-Adresse</label><input id="accountEmail" name="email" type="email" autocomplete="email" required maxlength="254">`}
+        ${recover ? "" : `<label for="accountPassword">${password ? "Neues Passwort" : "Passwort"}</label><input id="accountPassword" name="password" type="password" autocomplete="${signup || password ? "new-password" : "current-password"}" ${signup || password ? 'minlength="8"' : ""} required>`}
+        ${signup ? `<p class="auth-privacy">Dein Konto speichert E-Mail-Adresse, Profil und Lernfortschritt. <a href="datenschutz.html">Datenschutz</a> · <a href="agb.html">Nutzungshinweise</a></p>` : ""}
+        <p id="authMessage" role="status" aria-live="polite">${esc(authMessage)}</p><button class="btn primary" type="submit">${button}</button>
+      </form><div class="auth-options">${password ? "" : `<button class="text-button" data-mode="${signup || recover ? "login" : "signup"}">${signup || recover ? "Zur Anmeldung" : "Noch kein Konto? Kostenlos registrieren"}</button>${!recover && !signup ? '<button class="text-button" data-mode="recover">Passwort vergessen?</button>' : ""}`}</div>
+      <p class="auth-free-note">Alle veröffentlichten Lerninhalte sind kostenlos. Keine Zahlungsdaten erforderlich.</p></section>`);
+    card.querySelectorAll("[data-mode]").forEach(node => node.onclick = () => { authMode = node.dataset.mode; authMessage = ""; render(); });
+    card.querySelector("form").addEventListener("submit", async event => {
+      event.preventDefault(); const form = event.currentTarget, submit = form.querySelector('[type="submit"]'); submit.disabled = true;
+      const email = form.querySelector('[name="email"]')?.value || "", secret = form.querySelector('[name="password"]')?.value || "";
+      form.querySelector("#authMessage").textContent = "Bitte warten …";
+      try {
+        if (recover) { await auth.recover(email); form.querySelector("#authMessage").textContent = "Falls ein Konto zu dieser Adresse besteht, erhältst du eine E-Mail. Prüfe bitte auch deinen Spamordner."; return; }
+        if (password) await auth.updatePassword(secret);
+        else if (signup) {
+          const result = await auth.signUp(email, secret);
+          if (!result) { form.querySelector("#authMessage").textContent = "Prüfe dein E-Mail-Postfach und bestätige dort deine Registrierung. Besteht dein Konto bereits, nutze die Anmeldung oder setze dein Passwort zurück."; return; }
+        } else await auth.signIn(email, secret);
+        authMessage = ""; authMode = "login";
+        if (current.view === "login") { current = { view: "home", arg: null }; history.replaceState(null, "", "#home"); }
+        await activateAccount();
+      } catch (error) { form.querySelector("#authMessage").textContent = error.message; }
+      finally { form.querySelector('[name="password"]')?.setAttribute("value", ""); if (form.querySelector('[name="password"]')) form.querySelector('[name="password"]').value = ""; submit.disabled = false; }
+    });
+    main.appendChild(card);
+  }
 
   function render() {
     applyTheme();
     setMobileNav(false);
     const root = document.getElementById("app");
     root.innerHTML = "";
-    const lessonContext = current.view === "lesson" ? findLesson(current.arg) : null;
+    const authRequired = current.view === "login" || auth.isRecovery() || (!accountReady && !["home", "roadmap"].includes(current.view));
+    const lessonContext = !authRequired && current.view === "lesson" ? findLesson(current.arg) : null;
     if (lessonContext && state.lastLesson !== current.arg) { state.lastLesson = current.arg; save(); }
     const focusMode = !!lessonContext;
     document.body.classList.toggle("lesson-focus-active", focusMode);
@@ -435,7 +574,8 @@
     const activeLesson = lessonContext ? current.arg : null;
     if (!focusMode) layout.appendChild(renderSidebar(activeLesson));
     const main = el(`<main id="main-content" tabindex="-1" class="content ${focusMode ? "lesson-focus-content" : ""}"></main>`);
-    if (current.view === "home") renderHome(main);
+    if (authRequired) renderAuth(main);
+    else if (current.view === "home") renderHome(main);
     else if (current.view === "lesson") renderLesson(main, current.arg);
     else if (current.view === "roadmap") renderRoadmap(main, current.arg);
     else if (current.view === "cert") renderCertificate(main, current.arg);
@@ -487,12 +627,12 @@
   function renderHome(main) {
     const done = C.tracks.reduce((n,t) => n + trackProgress(t).done, 0);
     const total = profileStore.lessonCount;
-    main.appendChild(el(`<section class="universe-welcome"><div><p class="eyebrow">DEIN OFFENES LERNUNIVERSUM</p><h1>Neugier ist dein Anfang.</h1><p>Lernen, ausprobieren, weiterdenken. Alle Lernpfade sind kostenlos – für alle.</p><button class="btn primary" id="continueLearning">${state.lastLesson ? "Weiterlernen" : "Erste Lektion entdecken"} <span aria-hidden="true">↗</span></button></div><button class="buddy-card" id="makeBuddy" aria-label="Dein Tierchen gestalten">${buddyMarkup("buddy-large")}<span>${esc(state.name === "Lernender" ? "Wer begleitet dich?" : state.name)}</span><small>Tierchen gestalten ↗</small></button></section>`));
+    if (activeUser) main.appendChild(el(`<p class="muted" data-account-status role="status">${esc(accountMessage)}</p>`));
+    main.appendChild(el(`<section class="universe-welcome"><div class="welcome-copy"><p class="eyebrow">WISSEN GEHÖRT ALLEN.</p><h1>Große Neugier.<br><span>Null Euro.</span></h1><p>KI verstehen. Eigene Ideen programmieren. Mit gutem Wissen sichtbar werden. Alles hier ist kostenlos.</p><div class="welcome-actions"><button class="btn primary" id="continueLearning">${state.lastLesson ? "Weiterlernen" : "Jetzt loslernen"} <span aria-hidden="true">↗</span></button><a class="text-button" href="#lernpfade">Lernpfade entdecken</a></div><p class="welcome-promise">Kostenloses E-Mail-Konto · In deinem Tempo · Ohne Abo</p></div><aside class="welcome-feature" aria-labelledby="featureTitle"><div class="feature-top"><span class="eyebrow">DEIN NÄCHSTES KÖNNEN</span><span class="feature-mark" aria-hidden="true">✳</span></div><h2 id="featureTitle">KI verstehen.<br>Selbst entscheiden.</h2><p>Vom ersten Prompt bis zum eigenen Prüfplan. Mit Beispielen und Übungen direkt im Browser.</p><a class="feature-link" href="studio.html#roadmap/ki">Kostenlos KI lernen <span aria-hidden="true">↗</span></a><div class="feature-tags"><span>Grundlagen</span><span>Prompts</span><span>Prüfen</span></div></aside></section>`));
     main.querySelector("#continueLearning").addEventListener("click", () => go("lesson", findLesson(state.lastLesson) ? state.lastLesson : (findLesson("einstieg-0-1") ? "einstieg-0-1" : C.tracks[0].stages[0].lessons[0].id)));
-    main.querySelector("#makeBuddy").addEventListener("click", openProfile);
-    main.appendChild(el(`<div class="learning-stats"><span><b>${done}</b> von ${total} Lektionen entdeckt</span><span><b>${totalXp()}</b> XP gesammelt</span><span><b>${earnedBadges().length}</b> Abzeichen</span><span class="free-note">Für dich frei zugänglich</span></div>`));
+    main.appendChild(el(`<div class="learning-stats"><span><b>${C.tracks.length}</b> Lernpfade</span><span><b>${total}</b> kostenlose Lektionen</span><span><b>${done}</b> abgeschlossen</span><span class="free-note">Dein Wissen wächst. Der Preis bleibt 0 €.</span></div>`));
     main.appendChild(el(`<p class="storage-notice" id="storageNotice" role="status" ${profileStore.canPersist() && !profileStore.recovered() ? "hidden" : ""}>${profileStore.recovered() ? "Ein gespeicherter Lernstand konnte nicht gelesen werden. Die Originaldaten bleiben erhalten; du kannst deine Sicherung im Profil laden." : "Dein Browser erlaubt gerade keine dauerhafte Speicherung. Sichere deinen Lernstand als Datei."}</p>`));
-    const catalogue = el(`<section aria-labelledby="worldsTitle"><div class="catalogue-heading"><h2 id="worldsTitle">Worauf bist du neugierig?</h2><label class="search-label"><span class="sr-only">Lernpfade und Lektionen durchsuchen</span><input type="search" id="lessonSearch" placeholder="Thema oder Lektion suchen …" autocomplete="off"></label></div><div class="world-filters" role="group" aria-label="Lernbereich"><button data-group="all" aria-pressed="true">Alles entdecken</button>${rubrikGruppen().map(g => `<button data-group="${esc(g.id)}" aria-pressed="false">${g.icon} ${esc(g.name)}</button>`).join("")}</div><p id="searchSummary" class="muted" role="status"></p><div class="world-grid" id="worldResults"></div></section>`);
+    const catalogue = el(`<section id="lernpfade" aria-labelledby="worldsTitle"><div class="catalogue-heading"><div><p class="eyebrow">SUCH DIR DEINEN ANFANG.</p><h2 id="worldsTitle">Was willst du können?</h2></div><label class="search-label"><span class="sr-only">Lernpfade und Lektionen durchsuchen</span><input type="search" id="lessonSearch" placeholder="Zum Beispiel: KI, Python, Marketing …" autocomplete="off"></label></div><div class="world-filters" role="group" aria-label="Lernbereich"><button data-group="all" aria-pressed="true">Alle Lernpfade</button>${rubrikGruppen().map(g => `<button data-group="${esc(g.id)}" aria-pressed="false">${esc(g.name)}</button>`).join("")}</div><p id="searchSummary" class="muted" role="status"></p><div class="world-grid" id="worldResults"></div></section>`);
     let group = "all";
     function showResults() {
       const query = catalogue.querySelector("#lessonSearch").value.trim().toLocaleLowerCase("de");
@@ -503,7 +643,8 @@
         const p = trackProgress(tr);
         const match = !query || (tr.name + " " + tr.subtitle).toLocaleLowerCase("de").includes(query);
         if (match) {
-          const card = el(`<article class="world-card"><span class="world-icon" style="--world-color:${tr.color}" aria-hidden="true">${tr.icon}</span><h3>${esc(tr.name)}</h3><p>${esc(tr.subtitle)}</p><div class="world-progress"><progress value="${p.done}" max="${p.total || 1}" aria-label="Fortschritt ${esc(tr.name)}"></progress><small>${p.done} / ${p.total} Lektionen</small></div><button class="world-open" type="button">Lernpfad öffnen <span aria-hidden="true">↗</span><span class="sr-only">: ${esc(tr.name)}</span></button></article>`);
+          const symbols = {einstieg:"↗",machine:"01",html:"</>",python:"Py",js:"JS",sec:"◇",math:"∑",mktg:"↗",seo:"◎",proj:"{ }",srv:"$_",matheanfassen:"ƒ",ki:"✳"};
+          const card = el(`<article class="world-card" data-track="${esc(tr.id)}" style="--world-color:${tr.color}"><div class="world-card-top"><span class="world-icon" aria-hidden="true">${esc(symbols[tr.id] || tr.icon)}</span><span class="course-free">KOSTENLOS</span></div><h3>${esc(tr.name)}</h3><p>${esc(tr.subtitle)}</p><div class="world-progress"><progress value="${p.done}" max="${p.total || 1}" aria-label="Fortschritt ${esc(tr.name)}"></progress><small>${p.total} Lektionen${p.done ? " · " + p.done + " abgeschlossen" : " · Dein Tempo"}</small></div><button class="world-open" type="button">${p.done ? "Weiterlernen" : "Lernpfad öffnen"} <span aria-hidden="true">↗</span><span class="sr-only">: ${esc(tr.name)}</span></button></article>`);
           card.querySelector("button").addEventListener("click", () => go("roadmap", tr.id)); results.appendChild(card); count++;
         } else {
           for (const item of allLessons(tr)) {
@@ -513,13 +654,13 @@
           }
         }
       }
-      catalogue.querySelector("#searchSummary").textContent = query ? count + " passende Ergebnisse" : "Wähle einen Lernpfad. Du brauchst kein Konto und keine Wallet.";
-      if (!count) results.appendChild(el(`<p class="empty-result">Dazu haben wir noch nichts gefunden. Versuche ein anderes Wort oder wähle „Alles entdecken“.</p>`));
+      catalogue.querySelector("#searchSummary").textContent = query ? count + " passende Ergebnisse" : count + " Lernpfade. Jeder davon steht dir vollständig offen.";
+      if (!count) results.appendChild(el(`<p class="empty-result">Dazu haben wir noch nichts gefunden. Versuche ein anderes Wort oder wähle „Alle Lernpfade“.</p>`));
     }
     catalogue.querySelector("#lessonSearch").addEventListener("input", showResults);
     catalogue.querySelectorAll("[data-group]").forEach(b => b.addEventListener("click", () => { group = b.dataset.group; catalogue.querySelectorAll("[data-group]").forEach(c => c.setAttribute("aria-pressed", String(c === b))); showResults(); }));
     main.appendChild(catalogue); showResults();
-    const bottom = el(`<div class="universe-bottom"><section class="garden-note"><span class="eyebrow">GEMEINSAM WEITERDENKEN</span><h2>Eine Frage kann viel bewegen.</h2><p>Teile Fragen und Ideen mit anderen Lernenden. Das Forum öffnet bei GitHub; lesen ist öffentlich, zum Schreiben brauchst du dort ein Konto.</p><a class="btn" href="community.html">Zur Gemeinschaft ↗</a></section><section class="garden-note"><span class="eyebrow">FREIER QUELLCODE</span><h2>Verstehen. Verändern. Weitergeben.</h2><p>Die Plattform darf wachsen. Du kannst ihren Code ansehen, selbst betreiben und Verbesserungen beitragen.</p><a class="btn" href="quellcode.html">Quellcode entdecken ↗</a></section></div>`);
+    const bottom = el(`<div class="universe-bottom"><section class="garden-note mission-note"><span class="eyebrow">UNSERE ANSAGE</span><h2>Bildung braucht Neugier.<br>Keine Kreditkarte.</h2><p>Für deinen ersten Schritt, einen neuen Beruf oder einfach für dich: Hier lernst du kostenlos. Du brauchst weder ein Kursbudget noch einen Bildungsgutschein.</p><a class="btn" href="angebot.html">Dafür steht Lernstudio ↗</a></section><section class="garden-note"><span class="eyebrow">GEMEINSAM BESSER WERDEN</span><h2>Wissen teilen.<br>Code weiterdenken.</h2><p>Frag nach, hilf mit, bau darauf auf. Der Quellcode ist offen. Die Community trifft sich bei GitHub; zum Schreiben brauchst du dort ein Konto.</p><div class="welcome-actions"><a class="btn" href="quellcode.html">Quellcode ↗</a><a class="text-button" href="community.html">Zur Community</a></div></section></div>`);
     main.appendChild(bottom);
   }
 
@@ -1767,8 +1908,8 @@ document.getElementById("go").addEventListener("click", function(){
   function normVerify(s) { return String(s == null ? "" : s).replace(/\r/g, "").split("\n").map(l => l.replace(/\s+$/, "")).join("\n").trim(); }
 
   /* ---------------- MARKETING/SEO: geteilter Projekt-Zustand (eigener localStorage-Namespace, unabhaengig vom App-State) ---------------- */
-  function mktgGet() { try { return JSON.parse(localStorage.getItem("ls_mktg") || "{}") || {}; } catch (e) { return {}; } }
-  function mktgSet(patch) { const s = mktgGet(); Object.keys(patch || {}).forEach(k => { s[k] = (patch[k] && typeof patch[k] === "object" && !Array.isArray(patch[k])) ? Object.assign({}, s[k], patch[k]) : patch[k]; }); try { localStorage.setItem("ls_mktg", JSON.stringify(s)); } catch (e) {} planeFortschrittSync(); return s; }
+  function mktgGet() { return extraState.marketing || {}; }
+  function mktgSet(patch) { const s = { ...mktgGet() }; Object.keys(patch || {}).forEach(k => { s[k] = (patch[k] && typeof patch[k] === "object" && !Array.isArray(patch[k])) ? Object.assign({}, s[k], patch[k]) : patch[k]; }); extraState.marketing = s; planeFortschrittSync(); return s; }
   /* SERP-Pixelmessung wie Google (canvas.measureText). Google schneidet nach PIXELN ab, nicht nach Zeichen. */
   let _serpCanvas = null;
   function serpMeasure(text, fontPx, family) { _serpCanvas = _serpCanvas || document.createElement("canvas"); const cx = _serpCanvas.getContext("2d"); cx.font = fontPx + "px " + (family || "arial, sans-serif"); return Math.round(cx.measureText(String(text || "")).width); }
@@ -3301,14 +3442,19 @@ document.getElementById("go").addEventListener("click", function(){
     return H.map(x => ("00000000" + (x >>> 0).toString(16)).slice(-8)).join("");
   }
 
-  /* ---------- Public startup: no account, payment or wallet request ---------- */
+  /* Capture email callback once and remove credentials from the address bar. */
+  const callbackHash = /(?:access_token|refresh_token|error|type)=/.test(location.hash) ? location.hash : "";
+  if (callbackHash) history.replaceState(null, "", location.pathname + location.search);
   readRoute(); render();
+  window.learningAccountReady = bootAccount(callbackHash);
   window.addEventListener("popstate", () => { readRoute(); render(); });
   window.addEventListener("hashchange", () => { readRoute(); render(); });
   window.addEventListener("storage", event => {
-    if (event.key && event.key.startsWith(window.LearningProfile.KEY)) {
+    if (event.key === window.LearningAccount.SESSION_KEY || event.key === null) { ++accountEpoch; bootAccount(""); return; }
+    if (accountReady && event.key && event.key.startsWith(LS_ACCOUNT_PREFIX + activeUser + ":" + window.LearningProfile.KEY)) {
       state = profileStore.read();
       if (current.view === "home") render(); else refreshHeaderRing();
     }
   });
+  window.addEventListener("online", () => { if (activeUser) { if (accountReady) syncFortschrittJetzt(); else activateAccount(); } });
 })();
