@@ -2,6 +2,8 @@
 
 Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, Marketing ohne Werbebudget und selbst gestaltbaren Tier-Avataren. Ein E-Mail-Konto genügt: Alle veröffentlichten Lerninhalte sind ohne Kauf, Abonnement oder Zahlungsdaten verfügbar. Bestehende Lernstudio-Konten werden weiterverwendet.
 
+**HALVETH authorship and participation:** Juri Halveth (Juri Janovski) claims the rights in original platform design, lesson selection and arrangement, original prose, models, diagrams and new code contributions. Evidence or teaching boundaries are not rights waivers. Historical ISC permissions remain effective; protected new HALVETH contributions require a written commercial license and participation agreement.
+
 - [Lernstudio öffnen](https://www.mein-lernstudio.com/)
 - [Community](https://github.com/Juri-Halveth/lernstudio/discussions)
 - [EVE-Forschung](contracts/README.md)
@@ -46,4 +48,4 @@ Die Ausgabe dieses Quellstands ist für **www.mein-lernstudio.com** vorbereitet.
 
 ## Mitmachen und Lizenz
 
-Siehe [CONTRIBUTING.md](CONTRIBUTING.md), [LICENSE.txt](LICENSE.txt) und [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). Originale Plattformquellen und eigene veröffentlichte Lerninhalte stehen unter ISC. Abweichende Lizenzen, insbesondere das EVE-Forschungsmodul und Drittbestandteile, behalten ihren eigenen Geltungsbereich.
+Siehe [CONTRIBUTING.md](CONTRIBUTING.md), [LICENSES.md](LICENSES.md), [HALVETH-RIGHTS.md](HALVETH-RIGHTS.md) und [THIRD_PARTY_NOTICES.txt](THIRD_PARTY_NOTICES.txt). Der historische Stand bis `48db86421040d47cc066953df53b61a23be7342e` bleibt unter ISC. Unterscheidbare neue HALVETH-Beiträge stehen unter der [HALVETH Public-Interest Research License 2.0](LICENSE-HALVETH-PIRL-2.0.md); ihre kommerzielle Nutzung erfordert eine vorherige schriftliche Lizenz und Beteiligungsvereinbarung. Die Lerninhalte bleiben für Lernende ohne Kauf, Abo oder Zahlungsdaten frei zugänglich. EVE und Drittbestandteile behalten ihren eigenen Geltungsbereich.
