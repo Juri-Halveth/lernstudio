@@ -10,7 +10,7 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
+  "license": "SEE LICENSE IN LICENSES.md",
   "type": "commonjs",
   "dependencies": {
     "basic-ftp": "^6.0.1"
