@@ -7,6 +7,7 @@ Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, 
 - [Lernstudio öffnen](https://www.mein-lernstudio.com/)
 - [Community](https://github.com/Juri-Halveth/lernstudio/discussions)
 - [EVE-Forschung](contracts/README.md)
+- [HALVETH Research: Forschung prüfen, Entscheidungen erklären](https://github.com/Juri-Halveth/open-research-branches/blob/main/reports/HALVETH_RESEARCH_2026-09-18.md)
 
 ## Lokal starten
 
