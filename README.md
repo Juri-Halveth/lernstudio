@@ -1,5 +1,14 @@
 # Lernstudio — Wissen gehört allen
 
+<!-- HALVETH_WORK_CERTIFICATES_V1_1 -->
+## Juri Janovski / Juri Halveth – Privates HALVETH-Werkzertifikat
+
+[Privates HALVETH-Werkzertifikat: Dokumentierte Lernplattform und Testorganisation – Lernstudio](https://juri-halveth.github.io/werkzertifikate/#werk-lernstudio).
+
+HALVETH VERACHEL STUDIOS · Quellstand, dokumentierte Ergebnisse und SHA-256-Belege stehen im Werkzertifikat. Private, mit Codex erstellte Werkdokumentation; keine ISTQB- oder sonstige Personenzertifizierung.
+<!-- /HALVETH_WORK_CERTIFICATES_V1_1 -->
+
+
 Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, Marketing ohne Werbebudget und selbst gestaltbaren Tier-Avataren. Ein E-Mail-Konto genügt: Alle veröffentlichten Lerninhalte sind ohne Kauf, Abonnement oder Zahlungsdaten verfügbar. Bestehende Lernstudio-Konten werden weiterverwendet.
 
 **HALVETH authorship and participation:** Juri Halveth (Juri Janovski) claims the rights in original platform design, lesson selection and arrangement, original prose, models, diagrams and new code contributions. Evidence or teaching boundaries are not rights waivers. Historical ISC permissions remain effective; protected new HALVETH contributions require a written commercial license and participation agreement.
