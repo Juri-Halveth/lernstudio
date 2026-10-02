@@ -24,7 +24,7 @@ async function createApp(hash="",stored={},signedIn=true){
   w.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new w.Event("close"));};
   for(const [key,value]of Object.entries(stored))w.localStorage.setItem(key,value);
   if(signedIn)w.localStorage.setItem('ls_session',JSON.stringify({access_token:'fixture-token',refresh_token:'fixture-refresh',expires_at:Date.now()+3600000}));
-  for(const file of ["curriculum.js","learning-profile.js","account-auth.js","account-progress.js","reference.js","basics.js","plotter.js","payment-simulator.js","learning-space.js","lesson-visuals.js","expedition.js","learning-packets.js","journey-ui.js"])w.eval(fs.readFileSync(path.join(root,file),"utf8"));
+  for(const file of ["curriculum.js","learning-profile.js","account-auth.js","account-progress.js","reference.js","basics.js","plotter.js","payment-simulator.js","learning-space.js","lesson-visuals.js","expedition.js","learning-packets.js","journey-ui.js","connections-ui.js"])w.eval(fs.readFileSync(path.join(root,file),"utf8"));
   let source=fs.readFileSync(path.join(root,"app.js"),"utf8");
   source=source.replace('  readRoute(); render();','  window.__test={go,markDone,openProfile,readRoute,render,getState:()=>state};\n  readRoute(); render();');
   w.eval(source);await w.learningAccountReady;return {dom,w,errors,requests};

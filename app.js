@@ -533,7 +533,7 @@
   function readRoute() {
     const raw = location.hash.slice(1);
     const parts = raw.split("/");
-    const views = ["home","expedition","map","bridge","lesson","roadmap","cert","reference","basics","article","login","lab"];
+    const views = ["home","expedition","map","connections","bridge","lesson","roadmap","cert","reference","basics","article","login","lab"];
     try { current = {view:views.includes(parts[0]) ? parts[0] : "home",arg:parts[1] ? decodeURIComponent(parts[1]) : null}; }
     catch (error) { current = {view:"home",arg:null}; }
   }
@@ -590,7 +590,7 @@
     if (lessonContext && state.lastLesson !== current.arg) { state.lastLesson = current.arg; save(); }
     const focusMode = !!lessonContext;
     const journeyMode = !authRequired && ["home", "expedition"].includes(current.view);
-    const singleTask = !authRequired && (journeyMode || focusMode || ["lab", "bridge"].includes(current.view));
+    const singleTask = !authRequired && (journeyMode || focusMode || ["lab", "bridge", "connections"].includes(current.view));
     document.body.classList.toggle("lesson-focus-active", focusMode);
     document.body.classList.toggle("journey-active", journeyMode);
     document.body.classList.toggle("single-task-active", singleTask);
@@ -602,6 +602,7 @@
     if (authRequired) renderAuth(main);
     else if (journeyMode) renderHome(main);
     else if (current.view === "map") renderMap(main);
+    else if (current.view === "connections") viewCleanup = window.LernConnections.mount(main, {curriculum:C,state,go});
     else if (current.view === "bridge") viewCleanup = window.LernJourney.mountBridge(main, {curriculum:C,state,go});
     else if (current.view === "lesson") renderLesson(main, current.arg);
     else if (current.view === "roadmap") renderRoadmap(main, current.arg);

@@ -59,6 +59,20 @@ kein Agentenserver. Beiträge zur öffentlichen Welt werden als geprüfte Pull
 Requests übernommen. Einstieg: [AGENT_LEARNING.md](AGENT_LEARNING.md).
 Gestaltungsvertrag und fachliche Quellen: [docs/LEARNING_DESIGN.md](docs/LEARNING_DESIGN.md).
 
+### Direkte Verbindungen fuer Agenten
+
+Die optionale [Verbindungskarte](https://juri-halveth.github.io/lernstudio/#connections)
+zeigt alle Lernpfade um einen gemeinsamen Mittelpunkt. Der normale Lernstart
+bleibt eine Aufgabe. Die maschinenlesbare [Raumuebersicht](https://juri-halveth.github.io/lernstudio/api/space.json)
+liefert alle Pfadadressen, Schnittstellen und einzelnen Dateihashes in einer
+kleinen Antwort. Ein Agent liest danach nur die benoetigten Pfade.
+
+`node werkzeug/agent-space.mjs overview` startet lokal ohne Dienst oder Token.
+`context`, `search`, `verify` und `changes` liefern begrenzte JSON-Ausschnitte
+und pruefbare Versionsunterschiede. `llms.txt` und `AGENTS.md` erleichtern den
+Einstieg; sie verbinden einen fremden Agenten nicht von selbst.
+Vertrag und Cache-Regeln: [docs/AGENT_SPACE.md](docs/AGENT_SPACE.md).
+
 HTML, CSS und JavaScript. Der Gastzugang funktioniert unabhängig vom Kontodienst. Themenfilter und Volltextsuche erschließen alle Lektionen. Interaktive Denkmodelle, große Leseschrift und eine freie Code-Werkstatt ergänzen die bestehenden Übungen. Python und JavaScript laufen in einem Worker innerhalb eines getrennten, sandboxed Iframes mit Abbruch und Zeitlimit; kein Lernstudio-Server führt den eingegebenen Code aus. Python lädt Pyodide bei Bedarf von jsDelivr.
 
 Optional bleibt der bestehende Supabase-Kontodienst angebunden. `account-auth.js` verbindet die E-Mail-Anmeldung, Registrierung, Passwortwiederherstellung und Abmeldung. `account-progress.js` synchronisiert Profil, Abschlüsse und Marketingübungen mit der eigenen Kontozelle. Die Oberfläche bestätigt erfolgreiche Speicherung; bei Verbindungsproblemen bleibt der nach Konto getrennte Gerätecache erhalten. Eine zusätzliche Sicherung lässt sich herunterladen und ausdrücklich mit dem Konto zusammenführen. Die Lerninhalte selbst werden vollständig aus `curriculum.js` ausgeliefert. Eine Kaufberechtigung ist dafür nicht erforderlich.

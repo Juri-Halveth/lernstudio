@@ -1,4 +1,5 @@
 "use strict";
+const contextFiles = [...require("./build-learning-api.cjs").buildData().contexts.keys()].map(id => "api/contexts/" + id + ".json");
 // Exact release allowlist. History, private documents, accounts and server secrets stay out.
 module.exports = Object.freeze([
   "index.html", "studio.html", "angebot.html", "inhalte.html", "genie.html", "faq.html",
@@ -17,5 +18,6 @@ module.exports = Object.freeze([
   "LICENSE.txt", "THIRD_PARTY_NOTICES.txt",
   "expedition.js", "journey-ui.js", "journey.css", "learning-bay.js", "learning-packets.js",
   "api/manifest.json", "api/lessons.json", "api/learning-contract.v1.json", "api/example-learning-packet.json",
+  "api/space.json", "llms.txt", "connections-ui.js", "connections.css", ...contextFiles,
   "vendor/three/three.module.js", "vendor/three/three.core.js", "vendor/three/LICENSE.txt", "vendor/three/SOURCE.json"
 ]);

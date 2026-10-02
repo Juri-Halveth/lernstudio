@@ -7,12 +7,14 @@
   "trackCount": 13,
   "endpoints": {
     "lessons": "https://juri-halveth.github.io/lernstudio/api/lessons.json",
+    "agentSpace": "https://juri-halveth.github.io/lernstudio/api/space.json",
     "packetContract": "https://juri-halveth.github.io/lernstudio/api/learning-contract.v1.json",
     "packetExample": "https://juri-halveth.github.io/lernstudio/api/example-learning-packet.json"
   },
   "routes": {
     "journey": "https://juri-halveth.github.io/lernstudio/",
     "map": "https://juri-halveth.github.io/lernstudio/#map",
+    "connections": "https://juri-halveth.github.io/lernstudio/#connections",
     "workshop": "https://juri-halveth.github.io/lernstudio/#lab",
     "import": "https://juri-halveth.github.io/lernstudio/#bridge"
   },

@@ -34,4 +34,5 @@ for (const directory of ["website", "dist"]) {
   }
   if (JSON.stringify(listFiles(target).sort())!==JSON.stringify([...WEBSITE].sort())) throw new Error("Release allowlist mismatch");
 }
+execFileSync(process.execPath, [path.join(__dirname, "agent-space.mjs"), "verify", "--root", path.join(ROOT, "website")], {stdio:"inherit"});
 console.log("Build bestanden: " + WEBSITE.length + " öffentliche Dateien; vollständiges Curriculum; keine Kontodaten oder Geheimnisdateien.");
