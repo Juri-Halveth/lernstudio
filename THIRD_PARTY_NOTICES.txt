@@ -5,7 +5,7 @@ Original platform sources and original published lesson content: ISC;
 see LICENSE.txt. Emoji are rendered by the visitor's operating system;
 no third-party emoji artwork is bundled.
 
-Existing ambient audio (thematic preview only):
+Existing ambient audio (optional music in the learning journey and thematic previews):
 - Music: "Elevate", Fupi, OpenGameArt, CC0.
   https://opengameart.org/content/elevate-instrument-tracks
 - Forest birds: isaiah658, OpenGameArt, CC0.
@@ -29,6 +29,12 @@ in their package distributions. They are not shipped into the browser.
 Interface icons: Lucide 1.49.0, ISC; bundled in lucide.min.js.
 The full notice (including inherited icon notices) is in lucide.LICENSE.txt.
 https://lucide.dev/license
+
+Interactive harbor renderer: Three.js 0.186.1, MIT.
+Official npm distribution, self-hosted modules under vendor/three/.
+License: vendor/three/LICENSE.txt. Distribution and file hashes: vendor/three/SOURCE.json.
+https://github.com/mrdoob/three.js
+The harbor meshes and scene composition are original procedural Lernstudio art.
 
 EVE research source, if included: SPDX MIT, as declared in its source.
 OpenZeppelin Contracts 4.9.6 is an MIT dependency of that separate prototype.

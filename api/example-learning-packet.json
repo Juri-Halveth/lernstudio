@@ -1,0 +1,14 @@
+{
+  "schema": "lernstudio.learning-packet.v1",
+  "id": "note-computer-001",
+  "title": "Eingabe, Verarbeitung und Ausgabe",
+  "lessonId": "einstieg-0-1",
+  "observation": "Bei meiner lokalen Lernaufgabe war die Tastatur eine Eingabe und der Bildschirm eine Ausgabe. Ein Computer verarbeitet die eingegebenen Daten nach Anweisungen.",
+  "question": "Welche anderen Beispiele fuer Eingabe und Ausgabe finde ich in meinem Alltag?",
+  "source": {
+    "kind": "LOCAL_EXERCISE",
+    "ref": "urn:lernstudio:exercise:einstieg-0-1"
+  },
+  "recordedAt": "2026-10-02T10:00:00Z",
+  "publication": "LOCAL_DRAFT_ONLY"
+}

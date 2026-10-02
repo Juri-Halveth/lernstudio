@@ -38,6 +38,27 @@ Der Build erzeugt `dist/` und `website/` aus einer expliziten Dateiliste. `curri
 
 ## Wie es funktioniert
 
+Der Einstieg ist eine Sternenbucht mit drei kurzen, aufeinander folgenden
+Spielmissionen. Es steht immer eine konkrete Aufgabe im Vordergrund; die
+Lernkarte mit Suche bleibt freiwillig über das Menü erreichbar. Richtige und
+falsche Antworten erhalten eigenes Feedback. Danach führt die Reise in die
+vorhandenen Lektionen, bei Rückkehr zur ersten offenen Lektion im zuletzt
+besuchten Pfad. Die Ankunftsmissionen ersetzen keine Lektionsabschlüsse.
+
+Die 3D-Bucht verwendet lokal ausgeliefertes Three.js und originale prozedurale
+Geometrie. Musik beginnt erst nach Betätigung des Lautsprechers. Ruhige Bewegung,
+Systemeinstellungen für reduzierte Animation und eine Darstellung ohne WebGL
+sind berücksichtigt. Ankunftsfortschritt liegt getrennt je Gast beziehungsweise
+Konto im Browser; er ist nicht Teil der Kontosynchronisierung.
+
+Browser, Node.js und PowerShell können denselben typisierten Lernnotiz-Vertrag
+verwenden. Die [Wissensbrücke](https://juri-halveth.github.io/lernstudio/#bridge)
+öffnet eine ausdrücklich gewählte JSON-Datei als private Vorschau im Tab.
+Der öffentliche Lektionskatalog ist eine lesbare, statische Schnittstelle,
+kein Agentenserver. Beiträge zur öffentlichen Welt werden als geprüfte Pull
+Requests übernommen. Einstieg: [AGENT_LEARNING.md](AGENT_LEARNING.md).
+Gestaltungsvertrag und fachliche Quellen: [docs/LEARNING_DESIGN.md](docs/LEARNING_DESIGN.md).
+
 HTML, CSS und JavaScript. Der Gastzugang funktioniert unabhängig vom Kontodienst. Themenfilter und Volltextsuche erschließen alle Lektionen. Interaktive Denkmodelle, große Leseschrift und eine freie Code-Werkstatt ergänzen die bestehenden Übungen. Python und JavaScript laufen in einem Worker innerhalb eines getrennten, sandboxed Iframes mit Abbruch und Zeitlimit; kein Lernstudio-Server führt den eingegebenen Code aus. Python lädt Pyodide bei Bedarf von jsDelivr.
 
 Optional bleibt der bestehende Supabase-Kontodienst angebunden. `account-auth.js` verbindet die E-Mail-Anmeldung, Registrierung, Passwortwiederherstellung und Abmeldung. `account-progress.js` synchronisiert Profil, Abschlüsse und Marketingübungen mit der eigenen Kontozelle. Die Oberfläche bestätigt erfolgreiche Speicherung; bei Verbindungsproblemen bleibt der nach Konto getrennte Gerätecache erhalten. Eine zusätzliche Sicherung lässt sich herunterladen und ausdrücklich mit dem Konto zusammenführen. Die Lerninhalte selbst werden vollständig aus `curriculum.js` ausgeliefert. Eine Kaufberechtigung ist dafür nicht erforderlich.

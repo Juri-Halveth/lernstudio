@@ -24,7 +24,7 @@ async function createApp(hash="",stored={},signedIn=true){
   w.HTMLDialogElement.prototype.close=function(){this.open=false;this.dispatchEvent(new w.Event("close"));};
   for(const [key,value]of Object.entries(stored))w.localStorage.setItem(key,value);
   if(signedIn)w.localStorage.setItem('ls_session',JSON.stringify({access_token:'fixture-token',refresh_token:'fixture-refresh',expires_at:Date.now()+3600000}));
-  for(const file of ["curriculum.js","learning-profile.js","account-auth.js","account-progress.js","reference.js","basics.js","plotter.js","payment-simulator.js","learning-space.js","lesson-visuals.js"])w.eval(fs.readFileSync(path.join(root,file),"utf8"));
+  for(const file of ["curriculum.js","learning-profile.js","account-auth.js","account-progress.js","reference.js","basics.js","plotter.js","payment-simulator.js","learning-space.js","lesson-visuals.js","expedition.js","learning-packets.js","journey-ui.js"])w.eval(fs.readFileSync(path.join(root,file),"utf8"));
   let source=fs.readFileSync(path.join(root,"app.js"),"utf8");
   source=source.replace('  readRoute(); render();','  window.__test={go,markDone,openProfile,readRoute,render,getState:()=>state};\n  readRoute(); render();');
   w.eval(source);await w.learningAccountReady;return {dom,w,errors,requests};
@@ -36,7 +36,7 @@ for(const track of guest.w.CURRICULUM.tracks)for(const stage of track.stages)for
   guest.w.__test.go('lesson',lesson.id);assert(guest.w.document.querySelector('.lesson-focus'),lesson.id+': accessible without an account');
   assert(guest.w.document.querySelector('.lesson-model'),lesson.id+': visual model is available');
 }
-guest.w.__test.go('home');
+guest.w.__test.go('map');
 const guestSearch=guest.w.document.getElementById('lessonSearch');guestSearch.value='print';guestSearch.dispatchEvent(new guest.w.Event('input'));
 assert(guest.w.document.querySelector('.lesson-result'),'Search includes lesson contents, not only path names');
 assert.equal(guest.requests.length,0,'All guest lessons and search remain independent of account services');
@@ -50,6 +50,25 @@ const returningGuest=await createApp('#lesson/html-0-magie',{[guestKey]:guestSta
 assert.equal(returningGuest.w.__test.getState().done['html-0-magie'],true);
 returningGuest.w.__test.go('home');returningGuest.w.__test.openProfile();assert(returningGuest.w.document.querySelector('dialog[open]'));assert(returningGuest.w.document.getElementById('pp-logout').hidden);returningGuest.dom.window.close();
 const {dom,w,errors,requests}=await createApp();
+assert(w.document.querySelector(".journey-screen"),"Home is a single mission, not a catalogue");
+assert.equal(w.document.querySelectorAll(".world-card,.sidebar").length,0);
+assert.equal(w.document.querySelectorAll(".mission-choices").length,1);
+for (const station of w.LernExpedition.stations) {
+  assert.equal(w.document.querySelector(".mission-content h1").textContent,station.title);
+  w.document.querySelector('[data-choice="'+station.choices.find(c=>c.id!==station.correctChoice).id+'"]').click();
+  assert.equal(w.document.querySelectorAll("#missionNext").length,0,"Incorrect answer does not advance");
+  assert.equal(w.document.querySelector(".mission-feedback").dataset.result,"retry");
+  w.document.querySelector('[data-choice="'+station.correctChoice+'"]').click();
+  assert(w.document.querySelector("#missionNext"),"Correct answer gets a single next action");
+  w.document.querySelector("#missionNext").click();
+}
+assert(w.document.querySelector("#missionContinue"),"Arrival connects to a real lesson");
+assert.equal(w.document.activeElement,w.document.querySelector(".mission-content h1"),"Focus reaches the final recommendation");
+assert.equal(Object.keys(w.__test.getState().done).length,0,"Arrival does not complete curriculum lessons");
+w.__test.go("home");assert(w.document.querySelector("#missionContinue"),"Arrival state survives navigation");
+w.__test.go("expedition");assert(w.document.querySelector(".mission-choices"),"Arrival can be replayed without resetting lesson progress");
+w.__test.go("bridge");assert(w.document.querySelector("#packetFile"),"Explicit learning-note import is reachable");
+w.__test.go("map");
 assert.equal(w.document.querySelectorAll(".world-card").length,w.CURRICULUM.tracks.length);
 assert.equal(requests.length,3,"Restore verifies the user, loads progress and merges it");
 const search=w.document.getElementById("lessonSearch");search.value="this-will-not-exist";search.dispatchEvent(new w.Event("input"));assert(w.document.querySelector(".empty-result"));
@@ -97,6 +116,15 @@ w.document.querySelector('[data-color="mint"]').click();assert.equal(w.__test.ge
 w.document.querySelector("dialog").close();assert.equal(w.document.activeElement.id,"acctBtn");
 const accountKey='lernstudio_account_fixture-a:'+w.LearningProfile.KEY;
 const saved=w.localStorage.getItem(accountKey);assert(saved);dom.window.close();
+const storageBlocked=await createApp('',{},false);
+storageBlocked.w.localStorage.setItem('lernstudio_expedition_v1:guest',JSON.stringify({version:1,solved:[]}));
+storageBlocked.w.Storage.prototype.setItem=function(){throw new Error('Storage denied by test');};
+const firstStation=storageBlocked.w.LernExpedition.stations[0];
+storageBlocked.w.document.querySelector('[data-choice="'+firstStation.correctChoice+'"]').click();
+assert(storageBlocked.w.document.querySelector('.mission-note').textContent.includes('Sitzung'));
+storageBlocked.w.__test.go('map');storageBlocked.w.__test.go('home');
+assert.equal(storageBlocked.w.document.querySelector('.mission-content h1').textContent,storageBlocked.w.LernExpedition.stations[1].title,"In-memory progress survives a view change when storage is blocked");
+storageBlocked.dom.window.close();
 const second=await createApp("#lesson/"+first,{[accountKey]:saved});assert.equal(second.w.__test.getState().lastLesson,first);assert.equal(second.w.__test.getState().avatar,"🐢");second.dom.window.close();
 const other=await createApp('',{['lernstudio_account_fixture-b:lernstudio_open_v1']:saved,lernstudio_open_v1:saved,lernstudio_v1:saved});assert.equal(Object.keys(other.w.__test.getState().done).length,0,'Only the verified account cache may be imported');other.dom.window.close();
 assert.deepEqual(errors.map(e=>e.message),[]);

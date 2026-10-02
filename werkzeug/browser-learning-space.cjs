@@ -15,7 +15,7 @@ async function layout(page){const v=await page.evaluate(()=>({width:innerWidth,s
   for(const width of [1440,1920,768,390,320]){
    const context=await browser.newContext({viewport:{width,height:900},locale:'de-DE'}),page=await context.newPage(),errors=[];
    page.on('pageerror',e=>errors.push(e.message));
-   await page.goto(base,{waitUntil:'domcontentloaded'});await page.waitForSelector('.world-card');await page.evaluate(()=>window.learningAccountReady);
+   await page.goto(base+'#map',{waitUntil:'domcontentloaded'});await page.waitForSelector('.world-card');await page.evaluate(()=>window.learningAccountReady);
    assert.equal(await page.locator('.world-card').count(),13);assert.equal(await page.locator('.course-art svg').count(),13);
    if(width<=900){assert.equal(await page.locator('#acctBtn .aname').isVisible(),false);assert.equal(await page.locator('#acctBtn').evaluate(e=>Math.round(e.getBoundingClientRect().width)),44);}
    const view=await layout(page);await page.screenshot({path:path.join(out,`${width}-home.png`),fullPage:true});
@@ -36,7 +36,7 @@ async function layout(page){const v=await page.evaluate(()=>({width:innerWidth,s
     await page.locator('#labLanguage').selectOption('js');await page.locator('#labCode').fill('while (true) {}');await page.locator('#labRun').click();await page.waitForTimeout(300);await page.locator('#labStop').click();await page.waitForFunction(()=>!document.getElementById('labRun').disabled);assert.match(await page.locator('#labOutput').textContent(),/gestoppt/);
     await page.locator('#labRun').click();await page.waitForFunction(()=>!document.getElementById('labRun').disabled,null,{timeout:15000});assert.match(await page.locator('#labOutput').textContent(),/Zeitlimit/);
     await page.locator('#labCode').fill('console.log(typeof document, typeof localStorage);');await page.locator('#labRun').click();await page.waitForFunction(()=>!document.getElementById('labRun').disabled);assert.equal(await page.locator('#labOutput').textContent(),'undefined undefined');
-    await page.goto(base+'#home');await page.locator('#themeBtn').click();await layout(page);await page.screenshot({path:path.join(out,'1440-light.png'),fullPage:true});
+    await page.goto(base+'#map');await page.locator('#themeBtn').click();await layout(page);await page.screenshot({path:path.join(out,'1440-light.png'),fullPage:true});
    }
    assert.deepEqual(errors,[]);reports.push({width,layout:view,errors,python:width===1440,canvasPixels:pixels});await context.close();
   }

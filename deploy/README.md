@@ -9,7 +9,7 @@ GitHub Pages veröffentlicht die statischen Dateien. Python läuft im Browser.
 ## Ablauf
 
 1. `npm ci --ignore-scripts` und `npm run build`.
-2. Die zwölf Prüfsuiten müssen bestehen. Der Build nimmt nur
+2. Die fünfzehn Prüfsuiten müssen bestehen. Der Build nimmt nur
    `werkzeug/public-files.js` in `website/` und `dist/` auf.
 3. Der Pages-Workflow erstellt einen öffentlichen Quellstand- und Dateibeleg
    in `build-info.json` mit Commit und SHA-256 pro Datei.
@@ -20,6 +20,15 @@ GitHub Pages veröffentlicht die statischen Dateien. Python läuft im Browser.
    Browserfunktionen prüfen. Ein grüner Build ist noch keine Live-Bestätigung.
 
 ## Browserprüfung
+
+`werkzeug/browser-expedition.cjs` prüft die geführte Sternenbucht auf sechs
+Desktop-, Tablet-, Handy- und Querformatgrößen, echte Canvas-Pixel und Bewegung,
+Antworten, Fortsetzen, Menü, Musik, reduzierte Animation und WebGL-Ersatzansicht.
+Der Lernnotiz-Import wird mit synthetischen gültigen und ungültigen Dateien
+geprüft. Anwendungsfremde, im Testbrowser beobachtete Antivirus-Injektion wird
+nur in diesem Testkontext blockiert und separat gezählt; die Hostkonfiguration
+bleibt unverändert. Ergebnisse liegen lokal unter
+`research/2026-10-02-expedition/browser/`, Live-Tests unter `live/`.
 
 `werkzeug/browser-learning-space.cjs` prüft fünf Bildschirmbreiten,
 Gastzugang, Suche, Denkmodelle, JavaScript, Python, Abbruch und Zeitlimit.

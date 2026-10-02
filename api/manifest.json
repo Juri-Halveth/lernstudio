@@ -1,0 +1,27 @@
+{
+  "schema": "lernstudio.read-api.v1",
+  "baseURL": "https://juri-halveth.github.io/lernstudio/",
+  "curriculumSha256": "a368a6fc7da04ab8b2e590cd933ea17fd7bd8678a26bcb65f1a17c5938c3b4b5",
+  "curriculumDigestMode": "UTF8_LF_NORMALIZED",
+  "lessonCount": 702,
+  "trackCount": 13,
+  "endpoints": {
+    "lessons": "https://juri-halveth.github.io/lernstudio/api/lessons.json",
+    "packetContract": "https://juri-halveth.github.io/lernstudio/api/learning-contract.v1.json",
+    "packetExample": "https://juri-halveth.github.io/lernstudio/api/example-learning-packet.json"
+  },
+  "routes": {
+    "journey": "https://juri-halveth.github.io/lernstudio/",
+    "map": "https://juri-halveth.github.io/lernstudio/#map",
+    "workshop": "https://juri-halveth.github.io/lernstudio/#lab",
+    "import": "https://juri-halveth.github.io/lernstudio/#bridge"
+  },
+  "contributionGuide": "https://github.com/Juri-Halveth/lernstudio/blob/main/AGENT_LEARNING.md",
+  "capabilities": {
+    "publicReads": true,
+    "explicitLocalPacketPreview": true,
+    "remoteWrites": false,
+    "backgroundAgents": false,
+    "automaticCollection": false
+  }
+}

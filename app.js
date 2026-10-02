@@ -243,7 +243,7 @@
     const head = el(`<header class="app universe-header">
       <button class="iconbtn mobile-nav-btn" id="mobileNavBtn" type="button" aria-controls="studioSidebar" aria-expanded="false" aria-label="Lernpfade öffnen">☰</button>
       <button class="brand-button" id="brandHome" type="button"><img src="icon-192.png" width="40" height="40" alt=""><span><b>Lernstudio</b><small>Wissen gehört allen.</small></span></button>
-      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="#home">Lernpfade</a><a href="#lab">Code-Werkstatt</a><a href="#reference">Nachschlagen</a><a href="community.html">Community</a></nav>
+      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="#home">Sternenbucht</a><a href="#map">Lernkarte</a><a href="#lab">Code-Werkstatt</a><a href="#bridge">Wissensbrücke</a></nav>
       <span class="spacer"></span>${accountReady ? `<span class="xp" title="Deine Erfahrungspunkte">✦ <b>${totalXp()}</b> XP</span>` : ""}
       <button class="account" id="acctBtn" type="button" aria-label="Lernprofil öffnen" title="Lernprofil öffnen"><i data-lucide="user-round" aria-hidden="true"></i><span class="aname">${activeUser ? esc(state.name === "Lernender" ? "Mein Konto" : state.name) : "Mein Lernstand"}</span></button>
       ${themeSwitchMarkup("themeBtn")}
@@ -272,8 +272,8 @@
           </span>
         </button>
         <span class="focus-spacer"></span>
-        <button class="focus-exit" id="focusExit" type="button" aria-label="Lernmodus verlassen und Kursübersicht öffnen">
-          <span>Übersicht</span><b aria-hidden="true">×</b>
+        <button class="focus-exit" id="focusExit" type="button" aria-label="Lernmodus verlassen und zur Sternenbucht zurückkehren">
+          <span>Bucht</span><b aria-hidden="true">×</b>
         </button>
       </header>
     `);
@@ -286,7 +286,8 @@
       try { localStorage.setItem('ls_reading', large ? 'large' : 'normal'); } catch (_) {}
     });
     head.querySelector("#focusTrack").addEventListener("click", leaveFocus);
-    head.querySelector("#focusExit").addEventListener("click", leaveFocus);
+    head.querySelector("#focusExit").addEventListener("click", () => go("home"));
+    if (window.LernJourney) head.insertBefore(window.LernJourney.soundButton(), head.querySelector('#focusExit'));
     return head;
   }
 
@@ -519,7 +520,7 @@
   /* ========================================================
      VIEWS
      ======================================================== */
-  let current = { view: "home", arg: null };
+  let current = { view: "home", arg: null }, viewCleanup = null;
 
   function routeFor(view, arg) { return view === "home" ? "#home" : "#" + view + "/" + encodeURIComponent(arg || ""); }
   function go(view, arg) {
@@ -532,7 +533,7 @@
   function readRoute() {
     const raw = location.hash.slice(1);
     const parts = raw.split("/");
-    const views = ["home","lesson","roadmap","cert","reference","basics","article","login","lab"];
+    const views = ["home","expedition","map","bridge","lesson","roadmap","cert","reference","basics","article","login","lab"];
     try { current = {view:views.includes(parts[0]) ? parts[0] : "home",arg:parts[1] ? decodeURIComponent(parts[1]) : null}; }
     catch (error) { current = {view:"home",arg:null}; }
   }
@@ -577,6 +578,8 @@
   }
 
   function render() {
+    if (viewCleanup) { viewCleanup(); viewCleanup = null; }
+    document.querySelectorAll('[data-journey-menu]').forEach(dialog => dialog.close());
     applyTheme();
     setMobileNav(false);
     const root = document.getElementById("app");
@@ -586,14 +589,20 @@
     const lessonContext = !authRequired && current.view === "lesson" ? findLesson(current.arg) : null;
     if (lessonContext && state.lastLesson !== current.arg) { state.lastLesson = current.arg; save(); }
     const focusMode = !!lessonContext;
+    const journeyMode = !authRequired && ["home", "expedition"].includes(current.view);
+    const singleTask = !authRequired && (journeyMode || focusMode || ["lab", "bridge"].includes(current.view));
     document.body.classList.toggle("lesson-focus-active", focusMode);
-    root.appendChild(focusMode ? renderFocusHeader(lessonContext) : renderHeader());
+    document.body.classList.toggle("journey-active", journeyMode);
+    document.body.classList.toggle("single-task-active", singleTask);
+    root.appendChild(focusMode ? renderFocusHeader(lessonContext) : singleTask && window.LernJourney ? window.LernJourney.header({go,onProfile:openProfile,onTheme:toggleTheme}) : renderHeader());
     const layout = el(`<div class="layout ${focusMode ? "lesson-focus" : ""}"></div>`);
     const activeLesson = lessonContext ? current.arg : null;
-    if (!focusMode) layout.appendChild(renderSidebar(activeLesson));
+    if (!singleTask) layout.appendChild(renderSidebar(activeLesson));
     const main = el(`<main id="main-content" tabindex="-1" class="content ${focusMode ? "lesson-focus-content" : ""}"></main>`);
     if (authRequired) renderAuth(main);
-    else if (current.view === "home") renderHome(main);
+    else if (journeyMode) renderHome(main);
+    else if (current.view === "map") renderMap(main);
+    else if (current.view === "bridge") viewCleanup = window.LernJourney.mountBridge(main, {curriculum:C,state,go});
     else if (current.view === "lesson") renderLesson(main, current.arg);
     else if (current.view === "roadmap") renderRoadmap(main, current.arg);
     else if (current.view === "lab") renderLab(main);
@@ -615,7 +624,7 @@
     layout.appendChild(main);
     root.appendChild(layout);
     window.lucide?.createIcons();
-    if (!focusMode) {
+    if (!singleTask) {
       const navBackdrop = el(`<button class="sidebar-backdrop" type="button" aria-label="Kursnavigation schließen"></button>`);
       navBackdrop.addEventListener("click", () => setMobileNav(false));
       root.appendChild(navBackdrop);
@@ -655,6 +664,10 @@
   }
 
   function renderHome(main) {
+    if (!window.LernJourney) { renderMap(main); return; }
+    viewCleanup = window.LernJourney.mount(main, {curriculum:C,state,go,namespace:activeUser || 'guest',forceIntro:current.view === 'expedition'});
+  }
+  function renderMap(main) {
     return window.LearningSpace.mount(main, {curriculum:C, state, go, progress:trackProgress, groups:rubrikGruppen(), persistent:profileStore.canPersist() && !profileStore.recovered()});
   }
   function renderLab(main) {
@@ -2056,7 +2069,7 @@ document.getElementById("go").addEventListener("click", function(){
       stageEl.appendChild(el(`<div class="beat-finish"><h3 style="margin:6px 0">Das war die Lektion.</h3><p style="color:var(--muted)">${bilanz}</p></div>`));
       setZurueck();
       setWeiter(true, "Weiter zur nächsten Lektion →");
-      weiter.onclick = () => { const seq = allLessons(track); const i = seq.findIndex(x => x.lesson.id === lesson.id); if (i >= 0 && i < seq.length - 1) go("lesson", seq[i + 1].lesson.id); else go("roadmap", track.id); };
+      weiter.onclick = () => { const seq = allLessons(track); const i = seq.findIndex(x => x.lesson.id === lesson.id); if (i >= 0 && i < seq.length - 1) go("lesson", seq[i + 1].lesson.id); else go("home"); };
     }
 
     function renderBeat() {

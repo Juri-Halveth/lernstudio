@@ -14,5 +14,8 @@ module.exports = Object.freeze([
   "voegel-wald-web-v2.mp3", "voegel-garten-web-v2.mp3", "tresor-dashboard.png", "tresor-detail.png",
   "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png",
   "favicon-32.png", "favicon-48.png", "favicon.ico", "social-share.png", "robots.txt", "sitemap.xml",
-  "LICENSE.txt", "THIRD_PARTY_NOTICES.txt"
+  "LICENSE.txt", "THIRD_PARTY_NOTICES.txt",
+  "expedition.js", "journey-ui.js", "journey.css", "learning-bay.js", "learning-packets.js",
+  "api/manifest.json", "api/lessons.json", "api/learning-contract.v1.json", "api/example-learning-packet.json",
+  "vendor/three/three.module.js", "vendor/three/three.core.js", "vendor/three/LICENSE.txt", "vendor/three/SOURCE.json"
 ]);
