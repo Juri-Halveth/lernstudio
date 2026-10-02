@@ -18,6 +18,6 @@ function copy(source, target) {
 for (const file of files) copy(path.join(root, "dist", file), file);
 copy(path.join(root, "dist", "index.html"), "index.htm");
 copy(path.join(root, "deploy", "all-inkl.htaccess"), ".htaccess");
-const manifest = { version, createdAt: new Date().toISOString(), target: "https://www.mein-lernstudio.com/", state: "PREPARED_NOT_DEPLOYED", entries };
+const manifest = { version, createdAt: new Date().toISOString(), target: null, state: "LEGACY_EXPORT_NOT_DEPLOYED", entries };
 fs.writeFileSync(directory + ".manifest.json", JSON.stringify(manifest, null, 2) + "\n");
 console.log(entries.length + " öffentliche Dateien vorbereitet: " + directory);

@@ -1,4 +1,4 @@
-# Lernstudio: kostenlose Fassung, Zielverzeichnis /mein-lernstudio.com/
+# Lernstudio: historischer Apache-Export ohne festes Hostingziel
 DirectoryIndex index.html
 Options -Indexes
 

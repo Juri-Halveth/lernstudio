@@ -7,7 +7,7 @@
   const URL = "https://nqvjsfdtubfsobrmqtbs.supabase.co";
   const KEY = "sb_publishable_irndXLddtkSIRtH2arWXsA_LYQuTrk4";
   const SESSION_KEY = "ls_session";
-  const REDIRECT = "https://www.mein-lernstudio.com/studio.html";
+  const REDIRECT = "https://juri-halveth.github.io/lernstudio/studio.html";
   function createClient({ storage, fetchImpl }) {
     let session = null, epoch = 0, refreshPending = null, recovery = false;
     function readSaved() { try { return JSON.parse(storage.getItem(SESSION_KEY) || "null"); } catch (_) { return null; } }

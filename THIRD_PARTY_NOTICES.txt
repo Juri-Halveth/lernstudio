@@ -26,6 +26,10 @@ https://pyodide.org/en/0.26.2/
 Development tools are installed from package-lock.json and retain the licenses
 in their package distributions. They are not shipped into the browser.
 
+Interface icons: Lucide 1.49.0, ISC; bundled in lucide.min.js.
+The full notice (including inherited icon notices) is in lucide.LICENSE.txt.
+https://lucide.dev/license
+
 EVE research source, if included: SPDX MIT, as declared in its source.
 OpenZeppelin Contracts 4.9.6 is an MIT dependency of that separate prototype.
 No mainnet deployment, endorsement, token price or production audit is implied.

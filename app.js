@@ -25,12 +25,15 @@
     const memory = new Map();
     return window.LearningProfile.createStore({
       getItem(key) {
-        if (!userId) return memory.get(key) || null;
+        if (!userId) return localStorage.getItem('lernstudio_guest:' + key) || memory.get(key) || null;
         // Only the cache explicitly bound to this verified account is imported.
         const scoped = key === "lernstudio_v1" ? "lernstudio_v2_account_" + userId : LS_ACCOUNT_PREFIX + userId + ":" + key;
         return localStorage.getItem(scoped);
       },
-      setItem(key, value) { if (userId) localStorage.setItem(LS_ACCOUNT_PREFIX + userId + ":" + key, value); else memory.set(key, value); }
+      setItem(key, value) {
+        if (userId) localStorage.setItem(LS_ACCOUNT_PREFIX + userId + ":" + key, value);
+        else { memory.set(key, value); localStorage.setItem('lernstudio_guest:' + key, value); }
+      }
     }, C);
   }
   let profileStore = scopedStore(null);
@@ -38,6 +41,7 @@
   try { const theme = localStorage.getItem(THEME_KEY); if (["dark", "light"].includes(theme)) state.theme = theme; } catch (error) {}
   function save() {
     state = profileStore.write(state);
+    if (!activeUser) setAccountMessage(profileStore.canPersist() ? 'Auf diesem Gerät gespeichert.' : 'Nur in dieser geöffneten Ansicht verfügbar. Bitte eine Sicherung herunterladen.');
     const notice = document.getElementById("storageNotice");
     if (notice) { notice.hidden = profileStore.canPersist(); notice.textContent = "Dein Browser erlaubt gerade keine dauerhafte Speicherung. Sichere deinen Lernstand als Datei."; }
     planeFortschrittSync();
@@ -72,7 +76,7 @@
     const run = ++accountEpoch, session = auth.getSession();
     accountReady = false; activeUser = session?.user_id || null; extraState = {};
     profileStore = scopedStore(activeUser); state = profileStore.read();
-    if (!activeUser) { accountBusy = false; setAccountMessage(""); render(); return; }
+    if (!activeUser) { accountBusy = false; accountReady = true; setAccountMessage("Auf diesem Gerät gespeichert."); render(); return; }
     accountBusy = true; setAccountMessage("Dein Lernstand wird geladen …"); render();
     try { extraState = window.LSAccountProgress.cleanExtraState(JSON.parse(localStorage.getItem(LS_ACCOUNT_PREFIX + activeUser + ":extra") || "{}")); } catch (_) {}
     const result = await progressClient.load(state, extraState);
@@ -96,12 +100,12 @@
       await auth.restore(callbackHash);
       if (auth.isRecovery()) { authMode = "password"; current = { view: "login", arg: null }; accountBusy = false; render(); }
       else await activateAccount();
-    } catch (error) { activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); accountBusy = false; authMessage = error.message; current = {view:"login",arg:null}; render(); }
+    } catch (error) { activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); accountBusy = false; accountReady = true; authMessage = error.message; render(); }
   }
   async function logout() {
     await syncFortschrittJetzt();
     ++accountEpoch; clearTimeout(syncTimer); accountReady = false; activeUser = null;
-    const pending = auth.signOut(); profileStore = scopedStore(null); state = profileStore.read(); extraState = {};
+    const pending = auth.signOut(); profileStore = scopedStore(null); state = profileStore.read(); extraState = {}; accountReady = true;
     document.querySelector(".profile-dialog")?.close(); go("home");
     const revoked = await pending;
     if (!revoked) { authMessage = "Auf diesem Gerät abgemeldet. Die serverseitige Abmeldung konnte nicht bestätigt werden."; go("login"); }
@@ -238,10 +242,10 @@
   function renderHeader() {
     const head = el(`<header class="app universe-header">
       <button class="iconbtn mobile-nav-btn" id="mobileNavBtn" type="button" aria-controls="studioSidebar" aria-expanded="false" aria-label="Lernpfade öffnen">☰</button>
-      <button class="brand-button" id="brandHome" type="button"><span class="universe-mark" aria-hidden="true">LS<span>↗</span></span><span><b>Lernstudio</b><small>Die freie Lernbörse.</small></span></button>
-      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="index.html">Entdecken</a><a href="studio.html#roadmap/ki">KI lernen</a><a href="wissen.html">Wissen</a><a href="community.html">Community</a></nav>
+      <button class="brand-button" id="brandHome" type="button"><img src="icon-192.png" width="40" height="40" alt=""><span><b>Lernstudio</b><small>Wissen gehört allen.</small></span></button>
+      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="#home">Lernpfade</a><a href="#lab">Code-Werkstatt</a><a href="#reference">Nachschlagen</a><a href="community.html">Community</a></nav>
       <span class="spacer"></span>${accountReady ? `<span class="xp" title="Deine Erfahrungspunkte">✦ <b>${totalXp()}</b> XP</span>` : ""}
-      <button class="account" id="acctBtn" type="button" aria-label="${accountReady ? "Konto und Lernprofil öffnen" : "Mit E-Mail anmelden"}">${accountReady ? buddyMarkup("buddy-small") : ""}<span class="aname">${accountReady ? esc(state.name === "Lernender" ? "Mein Konto" : state.name) : "Anmelden ↗"}</span></button>
+      <button class="account" id="acctBtn" type="button" aria-label="Lernprofil öffnen" title="Lernprofil öffnen"><i data-lucide="user-round" aria-hidden="true"></i><span class="aname">${activeUser ? esc(state.name === "Lernender" ? "Mein Konto" : state.name) : "Mein Lernstand"}</span></button>
       ${themeSwitchMarkup("themeBtn")}
     </header>`);
     head.querySelector("#mobileNavBtn").addEventListener("click", () => setMobileNav(!document.body.classList.contains("mobile-nav-open")));
@@ -258,6 +262,7 @@
     const head = el(`
       <header class="focus-header" aria-label="Fokussierter Lernmodus">
         ${themeSwitchMarkup("lessonThemeBtn")}
+        <button class="iconbtn" id="readingSize" type="button" aria-label="Große Leseschrift" aria-pressed="${document.documentElement.dataset.reading === 'large'}" title="Große Leseschrift">A+</button>
         <button class="focus-course" id="focusTrack" type="button" aria-label="Zurück zur Übersicht von ${esc(track.name)}">
           <span class="focus-back" aria-hidden="true">←</span>
           <span class="focus-icon" style="background:${track.color}">${track.icon}</span>
@@ -274,6 +279,12 @@
     `);
     const leaveFocus = () => go("roadmap", track.id);
     head.querySelector("#lessonThemeBtn").addEventListener("click", toggleTheme);
+    head.querySelector("#readingSize").addEventListener("click", e => {
+      const large = document.documentElement.dataset.reading !== 'large';
+      document.documentElement.dataset.reading = large ? 'large' : 'normal';
+      e.currentTarget.setAttribute('aria-pressed', String(large));
+      try { localStorage.setItem('ls_reading', large ? 'large' : 'normal'); } catch (_) {}
+    });
     head.querySelector("#focusTrack").addEventListener("click", leaveFocus);
     head.querySelector("#focusExit").addEventListener("click", leaveFocus);
     return head;
@@ -294,20 +305,20 @@
     return String(name).trim().split(/\s+/u).filter(Boolean).slice(0, 2).map(part => Array.from(part)[0]).join("").toLocaleUpperCase("de") || "LS";
   }
   function openProfile() {
-    if (!accountReady) { go("login"); return; }
+    if (activeUser && !accountReady) { go("login"); return; }
     if (document.querySelector(".profile-dialog")) return;
     const colorLabels = { violet: "Violett", mint: "Mint", sun: "Sonne", rose: "Rosa", ocean: "Ozean" };
     const animalLabels = ["Fuchs", "Panda", "Eule", "Frosch", "Katze", "Hund", "Hase", "Bär", "Schmetterling", "Schildkröte", "Oktopus", "Pinguin"];
     const dialog = el(`<dialog class="profile-dialog" aria-labelledby="profileTitle">
       <form method="dialog"><button class="profile-close" aria-label="Profil schließen">×</button></form>
-      <h2 id="profileTitle">Dein Lernprofil</h2><p class="muted">${esc(auth.getSession()?.email || "")} · Kostenloses Konto</p>
+      <h2 id="profileTitle">Dein Lernprofil</h2><p class="muted">${activeUser ? esc(auth.getSession()?.email || "") + ' · Kostenloses Konto' : 'Gastprofil · Auf diesem Gerät'}</p>
       <div class="buddy-preview">${buddyMarkup("buddy-large")}</div>
       <label class="field-label" for="profileName">Dein Anzeigename</label><input id="profileName" maxlength="28" value="${esc(state.name)}" autocomplete="off">
       <p>Deine Initialien <span id="profileInitials" class="profile-initials">${esc(profileInitials(state.name))}</span></p>
       <fieldset><legend>Wähle dein Tierchen</legend><div class="emoji-row">${AVATARS.map((a,i) => `<button type="button" data-animal="${a}" aria-label="${animalLabels[i]}" aria-pressed="${a === state.avatar}">${a}</button>`).join("")}</div></fieldset>
       <fieldset><legend>Deine Farbe</legend><div class="choice-row">${window.LearningProfile.COLORS.map(c => `<button type="button" data-color="${c}" class="swatch buddy-${c}" aria-label="${colorLabels[c]}" aria-pressed="${c === state.color}"></button>`).join("")}</div></fieldset>
       <fieldset><legend>Ein kleines Extra</legend><div class="emoji-row">${window.LearningProfile.ACCESSORIES.map((a,i) => `<button type="button" data-accessory="${a}" aria-label="${["Kein Extra", "Pflänzchen", "Stern", "Blume", "Kopfhörer", "Krone"][i]}" aria-pressed="${a === state.accessory}">${a || "–"}</button>`).join("")}</div></fieldset>
-      <p class="local-note">Dein Lernstand wird in deinem Konto gespeichert. Auf einem anderen Gerät meldest du dich mit derselben E-Mail-Adresse an.</p>
+      <p class="local-note">${activeUser ? 'Dein Lernstand wird in deinem Konto gespeichert. Auf einem anderen Gerät meldest du dich mit derselben E-Mail-Adresse an.' : 'Dein Lernstand bleibt in diesem Browser. Eine Sicherung schützt ihn vor gelöschten Browserdaten. Ein Konto ist freiwillig; Gast- und Kontostand bleiben getrennt.'}</p>
       <div class="profile-actions"><button class="btn" id="pp-export" type="button">Sicherung herunterladen</button><button class="btn" id="pp-import" type="button">Sicherung laden</button></div>
       <p id="profileMessage" data-account-status role="status">${esc(accountMessage)}</p>
       <button class="text-button" id="pp-sync" type="button">Speicherung erneut versuchen</button>
@@ -340,9 +351,15 @@
         await auth.deleteAccount();
         const prefix = LS_ACCOUNT_PREFIX + activeUser + ":";
         try { Object.keys(localStorage).filter(key => key.startsWith(prefix) || key === "lernstudio_v2_account_" + activeUser).forEach(key => localStorage.removeItem(key)); } catch (_) {}
-        activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); extraState = {}; dialog.close(); go("home");
+        activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); extraState = {}; accountReady = true; dialog.close(); go("home");
       } catch (error) { accountReady = true; event.target.disabled = false; setAccountMessage(error.message + " Bei weiteren Problemen nutze bitte unsere Kontaktseite."); }
     });
+    if (!activeUser) {
+      for (const id of ['pp-sync', 'pp-logout', 'pp-delete']) dialog.querySelector('#' + id).hidden = true;
+      const login = el('<button class="text-button" type="button">Mit bestehendem Konto anmelden</button>');
+      login.onclick = () => { dialog.close(); go('login'); };
+      dialog.appendChild(login);
+    }
     dialog.addEventListener("close", () => { dialog.remove(); if (current.view === "home") render(); const opener = document.getElementById("acctBtn") || document.getElementById("focusExit"); if (opener) opener.focus(); });
     document.body.appendChild(dialog); dialog.showModal();
   }
@@ -361,7 +378,7 @@
       try {
         if (file.size > 262144) throw new Error("Die Sicherung ist zu groß (maximal 256 KB).");
         const candidate = profileStore.importText(await file.text());
-        if (!confirm("Die Abschlüsse dieser Sicherung werden mit deinem Konto zusammengeführt. Anzeigename und Gestaltung werden übernommen. Fortfahren?")) return;
+        if (!confirm("Die Abschlüsse dieser Sicherung werden mit dem aktuellen Lernprofil zusammengeführt. Anzeigename und Gestaltung werden übernommen. Fortfahren?")) return;
         state = profileStore.write({ ...candidate, generation: state.generation, done: { ...state.done, ...candidate.done }, perfect: { ...state.perfect, ...candidate.perfect } }); applyTheme(); planeFortschrittSync();
         const dialog = document.querySelector(".profile-dialog"); if (dialog) dialog.close();
         go("home");
@@ -515,7 +532,7 @@
   function readRoute() {
     const raw = location.hash.slice(1);
     const parts = raw.split("/");
-    const views = ["home","lesson","roadmap","cert","reference","basics","article","login"];
+    const views = ["home","lesson","roadmap","cert","reference","basics","article","login","lab"];
     try { current = {view:views.includes(parts[0]) ? parts[0] : "home",arg:parts[1] ? decodeURIComponent(parts[1]) : null}; }
     catch (error) { current = {view:"home",arg:null}; }
   }
@@ -564,7 +581,8 @@
     setMobileNav(false);
     const root = document.getElementById("app");
     root.innerHTML = "";
-    const authRequired = current.view === "login" || auth.isRecovery() || (!accountReady && !["home", "roadmap"].includes(current.view));
+    window.LSCodeRunner?.stop();
+    const authRequired = current.view === "login" || auth.isRecovery() || (activeUser && !accountReady && !["home", "roadmap"].includes(current.view));
     const lessonContext = !authRequired && current.view === "lesson" ? findLesson(current.arg) : null;
     if (lessonContext && state.lastLesson !== current.arg) { state.lastLesson = current.arg; save(); }
     const focusMode = !!lessonContext;
@@ -578,13 +596,25 @@
     else if (current.view === "home") renderHome(main);
     else if (current.view === "lesson") renderLesson(main, current.arg);
     else if (current.view === "roadmap") renderRoadmap(main, current.arg);
+    else if (current.view === "lab") renderLab(main);
     else if (current.view === "cert") renderCertificate(main, current.arg);
     else if (current.view === "reference") renderReference(main);
     else if (current.view === "basics") renderBasics(main);
     else if (current.view === "article") renderArticle(main, current.arg);
     else renderHome(main);
+    if (lessonContext && window.LSLessonVisuals) {
+      const model = document.createElement('details'); model.className = 'lesson-model';
+      const summary = document.createElement('summary'); summary.textContent = 'Den Gedanken als Bild erkunden'; model.appendChild(summary);
+      const host = document.createElement('div'); model.appendChild(host); main.appendChild(model);
+      model.addEventListener('toggle', function buildModel() {
+        if (!model.open || host.childNodes.length) return;
+        window.LSLessonVisuals.mount(host, lessonContext);
+        host.querySelector('details')?.setAttribute('open','');
+      });
+    }
     layout.appendChild(main);
     root.appendChild(layout);
+    window.lucide?.createIcons();
     if (!focusMode) {
       const navBackdrop = el(`<button class="sidebar-backdrop" type="button" aria-label="Kursnavigation schließen"></button>`);
       navBackdrop.addEventListener("click", () => setMobileNav(false));
@@ -625,43 +655,59 @@
   }
 
   function renderHome(main) {
-    const done = C.tracks.reduce((n,t) => n + trackProgress(t).done, 0);
-    const total = profileStore.lessonCount;
-    if (activeUser) main.appendChild(el(`<p class="muted" data-account-status role="status">${esc(accountMessage)}</p>`));
-    main.appendChild(el(`<section class="universe-welcome"><div class="welcome-copy"><p class="eyebrow">WISSEN GEHÖRT ALLEN.</p><h1>Große Neugier.<br><span>Null Euro.</span></h1><p>KI verstehen. Eigene Ideen programmieren. Mit gutem Wissen sichtbar werden. Alles hier ist kostenlos.</p><div class="welcome-actions"><button class="btn primary" id="continueLearning">${state.lastLesson ? "Weiterlernen" : "Jetzt loslernen"} <span aria-hidden="true">↗</span></button><a class="text-button" href="#lernpfade">Lernpfade entdecken</a></div><p class="welcome-promise">Kostenloses E-Mail-Konto · In deinem Tempo · Ohne Abo</p></div><aside class="welcome-feature" aria-labelledby="featureTitle"><div class="feature-top"><span class="eyebrow">DEIN NÄCHSTES KÖNNEN</span><span class="feature-mark" aria-hidden="true">✳</span></div><h2 id="featureTitle">KI verstehen.<br>Selbst entscheiden.</h2><p>Vom ersten Prompt bis zum eigenen Prüfplan. Mit Beispielen und Übungen direkt im Browser.</p><a class="feature-link" href="studio.html#roadmap/ki">Kostenlos KI lernen <span aria-hidden="true">↗</span></a><div class="feature-tags"><span>Grundlagen</span><span>Prompts</span><span>Prüfen</span></div></aside></section>`));
-    main.querySelector("#continueLearning").addEventListener("click", () => go("lesson", findLesson(state.lastLesson) ? state.lastLesson : (findLesson("einstieg-0-1") ? "einstieg-0-1" : C.tracks[0].stages[0].lessons[0].id)));
-    main.appendChild(el(`<div class="learning-stats"><span><b>${C.tracks.length}</b> Lernpfade</span><span><b>${total}</b> kostenlose Lektionen</span><span><b>${done}</b> abgeschlossen</span><span class="free-note">Dein Wissen wächst. Der Preis bleibt 0 €.</span></div>`));
-    main.appendChild(el(`<p class="storage-notice" id="storageNotice" role="status" ${profileStore.canPersist() && !profileStore.recovered() ? "hidden" : ""}>${profileStore.recovered() ? "Ein gespeicherter Lernstand konnte nicht gelesen werden. Die Originaldaten bleiben erhalten; du kannst deine Sicherung im Profil laden." : "Dein Browser erlaubt gerade keine dauerhafte Speicherung. Sichere deinen Lernstand als Datei."}</p>`));
-    const catalogue = el(`<section id="lernpfade" aria-labelledby="worldsTitle"><div class="catalogue-heading"><div><p class="eyebrow">SUCH DIR DEINEN ANFANG.</p><h2 id="worldsTitle">Was willst du können?</h2></div><label class="search-label"><span class="sr-only">Lernpfade und Lektionen durchsuchen</span><input type="search" id="lessonSearch" placeholder="Zum Beispiel: KI, Python, Marketing …" autocomplete="off"></label></div><div class="world-filters" role="group" aria-label="Lernbereich"><button data-group="all" aria-pressed="true">Alle Lernpfade</button>${rubrikGruppen().map(g => `<button data-group="${esc(g.id)}" aria-pressed="false">${esc(g.name)}</button>`).join("")}</div><p id="searchSummary" class="muted" role="status"></p><div class="world-grid" id="worldResults"></div></section>`);
-    let group = "all";
-    function showResults() {
-      const query = catalogue.querySelector("#lessonSearch").value.trim().toLocaleLowerCase("de");
-      const tracks = group === "all" ? C.tracks : (rubrikGruppen().find(g => g.id === group)?.tracks || []);
-      const results = catalogue.querySelector("#worldResults"); results.innerHTML = "";
-      let count = 0;
-      for (const tr of tracks) {
-        const p = trackProgress(tr);
-        const match = !query || (tr.name + " " + tr.subtitle).toLocaleLowerCase("de").includes(query);
-        if (match) {
-          const symbols = {einstieg:"↗",machine:"01",html:"</>",python:"Py",js:"JS",sec:"◇",math:"∑",mktg:"↗",seo:"◎",proj:"{ }",srv:"$_",matheanfassen:"ƒ",ki:"✳"};
-          const card = el(`<article class="world-card" data-track="${esc(tr.id)}" style="--world-color:${tr.color}"><div class="world-card-top"><span class="world-icon" aria-hidden="true">${esc(symbols[tr.id] || tr.icon)}</span><span class="course-free">KOSTENLOS</span></div><h3>${esc(tr.name)}</h3><p>${esc(tr.subtitle)}</p><div class="world-progress"><progress value="${p.done}" max="${p.total || 1}" aria-label="Fortschritt ${esc(tr.name)}"></progress><small>${p.total} Lektionen${p.done ? " · " + p.done + " abgeschlossen" : " · Dein Tempo"}</small></div><button class="world-open" type="button">${p.done ? "Weiterlernen" : "Lernpfad öffnen"} <span aria-hidden="true">↗</span><span class="sr-only">: ${esc(tr.name)}</span></button></article>`);
-          card.querySelector("button").addEventListener("click", () => go("roadmap", tr.id)); results.appendChild(card); count++;
-        } else {
-          for (const item of allLessons(tr)) {
-            if (!item.lesson.title.toLocaleLowerCase("de").includes(query)) continue;
-            const card = el(`<article class="world-card lesson-result"><small>${esc(tr.name)}</small><h3>${esc(item.lesson.title)}</h3><p>${isDone(item.lesson.id) ? "Bereits abgeschlossen" : "Bereit zum Entdecken"}</p><button class="world-open" type="button">Lektion öffnen ↗</button></article>`);
-            card.querySelector("button").addEventListener("click", () => go("lesson", item.lesson.id)); results.appendChild(card); count++;
-          }
-        }
-      }
-      catalogue.querySelector("#searchSummary").textContent = query ? count + " passende Ergebnisse" : count + " Lernpfade. Jeder davon steht dir vollständig offen.";
-      if (!count) results.appendChild(el(`<p class="empty-result">Dazu haben wir noch nichts gefunden. Versuche ein anderes Wort oder wähle „Alle Lernpfade“.</p>`));
-    }
-    catalogue.querySelector("#lessonSearch").addEventListener("input", showResults);
-    catalogue.querySelectorAll("[data-group]").forEach(b => b.addEventListener("click", () => { group = b.dataset.group; catalogue.querySelectorAll("[data-group]").forEach(c => c.setAttribute("aria-pressed", String(c === b))); showResults(); }));
-    main.appendChild(catalogue); showResults();
-    const bottom = el(`<div class="universe-bottom"><section class="garden-note mission-note"><span class="eyebrow">UNSERE ANSAGE</span><h2>Bildung braucht Neugier.<br>Keine Kreditkarte.</h2><p>Für deinen ersten Schritt, einen neuen Beruf oder einfach für dich: Hier lernst du kostenlos. Du brauchst weder ein Kursbudget noch einen Bildungsgutschein.</p><a class="btn" href="angebot.html">Dafür steht Lernstudio ↗</a></section><section class="garden-note"><span class="eyebrow">GEMEINSAM BESSER WERDEN</span><h2>Wissen teilen.<br>Code weiterdenken.</h2><p>Frag nach, hilf mit, bau darauf auf. Der Quellcode ist offen. Die Community trifft sich bei GitHub; zum Schreiben brauchst du dort ein Konto.</p><div class="welcome-actions"><a class="btn" href="quellcode.html">Quellcode ↗</a><a class="text-button" href="community.html">Zur Community</a></div></section></div>`);
-    main.appendChild(bottom);
+    return window.LearningSpace.mount(main, {curriculum:C, state, go, progress:trackProgress, groups:rubrikGruppen(), persistent:profileStore.canPersist() && !profileStore.recovered()});
+  }
+  function renderLab(main) {
+    const samples = {python:'zahlen = [1, 2, 3, 4, 5]\nquadrate = [zahl ** 2 for zahl in zahlen]\nprint(quadrate)',js:'const zahlen = [1, 2, 3, 4, 5];\nconst quadrate = zahlen.map(zahl => zahl ** 2);\nconsole.log(quadrate);'};
+    const drafts = {...samples};
+    const draftKey = 'lernstudio_code_drafts:' + (activeUser || 'guest');
+    try {
+      const saved = JSON.parse(sessionStorage.getItem(draftKey) || '{}');
+      for (const lang of ['python','js']) if (typeof saved?.[lang] === 'string' && saved[lang].length <= 50000) drafts[lang] = saved[lang];
+    } catch (_) {}
+    let language = 'python', runNumber = 0;
+    main.innerHTML = `<section class="code-lab"><p class="eyebrow">AUSPROBIEREN & VERSTEHEN</p><h1>Code-Werkstatt</h1><div class="lab-toolbar"><label>Sprache<select id="labLanguage"><option value="python">Python</option><option value="js">JavaScript</option></select></label><button class="btn primary" id="labRun"><i data-lucide="play"></i>Ausführen</button><button class="iconbtn" id="labStop" title="Ausführung stoppen" aria-label="Ausführung stoppen" disabled><i data-lucide="square"></i></button><button class="iconbtn" id="labReset" title="Beispiel wiederherstellen" aria-label="Beispiel wiederherstellen"><i data-lucide="rotate-ccw"></i></button><button class="iconbtn" id="labDownload" title="Code herunterladen" aria-label="Code herunterladen"><i data-lucide="download"></i></button></div><div class="lab-columns"><section><h2><label for="labCode">Dein Programm</label></h2><textarea id="labCode" class="lab-editor" spellcheck="false" autocomplete="off" autocapitalize="off"></textarea></section><section><h2>Ausgabe</h2><pre id="labOutput" class="lab-output" aria-live="polite">Bereit.</pre></section></div><p class="lab-status" id="labStatus" role="status">Python 3 / Pyodide · Laufzeit lädt beim ersten Start von jsDelivr.</p><canvas id="labChart" width="900" height="230" style="width:100%;height:230px" hidden aria-label="Zahlen aus der Programmausgabe als Balkendiagramm" role="img"></canvas><section class="lab-explanation"><h2>Was passiert zwischen Code und Ergebnis?</h2><p><code>zahlen</code> hält fünf Werte. Das Programm nimmt jeden einzelnen Wert und multipliziert ihn mit sich selbst: 1, 4, 9, 16, 25. Die Liste bleibt geordnet. Ausgabe und Zahlenbild zeigen dieselben Ergebnisse.</p><p>Was passiert, wenn du <code>** 2</code> durch <code>** 3</code> ersetzt? Trifft deine Vorhersage zu?</p><a id="labLesson" href="#roadmap/python">Python Schritt für Schritt</a></section></section>`;
+    const editor = main.querySelector('#labCode'), output = main.querySelector('#labOutput'), status = main.querySelector('#labStatus');
+    const run = main.querySelector('#labRun'), stop = main.querySelector('#labStop'), chart = main.querySelector('#labChart');
+    editor.value = drafts[language]; editor.maxLength = 50000;
+    const saveDraft = () => { drafts[language] = editor.value; try { sessionStorage.setItem(draftKey,JSON.stringify(drafts)); } catch (_) {} };
+    editor.addEventListener('input',saveDraft);
+    const draw = value => {
+      chart.hidden = true;
+      try {
+        const numbers = JSON.parse(value.trim().split('\n').at(-1));
+        if (!Array.isArray(numbers) || !numbers.length || numbers.length > 40 || !numbers.every(n => typeof n === 'number' && Number.isFinite(n))) return;
+        chart.hidden = false; chart.width = Math.max(240,Math.floor(chart.getBoundingClientRect().width));
+        const c = chart.getContext('2d'); if (!c) return;
+        const scale = Math.max(1,...numbers.map(Math.abs)), normalized = numbers.map(n => n/scale);
+        const low = Math.min(0,...normalized), high = Math.max(0,...normalized), range = high-low || 1, slot = (chart.width-40)/numbers.length;
+        const y = n => 175-(n-low)/range*140, zero = y(0);
+        c.clearRect(0,0,chart.width,230); c.font = '14px Consolas'; c.textAlign = 'center';
+        c.strokeStyle = getComputedStyle(main).color; c.beginPath(); c.moveTo(15,zero); c.lineTo(chart.width-15,zero); c.stroke();
+        numbers.forEach((n,i) => { const end = y(normalized[i]); c.fillStyle = n < 0 ? '#f2949c' : '#67c9a0'; c.fillRect(20+i*slot,Math.min(zero,end),Math.max(2,slot-8),Math.abs(zero-end)); c.fillStyle = getComputedStyle(main).color; c.fillText(String(n),20+i*slot+(slot-8)/2,198,Math.max(10,slot-6)); });
+        chart.setAttribute('aria-label','Programmausgabe: '+numbers.join(', '));
+      } catch (_) {}
+    };
+    run.onclick = async () => {
+      const token = ++runNumber; run.disabled = true; stop.disabled = false; chart.hidden = true;
+      output.textContent = '…';
+      const result = await window.LSCodeRunner.run(language, editor.value, text => { if(token === runNumber) status.textContent = text; });
+      if (token !== runNumber) return;
+      output.textContent = result.output || '(Keine Ausgabe)'; status.textContent = result.ok ? 'Ausführung beendet.' : 'Ausführung beendet. Prüfe die Rückmeldung.';
+      run.disabled = false; stop.disabled = true; if (result.ok) draw(result.output);
+    };
+    stop.onclick = () => window.LSCodeRunner.stop();
+    main.querySelector('#labLanguage').onchange = event => {
+      saveDraft(); language = event.target.value; ++runNumber; window.LSCodeRunner.stop();
+      editor.value = drafts[language]; output.textContent = 'Bereit.'; chart.hidden = true; run.disabled = false; stop.disabled = true;
+      status.textContent = language === 'python' ? 'Python 3 / Pyodide · Laufzeit lädt beim Start von jsDelivr.' : 'JavaScript · Lokale Ausführung im Browser.';
+      const link = main.querySelector('#labLesson'); link.href = '#roadmap/'+language; link.textContent = (language === 'python' ? 'Python' : 'JavaScript')+' Schritt für Schritt';
+    };
+    main.querySelector('#labReset').onclick = () => { if (editor.value === samples[language] || confirm('Deinen aktuellen Code durch das Beispiel ersetzen?')) { editor.value = samples[language]; saveDraft(); } };
+    main.querySelector('#labDownload').onclick = () => {
+      const url = URL.createObjectURL(new Blob([editor.value],{type:'text/plain;charset=utf-8'}));
+      const link = document.createElement('a'); link.href = url; link.download = language === 'python' ? 'mein-programm.py' : 'mein-programm.js'; link.click(); setTimeout(() => URL.revokeObjectURL(url),1000);
+    };
   }
 
 
@@ -1943,6 +1989,7 @@ document.getElementById("go").addEventListener("click", function(){
 
     let idx = 0, weitesterSchritt = 0, zeigtErgebnis = false;
     const textPositions = new Map();
+    const hypothesisDraft = Object.create(null);
     function weiterLabel() { return idx < beats.length - 1 ? "Weiter →" : "Geschafft →"; }
     function setWeiter(on, label) {
       // Bereits erreichte Schritte bleiben beim Zurückblättern passierbar.
@@ -2023,6 +2070,7 @@ document.getElementById("go").addEventListener("click", function(){
       weiter.textContent = weiterLabel();
       setWeiter(false);
       if (b.kind === "predict") beatPredict(b);
+      else if (b.kind === "hypothesisWorksheet") beatHypothesisWorksheet(b);
       else if (b.kind === "live") beatLive(b);
       else if (b.kind === "do") beatDo(b);
       else if (b.kind === "flag") beatFlag(b);
@@ -2053,6 +2101,59 @@ document.getElementById("go").addEventListener("click", function(){
       textPositions.set(idx, position);
       stageEl.appendChild(el(`<div class="beat-text lesson-reader-card is-entering">${fragments[position]}</div>`));
       setWeiter(true, position < fragments.length - 1 ? "Weiter →" : weiterLabel());
+    }
+    function beatHypothesisWorksheet(b) {
+      const fields = [
+        ["hypothesis", "Deine Hypothese", "Die Pflanze braucht Wasser."],
+        ["alternativeA", "Alternative 1", "Der Boden ist bereits zu nass."],
+        ["alternativeB", "Alternative 2", "Die Pflanze bekommt zu wenig Licht."],
+        ["discriminator", "Welche Beobachtung trennt die Modelle?", "Bodenfeuchte an den Wurzeln vor dem Gießen."],
+        ["minimumEvidence", "Welche Mindestevidenz legst du vorher fest?", "Bodenfeuchte und Gießzeit, mit Datum notiert."],
+        ["changeMind", "Was würde deine Einschätzung ändern?", "Nasse Erde trotz hängender Blätter."],
+        ["eventTime", "Ereigniszeit", "Montag, 8 Uhr: gegossen; sonst unbekannt."],
+        ["observationTime", "Beobachtungszeit", "Dienstag, 9 Uhr: Blätter hängen."],
+        ["recordedTime", "Aufzeichnungszeit", "Dienstag, 18 Uhr: Notiz geschrieben."],
+        ["prediction", "Zukunftsvorhersage, noch nicht beobachtet", "Bis Mittwoch: Bei trockener Erde sollten sich die Blätter nach Wasser erholen."],
+        ["result", "Ergebnis oder offen", "Offen: Die Bodenfeuchte wurde noch nicht geprüft."],
+        ["openRest", "Was bleibt offen?", "Wie viel Licht erhielt die Pflanze?"],
+      ];
+      const c = el(`<div class="beat-block"><div class="beat-text">${b.html || ""}</div><div class="hypothesis-fields" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:12px;margin:18px 0"></div><div style="display:flex;gap:10px;flex-wrap:wrap"><button class="btn ghost hypothesis-example" type="button">Beispiel einsetzen</button><button class="btn primary hypothesis-check" type="button">Prüfblatt ordnen</button></div><div class="beat-reveal" aria-live="polite"></div></div>`);
+      const form = c.querySelector(".hypothesis-fields");
+      const reveal = c.querySelector(".beat-reveal");
+      const inputs = Object.create(null);
+      fields.forEach(([key, label, example]) => {
+        const row = el(`<label style="display:block;font-size:13px;color:var(--muted,#9a9ba3)"><span style="display:block;margin-bottom:5px">${esc(label)}</span><textarea rows="2" maxlength="800" data-worksheet-field="${key}" style="width:100%;box-sizing:border-box;background:var(--panel-2,#0c0d11);border:1px solid var(--line,#262730);color:var(--ink,#f4f3ee);border-radius:10px;padding:11px 13px;font:inherit;font-size:14px;resize:vertical" placeholder="${esc(example)}"></textarea></label>`);
+        const input = row.querySelector("textarea");
+        input.value = hypothesisDraft[key] || "";
+        input.addEventListener("input", () => { hypothesisDraft[key] = input.value; reveal.textContent = ""; setWeiter(false); });
+        inputs[key] = input;
+        form.appendChild(row);
+      });
+      c.querySelector(".hypothesis-example").addEventListener("click", () => {
+        fields.forEach(([key, , example]) => { inputs[key].value = example; hypothesisDraft[key] = example; });
+        reveal.textContent = "Beispiel eingesetzt. Du kannst jeden Satz verändern, bevor du das Prüfblatt ordnest.";
+        setWeiter(false);
+      });
+      c.querySelector(".hypothesis-check").addEventListener("click", () => {
+        const required = fields.slice(0, 10);
+        const missing = required.filter(([key]) => !inputs[key].value.trim());
+        if (missing.length) {
+          reveal.textContent = "Noch offen: " + missing.map(([, label]) => label).join(", ") + ". Unbekannte Zeiten darfst du ausdrücklich als unbekannt notieren.";
+          return;
+        }
+        const models = ["hypothesis", "alternativeA", "alternativeB"].map(key => inputs[key].value.trim().toLocaleLowerCase("de"));
+        if (new Set(models).size !== 3) {
+          reveal.textContent = "Die Hypothese und beide Alternativen brauchen drei verschiedene Beschreibungen.";
+          return;
+        }
+        const ordered = fields.map(([key, label]) => label + ": " + (inputs[key].value.trim() || "offen")).join("\n");
+        reveal.textContent = "Die Felder sind geordnet. Das bestätigt noch keine Hypothese; vergleiche erst die spätere Beobachtung mit deiner Vorhersage.";
+        const copy = el(`<textarea readonly rows="10" aria-label="Dein Prüfblatt als kopierbarer Text" style="display:block;width:100%;box-sizing:border-box;margin-top:12px;padding:12px;border-radius:10px;border:1px solid var(--line,#262730);background:var(--panel-2,#0c0d11);color:var(--ink,#f4f3ee);font:inherit;font-size:13px"></textarea>`);
+        copy.value = (b.methodId || "hypothesis-revision-cycle.v1") + " · 1.0.0\n" + ordered;
+        reveal.appendChild(copy);
+        setWeiter(true);
+      });
+      stageEl.appendChild(c);
     }
     function beatPaymentFlow(b) {
       const c = el(`<div class="beat-block"><div class="beat-text">${b.html || ""}</div><div class="payment-sim-slot"></div></div>`);
@@ -3331,60 +3432,12 @@ document.getElementById("go").addEventListener("click", function(){
     return "";
   }
   async function runJS(code) {
-    const logs = [];
-    const fakeConsole = {
-      log: (...a) => logs.push(a.map(fmt).join(" ")),
-      error: (...a) => logs.push(a.map(fmt).join(" ")),
-      warn: (...a) => logs.push(a.map(fmt).join(" ")),
-      info: (...a) => logs.push(a.map(fmt).join(" "))
-    };
-    try {
-      new Function("console", '"use strict";\n' + code)(fakeConsole);
-      // Asynchrone Ausgaben (setTimeout, Promises, async/await) noch einsammeln.
-      // Jeder setTimeout(0) hier wird NACH den Timern/Microtasks des Nutzercodes
-      // ausgeführt und leert so die Warteschlangen. Echte lange Timer (z. B. 1000ms)
-      // werden bewusst nicht abgewartet.
-      for (let i = 0; i < 4; i++) { await new Promise(r => setTimeout(r, 0)); }
-    }
-    catch (e) {
-      logs.push("⚠ Fehler: " + e.message);
-      const h = friendlyHint(e.message); if (h) logs.push("💡 " + h);
-    }
-    return logs.join("\n");
-  }
-
-  let pyodidePromise = null;
-  function loadScript(src) {
-    return new Promise((res, rej) => {
-      const s = document.createElement("script");
-      s.src = src; s.onload = res; s.onerror = () => rej(new Error("Skript nicht ladbar: " + src));
-      document.head.appendChild(s);
-    });
-  }
-  function ensurePyodide() {
-    if (!pyodidePromise) {
-      pyodidePromise = (async () => {
-        const base = "https://cdn.jsdelivr.net/pyodide/v0.26.2/full/";
-        await loadScript(base + "pyodide.js");
-        return await loadPyodide({ indexURL: base });
-      })().catch(err => { pyodidePromise = null; throw err; });
-    }
-    return pyodidePromise;
+    const result = await window.LSCodeRunner.run('js', code);
+    return result.output;
   }
   async function runPython(code) {
-    const py = await ensurePyodide();
-    let buf = "";
-    try {
-      py.setStdout({ batched: (s) => { buf += s + "\n"; } });
-      py.setStderr({ batched: (s) => { buf += s + "\n"; } });
-    } catch (e) {}
-    try { await py.runPythonAsync(code); }
-    catch (e) {
-      const raw = e.message ? e.message.split("\n").slice(-3).join("\n") : String(e);
-      buf += "⚠ Fehler: " + raw;
-      const h = friendlyHint(raw); if (h) buf += "\n💡 " + h;
-    }
-    return buf.replace(/\n+$/, "");
+    const result = await window.LSCodeRunner.run('python', code);
+    return result.output;
   }
 
   /* ---- SHA-256 (für Flaggen-Prüfung; Browser-Krypto + JS-Fallback) ---- */
@@ -3444,6 +3497,7 @@ document.getElementById("go").addEventListener("click", function(){
 
   /* Capture email callback once and remove credentials from the address bar. */
   const callbackHash = /(?:access_token|refresh_token|error|type)=/.test(location.hash) ? location.hash : "";
+  try { document.documentElement.dataset.reading = localStorage.getItem('ls_reading') === 'large' ? 'large' : 'normal'; } catch (_) {}
   if (callbackHash) history.replaceState(null, "", location.pathname + location.search);
   readRoute(); render();
   window.learningAccountReady = bootAccount(callbackHash);

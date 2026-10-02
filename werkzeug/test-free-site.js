@@ -4,6 +4,10 @@ const {JSDOM}=require("jsdom"),files=require("./public-files"),{zahlen}=require(
 const root=path.resolve(__dirname,"..");
 const read=f=>fs.readFileSync(path.join(root,f),"utf8");
 for(const file of files){assert(fs.existsSync(path.join(root,file)),"Release file missing: "+file);}
+for(const file of files.filter(f=>/\.(?:html|js|txt|json|xml)$/.test(f))){
+  assert(!read(file).includes(['mein','lernstudio.com'].join('-')),file+': retired custom domain');
+}
+assert(!files.some(f=>f.toLowerCase()==='cname'),'Public release uses the GitHub Pages address without a custom domain');
 for(const file of files.filter(f=>f.endsWith(".html"))){
   const text=read(file),dom=new JSDOM(text),doc=dom.window.document;
   assert.equal(doc.documentElement.lang,"de",file+": language");assert(doc.querySelector("title")?.textContent,file+": title");

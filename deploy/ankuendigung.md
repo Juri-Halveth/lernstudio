@@ -8,7 +8,7 @@ Es wurde keine Werbung gebucht und keine Nachricht an andere Personen versandt.
 Große Neugier. Null Euro. Im Lernstudio lernst du KI, Programmieren, Mathe,
 digitale Sicherheit und Marketing kostenlos. Ein E-Mail-Konto, alle Lernpfade,
 dein gespeicherter Fortschritt. Ohne Kursgebühr, ohne Abo, ohne Zahlungsdaten.
-https://www.mein-lernstudio.com
+https://juri-halveth.github.io/lernstudio/
 
 ## Projektvorstellung
 
@@ -20,7 +20,7 @@ Du lernst mit kurzen Erklärungen, eigenen Aufgaben und Rückmeldungen. Dazu kom
 ein neuer KI-Lernpfad und Übungen für Marketing ohne Werbebudget. Der Quellcode
 ist öffentlich; Fragen und Verbesserungsvorschläge können wir bei GitHub sammeln.
 
-Lernen: https://www.mein-lernstudio.com
+Lernen: https://juri-halveth.github.io/lernstudio/
 Quellcode und Community: https://github.com/Juri-Halveth/lernstudio
 
 ## Veröffentlichungsrahmen

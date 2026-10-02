@@ -9,11 +9,11 @@ HALVETH VERACHEL STUDIOS · Quellstand, dokumentierte Ergebnisse und SHA-256-Bel
 <!-- /HALVETH_WORK_CERTIFICATES_V1_1 -->
 
 
-Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, Marketing ohne Werbebudget und selbst gestaltbaren Tier-Avataren. Ein E-Mail-Konto genügt: Alle veröffentlichten Lerninhalte sind ohne Kauf, Abonnement oder Zahlungsdaten verfügbar. Bestehende Lernstudio-Konten werden weiterverwendet.
+Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, Marketing ohne Werbebudget und selbst gestaltbaren Tier-Avataren. Ohne Pflichtkonto direkt loslernen: Alle veröffentlichten Lerninhalte sind ohne Kauf, Abonnement oder Zahlungsdaten verfügbar. Bestehende Lernstudio-Konten bleiben optional nutzbar. Ohne Konto liegt dein Fortschritt nur in deinem Browser.
 
 **HALVETH authorship and participation:** Juri Halveth (Juri Janovski) claims the rights in original platform design, lesson selection and arrangement, original prose, models, diagrams and new code contributions. Evidence or teaching boundaries are not rights waivers. Historical ISC permissions remain effective; protected new HALVETH contributions require a written commercial license and participation agreement.
 
-- [Lernstudio öffnen](https://www.mein-lernstudio.com/)
+- [Lernstudio öffnen](https://juri-halveth.github.io/lernstudio/)
 - [Community](https://github.com/Juri-Halveth/lernstudio/discussions)
 - [EVE-Forschung](contracts/README.md)
 - [HALVETH Research: Forschung prüfen, Entscheidungen erklären](https://github.com/Juri-Halveth/open-research-branches/blob/main/reports/HALVETH_RESEARCH_2026-09-18.md)
@@ -38,7 +38,9 @@ Der Build erzeugt `dist/` und `website/` aus einer expliziten Dateiliste. `curri
 
 ## Wie es funktioniert
 
-HTML, CSS und JavaScript mit dem bestehenden Supabase-Kontodienst. `account-auth.js` verbindet die E-Mail-Anmeldung, Registrierung, Passwortwiederherstellung und Abmeldung. `account-progress.js` synchronisiert Profil, Abschlüsse und Marketingübungen mit der eigenen Kontozelle. Die Oberfläche bestätigt erfolgreiche Speicherung; bei Verbindungsproblemen bleibt der nach Konto getrennte Gerätecache erhalten. Eine zusätzliche Sicherung lässt sich herunterladen und ausdrücklich mit dem Konto zusammenführen. Die Lerninhalte selbst werden vollständig aus `curriculum.js` ausgeliefert. Eine Kaufberechtigung ist dafür nicht erforderlich.
+HTML, CSS und JavaScript. Der Gastzugang funktioniert unabhängig vom Kontodienst. Themenfilter und Volltextsuche erschließen alle Lektionen. Interaktive Denkmodelle, große Leseschrift und eine freie Code-Werkstatt ergänzen die bestehenden Übungen. Python und JavaScript laufen in einem Worker innerhalb eines getrennten, sandboxed Iframes mit Abbruch und Zeitlimit; kein Lernstudio-Server führt den eingegebenen Code aus. Python lädt Pyodide bei Bedarf von jsDelivr.
+
+Optional bleibt der bestehende Supabase-Kontodienst angebunden. `account-auth.js` verbindet die E-Mail-Anmeldung, Registrierung, Passwortwiederherstellung und Abmeldung. `account-progress.js` synchronisiert Profil, Abschlüsse und Marketingübungen mit der eigenen Kontozelle. Die Oberfläche bestätigt erfolgreiche Speicherung; bei Verbindungsproblemen bleibt der nach Konto getrennte Gerätecache erhalten. Eine zusätzliche Sicherung lässt sich herunterladen und ausdrücklich mit dem Konto zusammenführen. Die Lerninhalte selbst werden vollständig aus `curriculum.js` ausgeliefert. Eine Kaufberechtigung ist dafür nicht erforderlich.
 
 GitHub Discussions speichert Community-Beiträge außerhalb dieser Website; zum Schreiben gelten GitHubs Konto- und Datenschutzregeln. Die Website selbst hat kein Chat- oder Beitragsbackend. Ein Entwurf auf der Community-Seite wird erst durch die Person kopiert und extern veröffentlicht.
 
@@ -54,7 +56,7 @@ Dies ist eine neu zusammengestellte öffentliche Quellfassung. Private Forschung
 
 ## Veröffentlichung und eigenes Hosting
 
-Die Ausgabe dieses Quellstands ist für **www.mein-lernstudio.com** vorbereitet. Ein GitHub-Commit allein ändert die Domain nicht. Den konkreten Ablauf und die ausstehenden Live-Kontoprüfungen beschreibt [deploy/README.md](deploy/README.md). Für einen Fork ein eigenes Supabase-Projekt konfigurieren; keine Testregistrierungen am bestehenden Produktivdienst vornehmen.
+Die Website wird mit GitHub Pages unter **https://juri-halveth.github.io/lernstudio/** veröffentlicht. Eine eigene bezahlte Domain wird dafür nicht verwendet. Der Workflow prüft den Quellstand und veröffentlicht nur die öffentliche Dateiliste, nicht das ganze Repository. Den Ablauf und die ausstehenden Live-Kontoprüfungen beschreibt [deploy/README.md](deploy/README.md). Für einen Fork ein eigenes Supabase-Projekt konfigurieren; keine Testregistrierungen am bestehenden Produktivdienst vornehmen.
 
 ## Mitmachen und Lizenz
 

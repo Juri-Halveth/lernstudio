@@ -436,7 +436,9 @@
 
     const groups = data.nodes.map((item, index) => {
       const p = pos[index];
-      const group = svgEl("g", { class: "lv-node", "data-step": index, transform: `translate(${p.x},${p.y})` });
+      const group = svgEl("g", { class: "lv-node", "data-step": index, transform: `translate(${p.x},${p.y})`, tabindex: 0, role: "button", "aria-label": item.label });
+      group.addEventListener("click", () => show(index));
+      group.addEventListener("keydown", event => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); show(index); } });
       const title = svgEl("title"); title.textContent = item.label + ": " + item.detail; group.appendChild(title);
       group.appendChild(svgEl("rect", { x: -78, y: -27, width: 156, height: 54, rx: 13 }));
       const number = svgEl("text", { x: -62, y: -5, class: "lv-number" }); number.textContent = String(index + 1).padStart(2, "0"); group.appendChild(number);
@@ -461,6 +463,10 @@
       stepText.textContent = `${data.nodes[active].label}: ${data.nodes[active].detail}`;
       button.textContent = active < data.nodes.length - 1 ? "Weiter im Bild →" : "Noch einmal von vorn ↺";
       button.setAttribute("aria-label", button.textContent);
+      if (canvas.clientWidth && canvas.scrollWidth > canvas.clientWidth) {
+        const scale = svg.getBoundingClientRect().width / 800;
+        canvas.scrollLeft = Math.max(0, pos[active].x * scale - canvas.clientWidth / 2);
+      }
     }
     button.addEventListener("click", () => show(active < data.nodes.length - 1 ? active + 1 : 0));
     show(0);

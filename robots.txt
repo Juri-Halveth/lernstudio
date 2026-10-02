@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /studio.html
 
-Sitemap: https://www.mein-lernstudio.com/sitemap.xml
+Sitemap: https://juri-halveth.github.io/lernstudio/sitemap.xml
