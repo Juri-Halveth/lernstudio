@@ -1,15 +1,15 @@
 (function(){
   "use strict";
-  // Retire only this application's old workers/caches. This release is ordinary web.
+  // Project sites share an origin. Retire only the worker in this script's folder.
+  const appBase=new URL(".",document.currentScript?.src||location.href);
+  const retiredWorker=new URL("sw.js",appBase).href;
   if("serviceWorker" in navigator && typeof navigator.serviceWorker.getRegistrations==="function"){
     navigator.serviceWorker.getRegistrations().then(registrations=>{
       for(const registration of registrations){
         const worker=registration.active||registration.waiting||registration.installing;
         if(!worker)continue;
-        const url=new URL(worker.scriptURL);
-        if(url.origin===location.origin && url.pathname==="/sw.js")registration.unregister();
+        if(worker.scriptURL===retiredWorker && registration.scope===appBase.href)registration.unregister();
       }
     }).catch(()=>{});
   }
-  if(window.caches)caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith("lernstudio-public-")).map(key=>caches.delete(key)))).catch(()=>{});
 })();

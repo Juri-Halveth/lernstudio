@@ -37,4 +37,20 @@ assert.doesNotMatch(read("wallet.js"),/eth_sendTransaction|personal_sign|eth_sig
 assert.doesNotMatch(read("ls-messung.js"),/fetch\(|googletagmanager|gtag\(/);
 assert(!files.some(f=>/secret|credentials|keyhashes|backend-|\.md$|\.zip$/.test(f)));
 const z=zahlen();assert(z.lektionen>0&&z.pfadeAnzahl>0);
-console.log("Öffentliche Seiten: Metadaten, JSON-LD, Release-Links, E-Mail-Konto, kostenlose Inhalte ohne Kauf-/Trackingpfade bestanden. Curriculum: "+z.lektionen+" Lektionen / "+z.pfadeAnzahl+" Pfade.");
+(async()=>{
+  const vm=require('node:vm');
+  for(const base of ['https://example.test/lernstudio/','https://example.test/']){
+    const removed=[];
+    const registrations=[
+      {id:'own',scope:base,active:{scriptURL:base+'sw.js'}},
+      {id:'sibling',scope:'https://example.test/scarlet/',active:{scriptURL:'https://example.test/scarlet/sw.js'}},
+      {id:'other-origin',scope:'https://other.test/',active:{scriptURL:'https://other.test/sw.js'}},
+      {id:'different-scope',scope:base+'nested/',active:{scriptURL:base+'sw.js'}},
+    ].map(item=>({...item,unregister:()=>removed.push(item.id)}));
+    if(base.endsWith('/lernstudio/'))registrations.push({scope:'https://example.test/',active:{scriptURL:'https://example.test/sw.js'},unregister:()=>removed.push('root')});
+    vm.runInNewContext(read('pwa.js'),{URL,document:{currentScript:{src:base+'pwa.js?v=4'}},location:{href:base+'studio.html'},navigator:{serviceWorker:{getRegistrations:()=>Promise.resolve(registrations)}},window:{caches:{keys:()=>{throw new Error('Shared cache enumeration is not needed');}}}});
+    await new Promise(resolve=>setImmediate(resolve));
+    assert.deepEqual(removed,['own'],'Only the bound application worker is retired');
+  }
+  console.log("Öffentliche Seiten: Metadaten, Release-Links, kostenloser Zugang und pfadgebundene PWA-Abmeldung bestanden. Curriculum: "+z.lektionen+" Lektionen / "+z.pfadeAnzahl+" Pfade.");
+})().catch(error=>{console.error(error);process.exitCode=1;});
