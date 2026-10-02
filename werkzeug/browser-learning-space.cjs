@@ -17,6 +17,7 @@ async function layout(page){const v=await page.evaluate(()=>({width:innerWidth,s
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base,{waitUntil:'domcontentloaded'});await page.waitForSelector('.world-card');await page.evaluate(()=>window.learningAccountReady);
    assert.equal(await page.locator('.world-card').count(),13);assert.equal(await page.locator('.course-art svg').count(),13);
+   if(width<=900){assert.equal(await page.locator('#acctBtn .aname').isVisible(),false);assert.equal(await page.locator('#acctBtn').evaluate(e=>Math.round(e.getBoundingClientRect().width)),44);}
    const view=await layout(page);await page.screenshot({path:path.join(out,`${width}-home.png`),fullPage:true});
    await page.locator('#lessonSearch').fill('print');await page.waitForSelector('.lesson-result');assert((await page.locator('.lesson-result').count())>0);
    await page.locator('#lessonSearch').fill('xy-no-result-1845');await page.waitForSelector('.empty-result');
