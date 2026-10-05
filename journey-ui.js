@@ -96,7 +96,7 @@
     if (ctx.forceIntro) solved = [];
     index = engine.stations.findIndex(station => !solved.includes(station.id));
     const resumed = !ctx.forceIntro && !!ctx.state.lastLesson;
-    main.innerHTML = `<section class="journey-screen" aria-label="Deine Lernmission"><div class="bay-viewport" aria-hidden="true"></div><div class="journey-location"><span class="location-line"></span><span>STERNENBUCHT / ANKUNFT</span></div><div class="mission-deck"><div class="mission-content"></div></div><div class="journey-bottom"><span>Wissen gehört allen.</span><a href="#bridge">${icon('waypoints')}Wissensbrücke</a><a href="#map">${icon('map')}Karte</a></div></section>`;
+    main.innerHTML = `<section class="journey-screen" aria-label="Deine Lernmission"><div class="bay-viewport" aria-hidden="true"></div><div class="journey-location"><span class="location-line"></span><span>STERNENBUCHT / ANKUNFT</span></div><div class="mission-deck"><div class="mission-content"></div></div><div class="journey-bottom"><span>Wissen gehört allen.</span><a href="eltern/" lang="ru">Для родителей и старших</a><a href="#bridge">${icon('waypoints')}Wissensbrücke</a><a href="#map">${icon('map')}Karte</a></div></section>`;
     const host = main.querySelector('.bay-viewport'), content = main.querySelector('.mission-content');
     let phase = resumed || index < 0 ? 2 : index;
     const updateMotion = () => handle?.setReducedMotion(motionPaused());

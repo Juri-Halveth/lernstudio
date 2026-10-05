@@ -10,13 +10,15 @@ for(const file of files.filter(f=>/\.(?:html|js|txt|json|xml)$/.test(f))){
 assert(!files.some(f=>f.toLowerCase()==='cname'),'Public release uses the GitHub Pages address without a custom domain');
 for(const file of files.filter(f=>f.endsWith(".html"))){
   const text=read(file),dom=new JSDOM(text),doc=dom.window.document;
-  assert.equal(doc.documentElement.lang,"de",file+": language");assert(doc.querySelector("title")?.textContent,file+": title");
+  assert.equal(doc.documentElement.lang,file.startsWith('eltern/')?'ru':"de",file+": language");assert(doc.querySelector("title")?.textContent,file+": title");
   assert(doc.querySelector('meta[name="viewport"]'),file+": viewport");
   for(const script of doc.querySelectorAll('script[type="application/ld+json"]'))JSON.parse(script.textContent);
   for(const element of doc.querySelectorAll("a[href],link[href],script[src],img[src]")){
     const value=element.getAttribute("href")||element.getAttribute("src");
     if(!value||/^(?:https?:|mailto:|tel:|data:|#)/.test(value))continue;
-    const target=value.split(/[?#]/)[0].replace(/^\.\//,"");
+    const relative=value.split(/[?#]/)[0];
+    const resolved=relative?path.posix.normalize(path.posix.join(path.posix.dirname(file),relative)):'';
+    const target=resolved.endsWith('/')?path.posix.normalize(resolved+'index.html'):resolved;
     if(target)assert(files.includes(target),file+": linked target absent from release: "+target);
   }
   assert(!doc.querySelector('script[src*="ls-messung"]'),file+": sales analytics still loaded");
