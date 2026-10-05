@@ -3194,7 +3194,7 @@ document.getElementById("go").addEventListener("click", function(){
 
       // Spickzettel
       REF.cheatsheets.forEach(cs => {
-        const rows = cs.rows.filter(r => !q || r.code.toLowerCase().includes(q) || r.desc.toLowerCase().includes(q) || cs.title.toLowerCase().includes(q));
+        const rows = cs.rows.filter(r => !q || r.code.toLowerCase().includes(q) || (window.HalvethHubLanguage?.searchable(r.desc) || r.desc).toLowerCase().includes(q) || (window.HalvethHubLanguage?.searchable(cs.title) || cs.title).toLowerCase().includes(q));
         if (!rows.length) return;
         const card = el(`<div class="cheat"><div class="cheat-head"><span class="cheat-ico" style="background:${cs.color}">${cs.icon}</span><b>${esc(cs.title)}</b></div><table class="cheat-table"></table></div>`);
         const tbl = card.querySelector("table");
@@ -3203,7 +3203,7 @@ document.getElementById("go").addEventListener("click", function(){
       });
 
       // Glossar
-      const terms = REF.glossary.filter(g => !q || g.term.toLowerCase().includes(q) || g.def.toLowerCase().includes(q));
+      const terms = REF.glossary.filter(g => !q || (window.HalvethHubLanguage?.searchable(g.term) || g.term).toLowerCase().includes(q) || (window.HalvethHubLanguage?.searchable(g.def) || g.def).toLowerCase().includes(q));
       if (terms.length) {
         const gwrap = el(`<div class="glossary"><h3 style="margin:6px 0 10px">Glossar${q ? " (Treffer: " + terms.length + ")" : ""}</h3></div>`);
         terms.forEach(g => gwrap.appendChild(el(`<div class="gitem"><b>${esc(g.term)}</b><span>${esc(g.def)}</span></div>`)));

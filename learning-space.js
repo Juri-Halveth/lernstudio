@@ -3,7 +3,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const normalized = s => String(s).normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('de');
   const asText = value => {
-    if (typeof value === 'string') return value.replace(/<[^>]*>/g, ' ');
+    if (typeof value === 'string') return value.replace(/<[^>]*>|[^<]+/g, part => part.startsWith('<') ? ' ' : (root.HalvethHubLanguage?.searchable(part) || part));
     if (Array.isArray(value)) return value.map(asText).join(' ');
     if (value && typeof value === 'object') return Object.values(value).map(asText).join(' ');
     return '';
@@ -12,7 +12,8 @@
   const colors = ['#56d5b0','#c1a4fc','#86bafa','#efb76e','#8ac5ed','#efe07c','#9cdc9f','#f5a1a7'];
   function mount(main, ctx) {
     const {curriculum, state, go, progress, groups, persistent} = ctx;
-    const lessons = curriculum.tracks.flatMap(track => track.stages.flatMap((stage, depth) => stage.lessons.map(lesson => ({track,stage,depth,lesson,text:normalized(track.name+' '+stage.title+' '+asText(lesson))}))));
+    const lessons = curriculum.tracks.flatMap(track => track.stages.flatMap((stage, depth) => stage.lessons.map(lesson => ({track,stage,depth,lesson,text:''}))));
+    let indexedLanguage;
     const last = lessons.find(x => x.lesson.id === state.lastLesson);
     const totalDone = lessons.filter(x => state.done[x.lesson.id]).length;
     main.innerHTML = `<section class="learning-intro"><div><p class="eyebrow">DEIN OFFENES LERNSTUDIO</p><h1>Was möchtest du entdecken?</h1><p>Dein erster Computer. Dein nächstes Programm. Eine neue Perspektive.</p></div><a class="btn" href="#lab"><i data-lucide="code"></i>Code-Werkstatt</a></section>
@@ -26,6 +27,11 @@
     main.querySelector('#continueLearning').onclick = () => go('lesson', last?.lesson.id || lessons[0].lesson.id);
     let group = 'all', limit = 36;
     function show() {
+      const availableLanguage = root.HalvethHubLanguage?.language || 'source';
+      if (indexedLanguage !== availableLanguage) {
+        for (const item of lessons) item.text = normalized(asText([item.track.name,groups.find(group => group.tracks.some(track => track.id === item.track.id))?.name,item.stage.title,item.lesson]));
+        indexedLanguage = availableLanguage;
+      }
       const tokens = normalized(main.querySelector('#lessonSearch').value.trim()).split(/\s+/).filter(Boolean);
       const depth = main.querySelector('#learningDepth').value;
       const trackIds = group === 'all' ? curriculum.tracks.map(t => t.id) : groups.find(g => g.id === group).tracks.map(t => t.id);

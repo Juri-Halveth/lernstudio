@@ -1,0 +1,44 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),test=require('node:test');
+const {JSDOM,VirtualConsole}=require('jsdom');
+const root=path.resolve(__dirname,'..'),learning=fs.existsSync(path.join(root,'learning-space.js'));
+const read=name=>fs.readFileSync(path.join(root,name),'utf8');
+const files=learning?['curriculum.js','learning-profile.js','account-auth.js','account-progress.js','reference.js','basics.js','plotter.js','payment-simulator.js','lesson-visuals.js','learning-space.js','expedition.js','learning-packets.js','journey-ui.js','connections-ui.js']:['curriculum.js','learning-profile.js','reference.js','basics.js','plotter.js','payment-simulator.js'];
+for(const language of ['de','en','ru'])test(language+' lesson search retains curriculum, direct routes, user input and raw code',async()=>{
+ const errors=[],network=[],console=new VirtualConsole();console.on('jsdomError',error=>errors.push(error.message));
+ const dom=new JSDOM('<!doctype html><html><body><div id="app"></div></body></html>',{url:'https://juri-halveth.github.io/'+(learning?'lernstudio':'mein-lernportal')+'/?lang='+language+(learning?'#map':''),runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:console});
+ const w=dom.window;w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=()=>{};w.structuredClone=value=>w.JSON.parse(JSON.stringify(value));
+ w.requestAnimationFrame=()=>0;w.cancelAnimationFrame=()=>{};w.matchMedia=()=>({matches:true,addEventListener(){},removeEventListener(){}});
+ w.fetch=async url=>{network.push(String(url));throw Error('External effect excluded from locale fixture');};
+ w.HTMLCanvasElement.prototype.getContext=()=>new Proxy({measureText:value=>({width:String(value).length*8})},{get:(target,key)=>key in target?target[key]:()=>{}});
+ try{
+  for(const file of files)w.eval(read(file));
+  const original=JSON.stringify(w.CURRICULUM);w.eval(read('app.js'));
+  w.eval(read('languages/catalog.js'));w.eval(read('languages/hub-language.js'));
+  await new Promise(resolve=>setTimeout(resolve,20));
+  assert.equal(w.document.documentElement.lang,language);assert.equal(network.length,0);
+  const lesson=w.CURRICULUM.tracks.find(track=>track.id==='math').stages[0].lessons[0];
+  const term=language==='de'?lesson.title:w.HalvethHubTranslations[lesson.title][language];
+  const input=w.document.getElementById('lessonSearch');assert(input,'Actual application search is present');
+  const category=language==='ru'?'математика':language==='en'?'Logic':'Logik';
+  input.value=category;input.dispatchEvent(new w.Event('input',{bubbles:true}));
+  await new Promise(resolve=>setTimeout(resolve,10));
+  assert(w.document.querySelector('#worldResults article'),'Translated category finds real curriculum entries');
+  input.value=term;input.dispatchEvent(new w.Event('input',{bubbles:true}));
+  await new Promise(resolve=>setTimeout(resolve,10));
+  assert(w.document.querySelector('.lesson-result'),'Translated source title finds a real lesson');assert.equal(input.value,term);
+  const button=learning?w.document.querySelector('[data-open-lesson="'+lesson.id+'"]'):w.document.querySelector('.lesson-result button');
+  assert(button,'Real lesson action is present');button.click();
+  assert.equal(decodeURIComponent(w.location.hash),'#lesson/'+lesson.id);assert.equal(JSON.stringify(w.CURRICULUM),original);
+  const pre=w.document.createElement('pre');pre.textContent='Lernpfad öffnen';w.document.body.append(pre);
+  const retained=w.document.createElement('input');retained.value='Mein eigener Text / 42';w.document.body.append(retained);
+  const count=w.document.createElement('p');count.textContent='13 Lernpfade · 702 Lektionen';w.document.body.append(count);
+  const label=w.document.createElement('p');label.textContent='🧠 Logik & Mathe · Suchen. · Lernen.';w.document.body.append(label);
+  await new Promise(resolve=>setTimeout(resolve,10));
+  assert.equal(pre.textContent,'Lernpfad öffnen');assert.equal(retained.value,'Mein eigener Text / 42');
+  assert.deepEqual(count.textContent.match(/[0-9]+/g),['13','702']);
+  if(language!=='de')assert(!/Lernpfade|Lektionen/.test(count.textContent),'Dynamic counters are localized');
+  if(language!=='de')assert(!/Logik|Suchen|Lernen/.test(label.textContent),'Decorated and punctuated labels are localized');
+  assert.equal(errors.length,0,errors.join('\n'));assert.equal(network.length,0);
+ }finally{w.dispatchEvent(new w.Event('pagehide'));dom.window.close();}
+});
