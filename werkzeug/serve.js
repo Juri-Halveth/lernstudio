@@ -9,6 +9,7 @@ const server = http.createServer((req, res) => {
   let file;
   try { file = decodeURIComponent(new URL(req.url, "http://localhost").pathname).slice(1) || "index.html"; }
   catch (error) { res.writeHead(400); res.end(); return; }
+  if(file.endsWith('/'))file+='index.html';
   if (!allowed.has(file) || !["GET", "HEAD"].includes(req.method)) { res.writeHead(404); res.end("Nicht gefunden"); return; }
   const target = path.join(root, file);
   if (!fs.existsSync(target)) { res.writeHead(404); res.end("Nicht gefunden"); return; }
