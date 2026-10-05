@@ -2,7 +2,7 @@
 const contextFiles = [...require("./build-learning-api.cjs").buildData().contexts.keys()].map(id => "api/contexts/" + id + ".json");
 // Exact release allowlist. History, private documents, accounts and server secrets stay out.
 module.exports = Object.freeze([
-  "index.html", "studio.html", "angebot.html", "inhalte.html", "genie.html", "faq.html",
+  "languages/catalog.json", "languages/catalog.js", "languages/hub-language.js", "languages/hub-language.css", "index.html", "studio.html", "angebot.html", "inhalte.html", "genie.html", "faq.html",
   "community.html", "eve.html", "quellcode.html", "wissen.html",
   "wissen-ki-programmieren.html", "wissen-zertifikate.html", "wissen-marketing-start.html",
   "wissen-studium-und-verstehen.html", "wissen-verstehen-aber-nicht-anwenden.html",
