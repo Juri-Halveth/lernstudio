@@ -12,7 +12,7 @@ const dependencyRoot = path.resolve(process.env.EVE_DEPENDENCY_ROOT || root);
 const dependencyRequire = createRequire(path.join(dependencyRoot, 'package.json'));
 const readJson = file => JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, ''));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-const expected = { solc: '0.8.26', ethers: '6.15.0', ganache: '7.9.2', openzeppelin: '4.9.6' };
+const expected = { solc: '0.8.37', ethers: '6.17.0', ganache: '7.9.2', openzeppelin: '4.9.6' };
 
 function packageDirectory(name) {
   let directory = path.dirname(dependencyRequire.resolve(name));
