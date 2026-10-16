@@ -7420,5 +7420,203 @@ Object.entries(SEO_FOUNDATION_EXTENSION).forEach(([stageId, lessons]) => {
   ]});
 }
 
+/* Praxisatelier: dieselben fünf Fachachsen auf fünf wachsenden Stufen.
+   Jeder Fall zeigt einen ersten Handgriff und einen fachlichen Prüfpunkt.
+   Alle Fälle sind synthetisch; Security bleibt auf eigene Übungsumgebungen begrenzt. */
+{
+  const levels = [
+    {title:"Sehen und benennen", goal:"Eine Beobachtung von einer Behauptung trennen und einen kleinen ersten Schritt ausführen."},
+    {title:"Ordnen und vergleichen", goal:"Eingaben, Alternativen und Vergleichsmaßstäbe vor einer Entscheidung festlegen."},
+    {title:"Bauen und prüfen", goal:"Ein kleines System mit Negativfall, Messpunkt und Rückweg erproben."},
+    {title:"Verbinden und begrenzen", goal:"Schnittstellen, Datenflüsse und Nebenwirkungen über mehrere Teile verfolgen."},
+    {title:"Entscheiden und übergeben", goal:"Ein Ergebnis mit Grenzen, Gegenmodell und verständlicher Übergabe vertreten."}
+  ];
+  const axes = [
+    {id:"denken", name:"Denken & Belegen", lessons:[
+      {title:"Was habe ich wirklich gesehen?", a:"Unterlektion 1: Schreibe einen beobachtbaren Satz mit Ort und Zeit. Eine Vermutung kommt in eine zweite Zeile.", b:"Unterlektion 2: Suche eine Beobachtung, die auch zu einer anderen Erklärung passt. Markiere den offenen Rest.", q:"Ein Diagramm steigt. Was weißt du zunächst?", options:["Der neue Knopf hat den Anstieg verursacht","Der gezeigte Wert ist im dargestellten Zeitraum gestiegen","Alle Nutzer sind zufriedener"], answer:1, cases:[
+        ["Drei Nutzer öffnen eine Seite.","Zähle die drei Aufrufe.","Prüfe Messfenster und Mehrfachaufrufe."],
+        ["Eine Pflanze hängt um 8 Uhr.","Notiere Zustand und Uhrzeit.","Trenne Feuchte, Licht und Temperatur als Erklärungen."],
+        ["Ein Spielbild zeigt grauen Nebel.","Beschreibe das sichtbare Bild.","Prüfe Kamera, Geometrie und Rendering getrennt."],
+        ["Ein Build meldet Erfolg.","Halte die Meldung fest.","Unterscheide Build-Erfolg von sichtbarer Laufzeit."],
+        ["Ein Kommentar sagt: zu langsam.","Erhalte den Wortlaut.","Frage nach Gerät, Szene und gemessener Dauer."]]},
+      {title:"Zwei Modelle gegeneinander halten", a:"Unterlektion 1: Formuliere zwei Erklärungen für dieselbe Beobachtung, ohne eine als Sieger vorauszusetzen.", b:"Unterlektion 2: Bestimme vor dem Test ein Ergebnis, bei dem die Erklärungen verschieden reagieren müssten.", q:"Was trennt zwei Erklärungen am besten?", options:["Ein neuer Name","Eine vorab benannte unterscheidende Beobachtung","Ein längerer Werbetext"], answer:1, cases:[
+        ["Seite lädt langsam: Bild oder Server?","Vergleiche Bildgröße und Antwortzeit.","Miss getrennt Netz-, Server- und Renderzeit."],
+        ["Gras wirkt flach: Mesh oder Licht?","Betrachte dasselbe Gras bei anderem Licht.","Halte Kamera und Geometrie konstant."],
+        ["Anmeldung scheitert: Passwort oder Dienst?","Prüfe eine harmlose Statusmeldung.","Trenne Authentisierung von Verfügbarkeit."],
+        ["Lektion wird abgebrochen: Länge oder Sprache?","Teste zwei kurze Fassungen freiwillig.","Binde Zielgruppe, Stichprobe und Abbruchpunkt."],
+        ["Stein schwebt: Offset oder Terrain?","Miss Abstand zum Boden.","Vergleiche Kollisionshit und sichtbare Mesh-Basis."]]},
+      {title:"Eine Behauptung prüfbar machen", a:"Unterlektion 1: Binde Aussage, Referent, Zeitraum und Methode. Schreibe vorher, welches Ergebnis sie stützen würde.", b:"Unterlektion 2: Probiere einen ungefährlichen Gegenfall; ein bestandener Test ist nur so breit wie seine Fälle.", q:"Fünf Tests bestehen. Welche Aussage trägt das?", options:["Alle Fälle sind gelöst","Die fünf benannten Fälle bestanden","Der Code ist fehlerfrei"], answer:1, cases:[
+        ["Backup ist vollständig.","Öffne eine Testdatei aus der Kopie.","Prüfe Stichprobe, Dateizahl und Wiederherstellbarkeit."],
+        ["Spielwelt ist begehbar.","Laufe einen dokumentierten Weg.","Teste Rand, Steigung und Rückweg mit Koordinaten."],
+        ["Quiz ist verständlich.","Lass eine Person ihre Antwort erklären.","Trenne richtige Wahl von geratenem Treffer."],
+        ["Quelle trägt einen Satz.","Lies die konkrete Stelle.","Prüfe Geltungszeit und alternative Lesart."],
+        ["Optimierung spart Zeit.","Miss vorher und nachher.","Vergleiche gleiche Szene und gleiche Hardware."]]},
+      {title:"Aus Quellen eine Kette bauen", a:"Unterlektion 1: Erfasse jede Quelle mit Datum und Reichweite. Ein gemeinsamer Ursprung ergibt keine unabhängige Bestätigung.", b:"Unterlektion 2: Zeichne Beobachtung, Ableitung und Entscheidung als getrennte Schritte. Halte die erste offene Kante sichtbar.", q:"Zwei Artikel zitieren dieselbe Studie. Wie viele unabhängige Studien sind das?", options:["Zwei","Eine","Das ist nicht prüfbar, also null"], answer:1, cases:[
+        ["Zwei Blogs teilen dieselbe Grafik.","Suche die Originalgrafik.","Prüfe gemeinsame Datenquelle und Achsenskalierung."],
+        ["Eine Engine-Doku nennt eine Funktion.","Lies die Version.","Trenne dokumentierte API von lokalem Laufzeitverhalten."],
+        ["Drei Agenten bestätigen einen Fund.","Vergleiche ihre Rohquellen.","Zähle gemeinsame Prompts und Dateien als Cluster."],
+        ["Ein Screenshot zeigt einen Fehler.","Binde Aufnahmezeit und Version.","Vergleiche mit Log und reproduzierbarem Minimalfall."],
+        ["Ein Bericht nennt Wirkung.","Suche das gemessene Ergebnis.","Trenne Korrelation, Eingriff und Kontrollgruppe."]]},
+      {title:"Ein Urteil mit offenem Rand", a:"Unterlektion 1: Führe Beobachtung, stärkste Erklärung und mindestens ein Gegenmodell nebeneinander.", b:"Unterlektion 2: Gib eine Entscheidung nur für den gebundenen Zweck ab. Formuliere, welcher neue Befund sie ändern würde.", q:"Was gehört zu einer verantwortbaren Übergabe?", options:["Nur ein klares Ja","Ergebnis, Reichweite und Reopen-Trigger","Nur die längste Quelle"], answer:1, cases:[
+        ["Terrain sieht besser aus.","Nenne die getestete Ansicht.","Halte offene Biome und Kamerawinkel fest."],
+        ["Sicherheitswarnung ist reproduziert.","Nenne lokale Bedingungen.","Trenne Demonstration und Produktionswirkung."],
+        ["Marketingidee funktioniert.","Nenne Zeitraum und Reaktion.","Trenne Klicks von dauerhaftem Nutzen."],
+        ["Lernpfad besteht Tests.","Nenne geprüfte Funktionen.","Trenne Strukturprüfung von Lernerfolg."],
+        ["Modell A gewinnt.","Nenne Maßstab und Alternativen.","Dokumentiere Grenzfälle und neues Messsignal."]]}
+    ]},
+    {id:"software", name:"Software bauen", lessons:[
+      {title:"Eingabe, Verarbeitung, Ausgabe", a:"Unterlektion 1: Zeichne für eine kleine Funktion drei Kästen: Was kommt hinein, was geschieht, was kommt heraus?", b:"Unterlektion 2: Füge einen ungültigen Eingang hinzu. Ein Programm braucht dafür ein bewusstes Verhalten.", q:"Was ist bei einem Taschenrechner eine Eingabe?", options:["Der Quellordner","Zwei Zahlen und eine Operation","Die Farbe des Fensters"], answer:1, cases:[
+        ["Summe 2+3","Gib 2 und 3 ein.","Prüfe Zahlentyp und Ergebnis 5."],
+        ["Leere Namenseingabe","Lasse das Feld leer.","Definiere Fehlermeldung statt stillen Default."],
+        ["Bild speichern","Wähle einen Zielpfad.","Prüfe Format, Berechtigung und Schreibresultat."],
+        ["Spieler springt","Drücke die Sprungtaste.","Prüfe Bodenstatus und Impuls."],
+        ["Lektion abschließen","Beantworte ein Quiz.","Trenne Antwortprüfung und gespeicherten Fortschritt."]]},
+      {title:"Zustand und Version", a:"Unterlektion 1: Ein Zustand beschreibt Werte zu einem Zeitpunkt. Eine Änderung bekommt eine benannte Vor- und Nachbedingung.", b:"Unterlektion 2: Versionsnummer und Hash binden Artefakte, sagen aber nichts über Schönheit oder Fehlerfreiheit.", q:"Ein Hash stimmt überein. Was weißt du?", options:["Die gebundenen Bytes stimmen überein","Das Spiel gefällt allen","Der Server ist sicher"], answer:0, cases:[
+        ["Inventar enthält ein Buch.","Zeige es im Inventar.","Prüfe Speichern und Laden derselben ID."],
+        ["Git-Commit existiert.","Lies die Kennung.","Prüfe Remote-Head und Diff getrennt."],
+        ["Spielwelt lädt neu.","Beobachte Startzustand.","Vergleiche Save-Version und Migration."],
+        ["Quizpunkt steigt.","Prüfe den Punktestand.","Trenne UI-Anzeige und persistierten Wert."],
+        ["Konfiguration wechselt.","Notiere alte und neue Werte.","Halte Rollback und unerwartete Nebenwirkung fest."]]},
+      {title:"Tests, die Fehler finden dürfen", a:"Unterlektion 1: Schreibe einen Normalfall, einen Grenzfall und einen absichtlich ungültigen Fall auf.", b:"Unterlektion 2: Der Negativtest muss bei einem sicheren Defekt fehlschlagen. Sonst ist ein grünes Ergebnis wenig wert.", q:"Was macht einen Negativtest aussagekräftig?", options:["Er besteht immer","Er erkennt einen vorher eingebauten sicheren Defekt","Er verwendet echte Kundendaten"], answer:1, cases:[
+        ["Leere Liste","Erwarte null Elemente.","Prüfe keinen Zugriff auf Index 0."],
+        ["Datei fehlt","Erwarte verständlichen Fehler.","Prüfe Rückweg ohne Teilschreibstand."],
+        ["Kollision fehlt","Laufe gegen Testwand.","Der Test muss ohne Kollision rot werden."],
+        ["Doppelter Klick","Klicke zweimal.","Prüfe Idempotenz des Abschlusses."],
+        ["Umlaut im Titel","Speichere Ö und Ä.","Prüfe UTF-8-Roundtrip und Suchbarkeit."]]},
+      {title:"Schnittstellen und Nebenwirkungen", a:"Unterlektion 1: Markiere pro Modul die Daten, die es lesen und schreiben darf. Eine Antwort ist noch keine bestätigte Wirkung.", b:"Unterlektion 2: Prüfe Zeitüberschreitung, Wiederholung und abgebrochene Ausführung mit demselben Vertrag.", q:"Ein HTTP-Request wurde gesendet. Was ist sicher?", options:["Die Zahlung wurde verbucht","Ein Versandversuch fand statt","Die Gegenstelle hat zugestimmt"], answer:1, cases:[
+        ["API antwortet 200.","Lies den Antwortkörper.","Prüfe Ziel-ID und gespeicherten Zustand."],
+        ["Speichern dauert lange.","Zeige Wartezustand.","Prüfe Retry ohne Dublette."],
+        ["Asset fehlt.","Zeige brauchbaren Ersatz.","Logge konkrete Quelle und Ladepfad."],
+        ["Zwei Module ändern Geld.","Finde die Schreibstelle.","Definiere eine einzige Write-Domain."],
+        ["NPC spricht nach Reload.","Prüfe Erinnerung.","Trenne generierten Satz von gespeichertem Weltfakt."]]},
+      {title:"Reproduzierbar übergeben", a:"Unterlektion 1: Ein guter Build hat Quellstand, Werkzeugversion, reproduzierbare Schritte und eine installierbare Ausgabe.", b:"Unterlektion 2: Vor Veröffentlichung prüfst du genau die Zielplattform, den Startpfad und die Rückkehr zur letzten funktionierenden Version.", q:"Wann ist ein Spielbuild spielbar belegt?", options:["Wenn Quellcode existiert","Wenn der konkrete Build startet und ein definierter Spielweg geprüft wurde","Wenn ein Titelbild schön ist"], answer:1, cases:[
+        ["EXE wird gebaut.","Starte die EXE.","Binde SHA und getestete Hardware."],
+        ["Neue Szene ersetzt alte.","Prüfe Startkarte.","Bewahre funktionierenden Rückweg."],
+        ["Performance wird genannt.","Miss eine definierte Szene.","Berichte Perzentile statt Einzel-FPS."],
+        ["Download erscheint.","Öffne Release-Link.","Prüfe Datei, Größe und Startverhalten."],
+        ["Fehlerbericht kommt.","Erfasse Repro-Schritte.","Binde Build-Version und Logfenster."]]}
+    ]},
+    {id:"sprachen", name:"Programmiersprachen", lessons:[
+      {title:"Werte, Namen und Typen", a:"Unterlektion 1: Ein Name verweist auf einen Wert. Text und Zahl sehen ähnlich aus, haben aber andere Operationen.", b:"Unterlektion 2: Vergleiche dieselbe kleine Aufgabe in Python und JavaScript; erkenne die Typumwandlung ausdrücklich.", q:"Was ergibt Text '2' plus Text '3' in JavaScript?", options:["5","23","Ein Dateiname"], answer:1, cases:[
+        ["Alter 18","Speichere eine Zahl.","Prüfe Integer gegen String aus Formular."],
+        ["Preis '9.99'","Zeige Text an.","Parse bewusst und beachte Dezimalformat."],
+        ["Wahr/Falsch","Setze einen Boolean.","Vermeide Text 'false' als truthy Wert."],
+        ["Name Ömer","Speichere Unicode-Text.","Prüfe UTF-8 und Normalisierung am Rand."],
+        ["Leerer Wert","Unterscheide leer von fehlend.","Definiere null, undefined oder None im Vertrag."]]},
+      {title:"Bedingungen und Wiederholung", a:"Unterlektion 1: Eine Bedingung wählt einen Weg. Eine Schleife wiederholt ihn über klar definierte Elemente.", b:"Unterlektion 2: Benenne Anfang, Ende und einen Fall, in dem die Schleife nichts tut.", q:"Eine Liste ist leer. Wie oft läuft eine for-each-Schleife?", options:["Nullmal","Einmal","Unendlich"], answer:0, cases:[
+        ["Punkte >= 10","Zeige Freischaltung.","Teste 9, 10 und 11."],
+        ["Fünf Bücher","Durchlaufe IDs.","Vermeide veränderliche Liste während Iteration."],
+        ["Keine Nachrichten","Zeige Leerzustand.","Teste null Iterationen explizit."],
+        ["Countdown 3","Zähle 3,2,1.","Setze Abbruchbedingung gegen Endlosschleife."],
+        ["Zwei Filter","Nutze and/&& bewusst.","Prüfe Operatorpriorität und Kurzschluss."]]},
+      {title:"Funktionen und Datenstrukturen", a:"Unterlektion 1: Eine Funktion bekommt Parameter und liefert ein Ergebnis. Eine Liste erhält Ordnung, eine Map Schlüssel.", b:"Unterlektion 2: Trenne reine Berechnung von Schreiben auf Platte oder Netz.", q:"Was hilft beim Test einer reinen Funktion?", options:["Sie verändert heimlich Dateien","Gleiche Eingaben liefern vergleichbare Ausgaben","Sie braucht immer Internet"], answer:1, cases:[
+        ["Verdopple 4","Erwarte 8.","Prüfe Zahlenbereich und Überlauf."],
+        ["Buch per ID","Nutze eine Map.","Definiere Verhalten bei unbekannter ID."],
+        ["Sortiere Namen","Nutze eine Liste.","Prüfe Locale und stabile Ordnung."],
+        ["Berechne Fläche","Gib Breite und Höhe.","Trenne cm und m im Typvertrag."],
+        ["Speichere Ergebnis","Rufe Schreibfunktion getrennt auf.","Prüfe Fehler und atomare Ablage."]]},
+      {title:"Async, Fehler und Grenzen", a:"Unterlektion 1: Ein Promise oder await bedeutet: Das Ergebnis kommt später. Ein Fehler braucht einen sichtbaren Pfad.", b:"Unterlektion 2: Binde Timeout und Wiederholung an die Aktion; unterscheide lesenden Abruf von schreibendem Effekt.", q:"Ein Timeout tritt auf. Was ist offen?", options:["Der Server hat sicher nichts getan","Ob die Gegenseite bereits wirkte","Die Funktion war synchron"], answer:1, cases:[
+        ["Bild lädt spät","Zeige Platzhalter.","Verhindere Layoutsprung bei Auflösung."],
+        ["Speichern timed out","Zeige unklaren Status.","Prüfe idempotenten Schlüssel vor Retry."],
+        ["JSON ist kaputt","Fange Parsefehler.","Logge Position ohne sensible Daten."],
+        ["Zwei Requests überholen sich","Zeige neuesten Stand.","Binde Antwort an Request-ID."],
+        ["Datei wird gelesen","Warte auf Ergebnis.","Trenne I/O-Fehler von Inhaltsvalidierung."]]},
+      {title:"Sprache als Werkzeug wählen", a:"Unterlektion 1: Wähle nach Laufzeit, Team, Bibliotheken und Zielplattform statt nach einem Sieger-Ranking.", b:"Unterlektion 2: Portiere dieselbe Funktion mit Tests, Eingabetypen und bekannten Verlusten. Gleiche Syntax beweist keine gleiche Semantik.", q:"Was gehört zu einem Sprachwechsel?", options:["Nur Dateiendung ändern","Vertrag und Grenzfälle erneut prüfen","Alle Tests löschen"], answer:1, cases:[
+        ["Python-Skript zu JS","Portiere Eingabe und Ausgabe.","Prüfe Ganzzahl- und Floatverhalten."],
+        ["JS zu C++","Nutze passende Typen.","Prüfe Lebensdauer und Besitz."],
+        ["Browser zu EXE","Verlege UI-Logik.","Prüfe Plattform-API und Packaging."],
+        ["SQL statt Schleife","Formuliere Abfrage.","Prüfe Nullwerte und Transaktion."],
+        ["Shader statt CPU-Code","Übertrage Farbfunktion.","Prüfe Präzision und GPU-Datenfluss."]]}
+    ]},
+    {id:"sicherheit", name:"Defensive Sicherheit", lessons:[
+      {title:"Schutzgut und Grenze", a:"Unterlektion 1: Benenne zuerst, was geschützt wird: Datei, Konto, Person oder Dienst. Lege eigene Übungsdaten an.", b:"Unterlektion 2: Unterscheide beobachtete Schwäche, denkbare Folge und tatsächlich belegten Effekt.", q:"Eine Fehlermeldung erscheint. Was belegt sie?", options:["Automatisch Datenabfluss","Die konkrete Fehlermeldung im Test","Alle Konten sind offen"], answer:1, cases:[
+        ["Eigenes Testkonto","Nutze eine Test-ID.","Binde Scope und Zeitpunkt."],
+        ["Login-Fehler","Notiere Meldung.","Prüfe ohne fremde Konten auf Informationsleck."],
+        ["Öffentlicher Link","Öffne die eigene Datei.","Trenne Sichtbarkeit von Schreibrecht."],
+        ["Altes Paket","Lies Versionsstand.","Prüfe Advisory und betroffene Konfiguration."],
+        ["Logdatei","Suche Testereignis.","Schütze personenbezogene Rohdaten."]]},
+      {title:"Eingaben an der Grenze", a:"Unterlektion 1: Fremde Eingaben sind Daten. Validierung bindet Typ, Größe und Format; Ausgaben werden zum Zielkontext passend kodiert.", b:"Unterlektion 2: Ein Filtertest braucht einen sicheren Negativfall, ohne reale Systeme zu belasten.", q:"Eine Eingabe sieht wie ein Befehl aus. Was ist der erste sichere Schritt?", options:["In Produktion ausführen","Als Daten in isolierter Übung behandeln","Mit Administratorrechten wiederholen"], answer:1, cases:[
+        ["Zu langer Name","Begrenze Testlänge.","Prüfe Fehlermeldung und Speicherlimit."],
+        ["HTML im Kommentar","Zeige Text, nicht Markup.","Prüfe kontextgerechtes Escaping."],
+        ["Pfad mit ..","Nutze Testverzeichnis.","Prüfe kanonischen Zielpfad."],
+        ["JSON mit Extra-Feld","Sende synthetischen Datensatz.","Prüfe Schema- und Versionsverhalten."],
+        ["Unicode im Login","Teste eigenes Konto.","Prüfe Normalisierung und erlaubte Zeichen."]]},
+      {title:"Identität ist keine Berechtigung", a:"Unterlektion 1: Trenne: Wer behauptet eine Rolle, wer wurde authentisiert und welche Aktion ist erlaubt?", b:"Unterlektion 2: Prüfe in einer lokalen Demo einen erlaubten und einen verbotenen Zugriff auf zwei eigene Testobjekte.", q:"Ein gültiger Login bedeutet automatisch …", options:["Zugriff auf alle Daten","Nur bestätigte Identität für diesen Kontext","Adminrechte"], answer:1, cases:[
+        ["Nutzer A liest A","Erwarte Erfolg.","Prüfe Objektbindung serverseitig."],
+        ["Nutzer A liest B","Erwarte Ablehnung in eigener Demo.","Prüfe fehlende Daten im Fehlerkörper."],
+        ["Rolle Redaktion","Ändere Testartikel.","Prüfe Aktion und Scope separat."],
+        ["Abgelaufene Sitzung","Fordere eigene Testseite an.","Prüfe erneute Authentisierung."],
+        ["Geteiltes Gerät","Melde Testkonto ab.","Prüfe lokale Cache- und Tokenwirkung."]]},
+      {title:"Beobachtung und Wirkung verbinden", a:"Unterlektion 1: Führe eine Kette aus Quelle, Version, Request, Antwort und gespeicherter Wirkung. Jede Kante hat eigene Evidenz.", b:"Unterlektion 2: Stoppe am kleinsten sicheren Demonstrationspunkt; ein lokaler Nachbau beweist keine Produktionslücke.", q:"Ein lokaler Test findet einen Fehler. Was ist noch zu prüfen?", options:["Nichts","Ob Version, Scope und produktiver Pfad übereinstimmen","Wie laut der Bericht klingt"], answer:1, cases:[
+        ["Parser akzeptiert Wert","Speichere Testeingabe.","Prüfe Konsument und Zustandsentscheidung."],
+        ["Header fehlt","Lies eigenen Testresponse.","Binde Browserkontext und tatsächliche Wirkung."],
+        ["Datei in Archiv flaggt","Hash lokal.","Trenne Signatur, Inhalt und Ausführung."],
+        ["Port ist offen","Prüfe lokalen Listener.","Trenne Socket von externer Erreichbarkeit."],
+        ["CI ist grün","Lies Testliste.","Prüfe, ob kritischer Fall überhaupt lief."]]},
+      {title:"Reparatur und verantwortbare Übergabe", a:"Unterlektion 1: Ein guter Fix entfernt die Ursache und erhält erlaubtes Verhalten. Vergleiche Vor- und Nachzustand.", b:"Unterlektion 2: Übergib reproduzierbare Minimalfakten, Grenzen und einen Rückweg. Meldungen an Dritte brauchen ihren eigenen Scope.", q:"Woran erkennst du einen tragfähigen Fix?", options:["Nur an einem grünen Symbol","Am bestandenen Negativfall und erhaltenen Normalfall","An der Zahl der geänderten Dateien"], answer:1, cases:[
+        ["Objektzugriff gefixt","Teste erlaubtes A.","Teste verbotenes B und Regression."],
+        ["Parser gehärtet","Teste gültiges Format.","Teste Grenzwert und Ablehnung."],
+        ["Token rotiert","Prüfe eigenen Login.","Prüfe alte Sitzung und Auditspur."],
+        ["Patch veröffentlicht","Lies Release.","Binde Commit, Artefakt und Rollout separat."],
+        ["Befund kommuniziert","Nenne Minimalfall.","Trenne Versuch, Empfang und Anerkennung."]]}
+    ]},
+    {id:"marketing", name:"Marketing & Nutzen", lessons:[
+      {title:"Für wen ist das hilfreich?", a:"Unterlektion 1: Formuliere eine konkrete Personengruppe, Situation und Frage. Verzichte auf erfundene Bedürfnisse.", b:"Unterlektion 2: Prüfe, ob dein Inhalt die Frage selbst beantwortet, auch wenn niemand klickt oder kauft.", q:"Welche Überschrift ist genauer?", options:["Alles wird magisch","Fotos auf einer zweiten Festplatte sichern","Garantiert reich in fünf Minuten"], answer:1, cases:[
+        ["Anfänger fragt nach Backup","Schreibe drei Schritte.","Prüfe Voraussetzungen und Rückkopie."],
+        ["Eltern suchen Lernhilfe","Zeige kostenlosen Einstieg.","Prüfe Sprache und Barrieren."],
+        ["Spieler suchen EXE","Gib Startanleitung.","Trenne Preview und fertiges Spiel."],
+        ["Entwickler suchen API","Zeige ein Beispiel.","Binde Version und Fehlermeldung."],
+        ["Leser suchen Quellen","Nenne Primärstelle.","Trenne These und geprüften Befund."]]},
+      {title:"Ein Versprechen, das passt", a:"Unterlektion 1: Überschrift, Bild und erster Absatz versprechen denselben Gegenstand wie der eigentliche Inhalt.", b:"Unterlektion 2: Markiere belegte Eigenschaft, geplantes Ziel und noch offene Wirkung getrennt.", q:"Ein Prototyp zeigt eine Landschaft. Was darf die Seite sagen?", options:["Fertige riesige Open World","Spielbarer Landschaftsprototyp mit benanntem Umfang","Garantiert höchste FPS"], answer:1, cases:[
+        ["Kurs hat 25 neue Lektionen","Nenne Anzahl.","Prüfe Build-Zählung und Inhalte."],
+        ["Spielbild ist schön","Zeige echtes Capture.","Binde Build und Szene statt Konzeptart."],
+        ["Tool ist gratis","Nenne Kostenfreiheit.","Prüfe versteckte Infrastrukturkosten."],
+        ["Sicherheitswerkzeug hilft","Zeige begrenzten Test.","Vermeide allgemeine Schutzgarantie."],
+        ["Newsletter wirbt","Beschreibe Thema.","Prüfe Einwilligung und Abmeldbarkeit."]]},
+      {title:"Eine nützliche Seite bauen", a:"Unterlektion 1: Stelle Frage, Antwort, Beispiel und nächsten freiwilligen Schritt in diese Reihenfolge.", b:"Unterlektion 2: Teste mobile Lesbarkeit und Tastaturweg mit echten Aufgaben statt nur Bildschirmbreite.", q:"Woran erkennst du eine hilfreiche Startseite?", options:["Viele Kästen verdecken alles","Menschen finden die gesuchte Aufgabe","Jede Animation läuft dauerhaft"], answer:1, cases:[
+        ["Mobile Startseite","Zeige Inhalt zuerst.","Prüfe 320px, Touch und Fokus."],
+        ["Lektionskarte","Benenne Ziel.","Prüfe Screenreader-Reihenfolge."],
+        ["Spiel-Download","Zeige Plattform.","Prüfe Dateigröße und Installationsweg."],
+        ["Forschungsgrafik","Beschrifte Achsen.","Gib Quelle und Alternativtext."],
+        ["Kontaktseite","Nenne Kanal.","Prüfe Formularfeedback ohne Datensammelei."]]},
+      {title:"Reichweite ohne Selbsttäuschung", a:"Unterlektion 1: Trenne Ausspielung, Besuch, Teilnahme und Nutzen. Jede Zahl braucht Zeitraum und Nenner.", b:"Unterlektion 2: Vergleiche zwei Fassungen nur bei ähnlicher Zielgruppe und dokumentiere den Wechsel.", q:"Was beweisen 100 Aufrufe?", options:["100 Lernabschlüsse","100 gezählte Aufrufe im Messvertrag","100 zufriedene Menschen"], answer:1, cases:[
+        ["100 Views, 3 Starts","Zähle beides.","Berechne Rate mit eindeutigem Zeitraum."],
+        ["Zwei Titel","Vergleiche freiwillig.","Prüfe Kanal und Zielgruppenmix."],
+        ["Viele Klicks, kein Lernen","Frage nach Hindernis.","Prüfe Aufgabenabschluss statt Vanity-Metrik."],
+        ["Community teilt Beitrag","Bedanke dich.","Prüfe Zustimmung und Plattformregeln."],
+        ["Mehr Besuche nach Release","Notiere Datum.","Prüfe andere gleichzeitige Ursachen."]]},
+      {title:"Ein ehrliches Wachstumsprogramm", a:"Unterlektion 1: Definiere Nutzen, freiwillige Verbreitung, Pflegeaufwand und eine messbare Rückmeldung.", b:"Unterlektion 2: Entscheide mit Kosten, Rechte- und Datenschutzgrenzen. Eine gute Geschichte darf ihre offenen Fragen zeigen.", q:"Was ist ein nachhaltiger nächster Schritt?", options:["Ungefragter Massenversand","Einen hilfreichen Beitrag verbessern und freiwillige Rückmeldung prüfen","Erfundene Testimonials"], answer:1, cases:[
+        ["Kurs wird empfohlen","Bitte um freiwilliges Feedback.","Prüfe reale Aussagen vor Zitierung."],
+        ["Neuer Pfad startet","Zeige Einstiegslektion.","Miss Abschluss unter freiwilligen Nutzern."],
+        ["Spiel-Preview erscheint","Benenne Stand und Grenzen.","Prüfe echte Starts und Crashrate."],
+        ["Kleine Community wächst","Pflege Fragen.","Trenne Mitgliederzahl und Beteiligung."],
+        ["Zeitbudget ist knapp","Wähle eine Verbesserung.","Vergleiche Nutzen pro Pflegeaufwand."]]}
+    ]}
+  ];
+  const escape = value => String(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
+  })[char]);
+  const stages = levels.map((level, index) => ({
+    id:`atelier-${index}`, stage:index, title:level.title, goal:level.goal,
+    lessons:axes.map(axis => {
+      const item = axis.lessons[index];
+      if (item.cases.length !== 5) throw new Error(`Praxisatelier: fünf Fälle für ${axis.id}-${index} erwartet`);
+      const examples = item.cases.map(([situation, beginner, expert], number) =>
+        `<li><b>Fall ${number + 1}: ${escape(situation)}</b><br>Erster Schritt: ${escape(beginner)}<br>Fachblick: ${escape(expert)}</li>`).join("");
+      return {id:`atelier-${index}-${axis.id}`, type:"lesson", title:`${axis.name}: ${item.title}`,
+        minutes:12, beats:[
+          {kind:"text", html:`<h3>Unterlektion 1 · Einstieg</h3><p>${escape(item.a)}</p>`},
+          {kind:"text", html:`<h3>Unterlektion 2 · Vertiefung</h3><p>${escape(item.b)}</p>`},
+          {kind:"text", html:`<h3>Fünf Fälle · vom ersten Schritt zum Fachblick</h3><ol>${examples}</ol>`},
+          {kind:"predict", frage:`<p>${escape(item.q)}</p>`, optionen:item.options,
+            answer:item.answer, enthuellung:`<p>${escape(item.options[item.answer])} · Vergleiche deine Wahl mit den fünf Fällen und benenne den offenen Rest.</p>`}
+        ]};
+    })
+  }));
+  CURRICULUM.tracks.push({id:"atelier", name:"Praxisatelier: Denken & Bauen",
+    subtitle:"Fünf Stufen von einfach bis anspruchsvoll. Jede Stufe verbindet Denken, Software, Programmiersprachen, defensive Sicherheit und Marketing mit fünf konkreten Fällen pro Lektion.",
+    icon:"◇", color:"#9de0d4", stages});
+}
+
 /* Für app.js global verfügbar machen */
 window.CURRICULUM = CURRICULUM;

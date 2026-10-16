@@ -16,7 +16,7 @@ async function layout(page){const v=await page.evaluate(()=>({width:innerWidth,s
    const context=await browser.newContext({viewport:{width,height:900},locale:'de-DE'}),page=await context.newPage(),errors=[];
    page.on('pageerror',e=>errors.push(e.message));
    await page.goto(base+'#map',{waitUntil:'domcontentloaded'});await page.waitForSelector('.world-card');await page.evaluate(()=>window.learningAccountReady);
-   assert.equal(await page.locator('.world-card').count(),13);assert.equal(await page.locator('.course-art svg').count(),13);
+   assert.equal(await page.locator('.world-card').count(),14);assert.equal(await page.locator('.course-art svg').count(),14);
    if(width<=900){assert.equal(await page.locator('#acctBtn .aname').isVisible(),false);assert.equal(await page.locator('#acctBtn').evaluate(e=>Math.round(e.getBoundingClientRect().width)),44);}
    const view=await layout(page);await page.screenshot({path:path.join(out,`${width}-home.png`),fullPage:true});
    await page.locator('#lessonSearch').fill('print');await page.waitForSelector('.lesson-result');assert((await page.locator('.lesson-result').count())>0);

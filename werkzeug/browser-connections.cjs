@@ -108,8 +108,8 @@ async function run({ onScreenshot, nodePackages } = {}) {
             return { id: t.id, title: t.name, count: own.length, stages: t.stages.length,
               next: own.find(l => __state.done[l.id] !== true).id };
           }));
-          assert.equal(expected.length, 13);
-          assert.equal(await page.locator('.connections-total').textContent(), '702');
+          assert.equal(expected.length, 14);
+          assert.equal(await page.locator('.connections-total').textContent(), '727');
           const requestCount = requests.length;
           for (const track of expected) {
             const button = page.getByRole('button', { name: track.title, exact: true });
@@ -154,7 +154,7 @@ async function run({ onScreenshot, nodePackages } = {}) {
           assert.equal(await page.locator('.connections-view').count(), 0);
           assert(await page.locator('#qa-lesson').evaluate(n => n === document.activeElement));
           await page.locator('#qa-back').click();
-          assert.equal(await page.locator('.connections-track').count(), 13);
+          assert.equal(await page.locator('.connections-track').count(), 14);
           assert.equal(await page.locator('a[href="api/space.json"]').count(), 1);
           assert.equal(await page.locator('a[href$="/AGENT_LEARNING.md"]').count(), 1);
           await page.getByRole('button', { name: expected[10].title, exact: true }).click();
@@ -177,7 +177,7 @@ async function run({ onScreenshot, nodePackages } = {}) {
         } finally { await context.close(); }
       }
     }
-    return { viewports: reports.length, tracks: 13, lessons: 702, reports, integration: 'isolated component with actual curriculum and shared styles' };
+    return { viewports: reports.length, tracks: 14, lessons: 727, reports, integration: 'isolated component with actual curriculum and shared styles' };
   } finally {
     await browser?.close();
     await new Promise(resolve => server.close(resolve));

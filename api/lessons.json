@@ -1,6 +1,6 @@
 {
   "schema": "lernstudio.lesson-catalogue.v1",
-  "curriculumSha256": "a368a6fc7da04ab8b2e590cd933ea17fd7bd8678a26bcb65f1a17c5938c3b4b5",
+  "curriculumSha256": "c26dc969d779871bc0538b0db8733f560d59161aae76d42ca988f9f82546735f",
   "curriculumDigestMode": "UTF8_LF_NORMALIZED",
   "lessons": [
     {
@@ -6320,6 +6320,231 @@
       "stageTitle": "Master: Alles zusammen, deine eigene Funktion",
       "url": "https://juri-halveth.github.io/lernstudio/#lesson/matheanfassen-master-quiz",
       "order": 702
+    },
+    {
+      "id": "atelier-0-denken",
+      "title": "Denken & Belegen: Was habe ich wirklich gesehen?",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Sehen und benennen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-0-denken",
+      "order": 703
+    },
+    {
+      "id": "atelier-0-software",
+      "title": "Software bauen: Eingabe, Verarbeitung, Ausgabe",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Sehen und benennen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-0-software",
+      "order": 704
+    },
+    {
+      "id": "atelier-0-sprachen",
+      "title": "Programmiersprachen: Werte, Namen und Typen",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Sehen und benennen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-0-sprachen",
+      "order": 705
+    },
+    {
+      "id": "atelier-0-sicherheit",
+      "title": "Defensive Sicherheit: Schutzgut und Grenze",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Sehen und benennen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-0-sicherheit",
+      "order": 706
+    },
+    {
+      "id": "atelier-0-marketing",
+      "title": "Marketing & Nutzen: Für wen ist das hilfreich?",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Sehen und benennen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-0-marketing",
+      "order": 707
+    },
+    {
+      "id": "atelier-1-denken",
+      "title": "Denken & Belegen: Zwei Modelle gegeneinander halten",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Ordnen und vergleichen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-1-denken",
+      "order": 708
+    },
+    {
+      "id": "atelier-1-software",
+      "title": "Software bauen: Zustand und Version",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Ordnen und vergleichen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-1-software",
+      "order": 709
+    },
+    {
+      "id": "atelier-1-sprachen",
+      "title": "Programmiersprachen: Bedingungen und Wiederholung",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Ordnen und vergleichen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-1-sprachen",
+      "order": 710
+    },
+    {
+      "id": "atelier-1-sicherheit",
+      "title": "Defensive Sicherheit: Eingaben an der Grenze",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Ordnen und vergleichen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-1-sicherheit",
+      "order": 711
+    },
+    {
+      "id": "atelier-1-marketing",
+      "title": "Marketing & Nutzen: Ein Versprechen, das passt",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Ordnen und vergleichen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-1-marketing",
+      "order": 712
+    },
+    {
+      "id": "atelier-2-denken",
+      "title": "Denken & Belegen: Eine Behauptung prüfbar machen",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Bauen und prüfen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-2-denken",
+      "order": 713
+    },
+    {
+      "id": "atelier-2-software",
+      "title": "Software bauen: Tests, die Fehler finden dürfen",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Bauen und prüfen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-2-software",
+      "order": 714
+    },
+    {
+      "id": "atelier-2-sprachen",
+      "title": "Programmiersprachen: Funktionen und Datenstrukturen",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Bauen und prüfen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-2-sprachen",
+      "order": 715
+    },
+    {
+      "id": "atelier-2-sicherheit",
+      "title": "Defensive Sicherheit: Identität ist keine Berechtigung",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Bauen und prüfen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-2-sicherheit",
+      "order": 716
+    },
+    {
+      "id": "atelier-2-marketing",
+      "title": "Marketing & Nutzen: Eine nützliche Seite bauen",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Bauen und prüfen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-2-marketing",
+      "order": 717
+    },
+    {
+      "id": "atelier-3-denken",
+      "title": "Denken & Belegen: Aus Quellen eine Kette bauen",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Verbinden und begrenzen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-3-denken",
+      "order": 718
+    },
+    {
+      "id": "atelier-3-software",
+      "title": "Software bauen: Schnittstellen und Nebenwirkungen",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Verbinden und begrenzen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-3-software",
+      "order": 719
+    },
+    {
+      "id": "atelier-3-sprachen",
+      "title": "Programmiersprachen: Async, Fehler und Grenzen",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Verbinden und begrenzen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-3-sprachen",
+      "order": 720
+    },
+    {
+      "id": "atelier-3-sicherheit",
+      "title": "Defensive Sicherheit: Beobachtung und Wirkung verbinden",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Verbinden und begrenzen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-3-sicherheit",
+      "order": 721
+    },
+    {
+      "id": "atelier-3-marketing",
+      "title": "Marketing & Nutzen: Reichweite ohne Selbsttäuschung",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Verbinden und begrenzen",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-3-marketing",
+      "order": 722
+    },
+    {
+      "id": "atelier-4-denken",
+      "title": "Denken & Belegen: Ein Urteil mit offenem Rand",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Entscheiden und übergeben",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-4-denken",
+      "order": 723
+    },
+    {
+      "id": "atelier-4-software",
+      "title": "Software bauen: Reproduzierbar übergeben",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Entscheiden und übergeben",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-4-software",
+      "order": 724
+    },
+    {
+      "id": "atelier-4-sprachen",
+      "title": "Programmiersprachen: Sprache als Werkzeug wählen",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Entscheiden und übergeben",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-4-sprachen",
+      "order": 725
+    },
+    {
+      "id": "atelier-4-sicherheit",
+      "title": "Defensive Sicherheit: Reparatur und verantwortbare Übergabe",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Entscheiden und übergeben",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-4-sicherheit",
+      "order": 726
+    },
+    {
+      "id": "atelier-4-marketing",
+      "title": "Marketing & Nutzen: Ein ehrliches Wachstumsprogramm",
+      "trackId": "atelier",
+      "trackTitle": "Praxisatelier: Denken & Bauen",
+      "stageTitle": "Entscheiden und übergeben",
+      "url": "https://juri-halveth.github.io/lernstudio/#lesson/atelier-4-marketing",
+      "order": 727
     }
   ]
 }

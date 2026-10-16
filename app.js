@@ -142,7 +142,7 @@
     { id: "ki",        icon: "✳", name: "Künstliche Intelligenz",   tracks: ["ki"] },
     { id: "coding",    icon: "💻", name: "Programmieren",            tracks: ["html", "python", "js"] },
     { id: "security",  icon: "🛡️", name: "Digitale Sicherheit",       tracks: ["sec"] },
-    { id: "projekte",  icon: "🎮", name: "Projekte",                 tracks: ["proj"] },
+    { id: "projekte",  icon: "🎮", name: "Projekte",                 tracks: ["atelier", "proj"] },
     { id: "server",    icon: "🖥️", name: "Terminal, Linux & Server", tracks: ["srv"] },
     { id: "marketing", icon: "📈", name: "Marketing & Suche",        tracks: ["mktg", "seo"] },
   ];
