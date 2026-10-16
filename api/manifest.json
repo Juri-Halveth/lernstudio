@@ -1,7 +1,7 @@
 {
   "schema": "lernstudio.read-api.v1",
   "baseURL": "https://juri-halveth.github.io/lernstudio/",
-  "curriculumSha256": "c26dc969d779871bc0538b0db8733f560d59161aae76d42ca988f9f82546735f",
+  "curriculumSha256": "be218e2f38843a81e0436c67d7c7a07a94749df7111514bd4046fa08c335c25d",
   "curriculumDigestMode": "UTF8_LF_NORMALIZED",
   "lessonCount": 727,
   "trackCount": 14,

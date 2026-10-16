@@ -7593,6 +7593,45 @@ Object.entries(SEO_FOUNDATION_EXTENSION).forEach(([stageId, lessons]) => {
         ["Zeitbudget ist knapp","Wähle eine Verbesserung.","Vergleiche Nutzen pro Pflegeaufwand."]]}
     ]}
   ];
+  // Ein eigener Arbeitsvertrag je Fach und Stufe. Die fünf Fälle liefern
+  // unterschiedliche Situationen; dieser Vertrag macht jeden Fall prüfbar.
+  const practice = {
+    denken: [
+      ["Halte nur fest, was du direkt wahrgenommen hast: Quelle, Ort, Zeitpunkt und sichtbaren Wert.", "Schreibe daneben zwei mögliche Erklärungen. Suche ein Detail, das zwischen ihnen noch nicht unterscheidet.", "Ein Satz mit Beobachtung, zwei getrennte Vermutungen und eine offene Frage."],
+      ["Zeichne für beide Erklärungen je eine Vorhersage, bevor du neue Daten ansiehst.", "Ändere nur eine Bedingung oder finde eine Quelle, bei der die Modelle verschiedene Ergebnisse erwarten.", "Eine kleine Tabelle: Modell A, Modell B, unterscheidende Beobachtung."],
+      ["Formuliere den Satz so genau, dass eine andere Person ihn mit derselben Methode nachprüfen kann.", "Lege Normalfall, Gegenfall, Messfenster und Abbruchkriterium vor dem Versuch fest.", "Ein Testprotokoll mit Eingabe, erwartetem und beobachtetem Ergebnis."],
+      ["Markiere an jedem Übergang, ob du Rohdaten, eine Interpretation oder eine Entscheidung weitergibst.", "Prüfe gemeinsame Ursprünge; zwei Texte mit derselben Rohquelle sind keine unabhängigen Messungen.", "Eine Quellenkette mit der ersten offenen Verbindung und ihrem Prüfweg."],
+      ["Entscheide nur für den konkret benannten Zweck und sage, was du sicher weißt.", "Vergleiche das stärkste Gegenmodell und benenne einen neuen Befund, der das Urteil ändern würde.", "Ein Urteil mit Reichweite, Gegenmodell und Wiederaufnahmebedingung."]
+    ],
+    software: [
+      ["Spiele den Fall einmal mit konkreten Eingaben durch und schreibe die sichtbare Ausgabe auf.", "Definiere Typen, ungültige Eingaben und Fehlerpfad, bevor du die Funktion vergrößerst.", "Eine Eingabe-Ausgabe-Tabelle mit mindestens einem abgelehnten Wert."],
+      ["Schreibe den Zustand vor und nach genau einer Aktion auf; gib dem Objekt eine stabile ID.", "Prüfe Speichern, Laden, Versionswechsel und Rückweg als getrennte Zustandsübergänge.", "Ein Vorher-Nachher-Snapshot mit Version und wiederherstellbarem Ausgangspunkt."],
+      ["Führe den normalen Fall, einen Randfall und einen Fehlerfall aus.", "Verändere in einer sicheren Kopie absichtlich eine Bedingung; der passende Test muss dann fehlschlagen.", "Ein grüner Normalfall und ein nachweislich roter Defekttest."],
+      ["Zeichne, welches Modul liest, schreibt und eine Antwort zurückgibt.", "Prüfe Wiederholung, Timeout und Teilfehler; eine gesendete Anfrage bestätigt noch keinen gespeicherten Effekt.", "Ein Datenfluss mit Schreibstelle, Rückmeldung und offenem Fehlerzustand."],
+      ["Starte das konkrete Paket auf dem Zielsystem und gehe einen definierten Weg durch.", "Binde Quellstand, Werkzeugversion, Artefakt, Testszene und Rückkehr zur letzten funktionierenden Version.", "Ein reproduzierbarer Build mit Startbeleg und benannter Grenze."]
+    ],
+    sprachen: [
+      ["Notiere für jeden Wert, ob er Text, Zahl oder Wahrheitswert ist; probiere die Operation klein aus.", "Vergleiche Konvertierung, fehlende Werte und Unicode in zwei Sprachen mit derselben Eingabe.", "Eine Tabelle aus Ausdruck, Typ und tatsächlichem Ergebnis."],
+      ["Verfolge Bedingung oder Schleife für einen, keinen und mehrere Werte von Hand.", "Teste Grenzwerte, Kurzschlusslogik und Terminierung; vermeide eine still angenommene Reihenfolge.", "Eine Spur der durchlaufenen Zweige samt Nullfall."],
+      ["Gib der Funktion genau benannte Parameter und ein erwartetes Ergebnis.", "Trenne reine Berechnung von Datei- oder Netzschreiben; prüfe fehlende Schlüssel und Einheiten.", "Eine kleine Funktion mit Beispielaufruf und klar definiertem Fehlerfall."],
+      ["Zeige Ladezustand, Ergebnis und Fehler als drei unterschiedliche Anzeigen.", "Binde Timeout, Request-ID und Wiederholungsregel; prüfe, ob eine spätere Antwort einen neueren Zustand überschreibt.", "Eine Ablaufspur für Erfolg, Fehler und verspätete Antwort."],
+      ["Nenne Zielplattform und Aufgabe, bevor du eine Sprache auswählst.", "Portiere einen kleinen Vertrag mit denselben Grenzfällen; protokolliere Unterschiede in Typen, Präzision und Laufzeit.", "Ein Vergleich mit Tests und begründeter Werkzeugwahl."]
+    ],
+    sicherheit: [
+      ["Arbeite mit selbst angelegten Testdaten und benenne das konkrete Schutzgut.", "Trenne sichtbare Fehlermeldung, mögliche Folge und belegte Wirkung; notiere Scope und Stop-Bedingung.", "Ein Beobachtungssatz ohne behauptete Drittwirkung."],
+      ["Gib einen gültigen und einen harmlos ungültigen Wert in deiner Übung ein.", "Prüfe Typ, Länge, Kodierung und Zielkontext; dokumentiere auch, welche Eingabe sicher abgewiesen wird.", "Eine kleine Positiv-/Negativtabelle mit erwarteter Ablehnung."],
+      ["Teste zwei eigene Konten oder Objekte und sage vorher, wer was sehen darf.", "Kontrolliere die Autorisierung am Objekt und an der Aktion, nicht nur am Login oder an der Oberfläche.", "Ein erlaubter und ein abgewiesener Zugriff in derselben lokalen Demo."],
+      ["Bewahre die konkrete Testeingabe und die direkt beobachtete Antwort.", "Verfolge den nächsten Verbraucher und eine mögliche Zustandsänderung nur bis zur kleinsten sicheren Kante.", "Eine Quellenkette mit erster belegter Wirkung und offenem Produktionsbezug."],
+      ["Prüfe nach dem Fix den erlaubten Normalfall erneut.", "Lass denselben Negativfall scheitern, prüfe Regression und halte Rückrollweg sowie Kommunikationsstand getrennt.", "Ein Vorher-Nachher-Vergleich mit zwei Tests und offener Reichweite."]
+    ],
+    marketing: [
+      ["Schreibe eine konkrete Frage einer Person auf und beantworte sie in einem Satz.", "Vergleiche behaupteten Nutzen mit dem tatsächlichen Inhalt; erfinde weder Nachfrage noch Zufriedenheit.", "Ein verständlicher Titel mit direkter Antwort und benannter Zielgruppe."],
+      ["Vergleiche Überschrift, Bild und ersten Absatz mit dem, was wirklich vorhanden ist.", "Markiere getrennt: gemessene Eigenschaft, begrenzter Prototyp und geplantes Ziel.", "Ein überprüfbares Versprechen mit Quelle und Geltungsbereich."],
+      ["Lass eine andere Person die gesuchte Information am Handy finden.", "Prüfe Tastaturweg, Lesereihenfolge, Ladezeit und Erfolg der eigentlichen Aufgabe.", "Ein kurzer Aufgaben-Test mit Fundstelle und beobachteter Hürde."],
+      ["Zähle Aufrufe, Starts und Abschlüsse getrennt für denselben Zeitraum.", "Prüfe Nenner, Zielgruppenmix und gleichzeitige Änderungen vor jeder Wirkungsbehauptung.", "Eine kleine Metriktabelle mit Zeitraum und alternativer Erklärung."],
+      ["Verbessere einen hilfreichen Inhalt und frage freiwillig nach Rückmeldung.", "Wäge Pflegezeit, Privatsphäre und tatsächlichen Nutzen gegen bloße Reichweite ab.", "Ein nächster Schritt mit Kosten, Rückmeldung und Abbruchmaßstab."]
+    ]
+  };
   const escape = value => String(value).replace(/[&<>"']/g, char => ({
     "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"
   })[char]);
@@ -7600,14 +7639,15 @@ Object.entries(SEO_FOUNDATION_EXTENSION).forEach(([stageId, lessons]) => {
     id:`atelier-${index}`, stage:index, title:level.title, goal:level.goal,
     lessons:axes.map(axis => {
       const item = axis.lessons[index];
+      const [firstMove, deeperCheck, visibleResult] = practice[axis.id][index];
       if (item.cases.length !== 5) throw new Error(`Praxisatelier: fünf Fälle für ${axis.id}-${index} erwartet`);
       const examples = item.cases.map(([situation, beginner, expert], number) =>
-        `<li><b>Fall ${number + 1}: ${escape(situation)}</b><br>Erster Schritt: ${escape(beginner)}<br>Fachblick: ${escape(expert)}</li>`).join("");
+        `<li><details class="atelier-case"><summary><span class="atelier-case-number">${number + 1}</span><span>${escape(situation)}</span><span class="atelier-case-hint">Erst überlegen, dann öffnen</span></summary><div class="atelier-case-answer"><p><b>Erster Schritt</b> ${escape(beginner)} ${escape(firstMove)}</p><p><b>Fachblick</b> ${escape(expert)} ${escape(deeperCheck)}</p><p><b>Zeigbares Ergebnis</b> ${escape(visibleResult)}</p></div></details></li>`).join("");
       return {id:`atelier-${index}-${axis.id}`, type:"lesson", title:`${axis.name}: ${item.title}`,
         minutes:12, beats:[
           {kind:"text", html:`<h3>Unterlektion 1 · Einstieg</h3><p>${escape(item.a)}</p>`},
           {kind:"text", html:`<h3>Unterlektion 2 · Vertiefung</h3><p>${escape(item.b)}</p>`},
-          {kind:"text", html:`<h3>Fünf Fälle · vom ersten Schritt zum Fachblick</h3><ol>${examples}</ol>`},
+          {kind:"text", html:`<h3>Fünf Fälle · vom ersten Schritt zum Fachblick</h3><p>Überlege bei jedem Fall kurz selbst, was du prüfen würdest. Öffne ihn dann und vergleiche deinen Schritt mit dem Fachblick.</p><ol class="atelier-cases">${examples}</ol>`},
           {kind:"predict", frage:`<p>${escape(item.q)}</p>`, optionen:item.options,
             answer:item.answer, enthuellung:`<p>${escape(item.options[item.answer])} · Vergleiche deine Wahl mit den fünf Fällen und benenne den offenen Rest.</p>`}
         ]};
