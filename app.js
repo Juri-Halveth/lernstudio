@@ -740,7 +740,7 @@
     const sections = [];
     const refreshEntry = () => {
       entrance.querySelectorAll('[data-entry]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.entry === entry)));
-      const firstAdvanced = Math.max(1, Math.floor(tr.stages.length / 2));
+      const firstAdvanced = Math.floor(tr.stages.length / 2);
       sections.forEach(({element, stage, index}) => {
         const show = entry !== 'expert' || index >= firstAdvanced;
         element.hidden = !show;
