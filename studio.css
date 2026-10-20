@@ -102,6 +102,29 @@ body.lesson-focus-active .thinking-close { width:40px; height:40px; border:0; ba
 body.lesson-focus-active .lesson-thinking textarea { border-radius:4px; background:var(--panel); }
 body.lesson-focus-active .lesson-reader-card { background:transparent; box-shadow:none; border:0; }
 
+/* One illustrated decision at a time. The line belongs to the thought model,
+   while the visible result belongs to the learner's selected route. */
+.idea-scene { --scene-glow:#b9a0ff; --scene-deep:#7f67c9; color:var(--ink); }
+.idea-scene-kicker { margin:0 0 13px; color:var(--scene-deep); font:800 11px/1.4 var(--mono); letter-spacing:.16em; }
+.idea-scene h3 { margin:0 0 13px; font:750 clamp(30px,4vw,48px)/1.08 var(--sans); letter-spacing:-.045em; }
+.idea-scene-prompt { max-width:55ch; margin:0 0 30px; color:var(--muted); font-size:clamp(17px,2vw,22px); line-height:1.4; }
+.idea-scene-path { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:0; padding:clamp(25px,5vw,48px) 0 28px; border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:radial-gradient(ellipse at 50% 48%,rgba(151,125,221,.11),transparent 65%); }
+.idea-scene-node { position:relative; display:flex; flex-direction:column; align-items:center; gap:17px; min-width:0; color:var(--muted); font:650 clamp(12px,1.4vw,16px)/1.3 var(--sans); text-align:center; transition:color .35s ease; }
+.idea-scene-node:not(:last-child)::after { content:""; position:absolute; top:31px; left:calc(50% + 34px); right:calc(-50% + 34px); height:2px; background:var(--line); transition:background .35s ease,box-shadow .35s ease; }
+.idea-scene-node.is-active { color:var(--ink); }
+.idea-scene-node.is-active:not(:last-child)::after { background:var(--scene-glow); box-shadow:0 0 14px var(--scene-glow); }
+.idea-scene-orb { position:relative; z-index:1; display:grid; place-items:center; width:64px; height:64px; border:2px solid var(--line); border-radius:50%; background:var(--bg); color:var(--muted); font:700 15px var(--mono); transform:scale(.84); transition:transform .35s ease,background .35s ease,box-shadow .35s ease,color .35s ease; }
+.idea-scene-node.is-active .idea-scene-orb { transform:scale(1); border-color:var(--scene-glow); background:radial-gradient(circle at 32% 25%,#e7dcff,var(--scene-glow) 52%,var(--scene-deep)); box-shadow:0 0 0 9px rgba(175,149,234,.12),0 0 34px rgba(175,149,234,.5); color:#20133e; }
+.idea-scene-choices { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:clamp(12px,3vw,26px); margin-top:26px; }
+.idea-scene-choice { display:flex; align-items:center; gap:13px; min-height:64px; padding:12px 0; border:0; border-bottom:2px solid var(--line); border-radius:0; background:transparent; color:var(--ink); font:650 clamp(15px,1.5vw,18px)/1.3 var(--sans); text-align:left; cursor:pointer; }
+.idea-scene-choice span:first-child { color:var(--scene-deep); font:700 12px var(--mono); }
+.idea-scene-choice span:last-child { margin-left:auto; color:var(--scene-deep); font-size:24px; }
+.idea-scene-choice:hover,.idea-scene-choice[aria-pressed="true"] { border-color:var(--scene-deep); background:rgba(151,125,221,.07); }
+.idea-scene-choice:focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+.idea-scene-result { min-height:3.5em; max-width:58ch; margin:24px 0 0; color:var(--ink); font:500 clamp(17px,2vw,22px)/1.45 var(--sans); }
+:root[data-theme="light"] .idea-scene { --scene-deep:#6345ad; }
+@media (prefers-reduced-motion:reduce) { .idea-scene-node,.idea-scene-node::after,.idea-scene-orb { transition:none; } }
+
 @media(max-width:700px) {
   .studio-header { gap:12px; min-height:65px; padding:9px 16px; }
   .studio-wordmark { font-size:13px; letter-spacing:.08em; }
@@ -129,4 +152,9 @@ body.lesson-focus-active .lesson-reader-card { background:transparent; box-shado
   body.lesson-focus-active .beatlesson .beat-stage > .beat-text.lesson-reader-card { font-size:clamp(20px,5.2vw,26px); }
   body.lesson-focus-active .beatlesson > .beat-nav { gap:8px; }
   body.lesson-focus-active .beatlesson .beat-weiter { min-width:0; }
+  .idea-scene-choices { grid-template-columns:1fr; gap:4px; }
+  .idea-scene-path { padding:22px 0 18px; }
+  .idea-scene-orb { width:44px; height:44px; font-size:12px; }
+  .idea-scene-node { gap:10px; font-size:11px; overflow-wrap:anywhere; }
+  .idea-scene-node:not(:last-child)::after { top:21px; left:calc(50% + 24px); right:calc(-50% + 24px); }
 }

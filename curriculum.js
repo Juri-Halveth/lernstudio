@@ -7658,5 +7658,82 @@ Object.entries(SEO_FOUNDATION_EXTENSION).forEach(([stageId, lessons]) => {
     icon:"◇", color:"#9de0d4", stages});
 }
 
+/* Ideenwerkstatt: eigenständige Übungen aus der Frage, wie ein Gedanke zu
+   einer überprüfbaren, menschlich steuerbaren Wirkung werden kann. */
+{
+  const sceneLesson = (id, title, opening, scene, deeper, question, options, answer, why) => ({
+    id, type: "lesson", title, minutes: 9, beats: [
+      { kind: "text", html: `<p>${opening}</p>` },
+      { kind: "ideaScene", ...scene },
+      { kind: "text", html: `<p>${deeper}</p>` },
+      { kind: "predict", frage: `<p>${question}</p>`, optionen: options, answer, enthuellung: `<p>${why}</p>` }
+    ]
+  });
+  CURRICULUM.tracks.push({
+    id: "ideenwerkstatt", name: "Ideenwerkstatt: vom Gedanken zur Wirkung", icon: "✦", color: "#c9aeff",
+    subtitle: "Sechs bebilderte Experimente über Wünsche, Erinnerung, Kontinuität, Forschung und die Übergabe einer Idee.",
+    stages: [
+      { id: "ideenwerkstatt-0", stage: 0, title: "Menschen und Systeme", goal: "Du unterscheidest Kontext, Auftrag und bestätigte Wirkung.", lessons: [
+        sceneLesson("ideenwerkstatt-0-1", "Ein Wunsch ist noch kein Auftrag",
+          "Jemand sagt: „Ich hätte gern einen Burger.“ Ein hilfreiches System kann Menü, Allergien und Öffnungszeiten prüfen. Daraus folgt noch keine Erlaubnis, Geld auszugeben oder eine Bestellung abzuschicken. Bewege im Bild die Entscheidung und beobachte, an welcher Stelle der Mensch wieder gebraucht wird.",
+          { title: "Die Burger-Bestellung", nodes: ["Wunsch", "Kontext", "Vorschlag", "Bestätigung"], prompt: "Welche Wirkung darf aus dem Satz allein entstehen?", choices: [
+            { label: "Möglichkeiten zeigen", path: 3, result: "Menü und offene Fragen werden sichtbar. Die Bestellung bleibt beim Menschen." },
+            { label: "Sofort bestellen", path: 3, result: "Hier fehlt die Bestätigung für Preis, Adresse und Zahlung. Die letzte Kante ist offen." }
+          ] },
+          "Ein erinnerter Geschmack ist Kontext, kein aktuelles Mandat. Ein konkreter Kauf benötigt die passende Zustimmung für Produkt, Preis und Empfänger. Im eigenen Programm könntest du diesen Unterschied als getrennte Zustände speichern: Wunsch erkannt, Angebot erstellt, Bestellung ausdrücklich bestätigt.",
+          "Welche Aussage ist nach dem Wunsch allein tragfähig?", ["Ein Kauf ist freigegeben", "Ein passender Vorschlag kann vorbereitet werden", "Alle früheren Vorlieben gelten für immer"], 1,
+          "Der Wunsch eröffnet die Vorbereitung. Vor einer Bestellung müssen die entscheidenden Angaben und die Autorisierung vorliegen."),
+        sceneLesson("ideenwerkstatt-0-2", "Erinnerung mit Herkunft und Rückweg",
+          "Eine Lernhilfe merkt sich: „Juri lernt gern an Beispielen.“ Ein alter Satz kann später helfen, darf aber nicht unbemerkt zu einer ewigen Regel werden. Im Bild ist eine Erinnerung eine Spur mit Quelle, Zeit und Korrekturmöglichkeit.",
+          { title: "Die Erinnerungsspur", nodes: ["Aussage", "Quelle", "Speicher", "Korrektur"], prompt: "Was passiert, wenn die Vorliebe sich ändert?", choices: [
+            { label: "Neue Vorliebe ergänzen", path: 4, result: "Die neue Aussage bekommt ihren eigenen Zeitpunkt. Die alte Spur bleibt als Geschichte erkennbar." },
+            { label: "Alte Aussage erzwingen", path: 2, result: "Ohne Aktualisierung wird aus früherem Kontext ein falscher aktueller Schluss." }
+          ] },
+          "Für ein belastbares Gedächtnis braucht jeder Eintrag einen Inhalt, einen Herkunftsbezug, seinen Geltungsbereich und die Möglichkeit zur Berichtigung oder Löschung. Ein gespeicherter Text beweist weder, dass er heute noch gilt, noch dass er von der genannten Person stammt.",
+          "Wodurch wird eine alte Präferenz zuverlässig nutzbar?", ["Durch Quelle, Zeitpunkt und Änderbarkeit", "Durch möglichst häufige Wiederholung", "Durch stilles Überschreiben ohne Spur"], 0,
+          "Herkunft und Zeit begrenzen die Aussage. Eine Korrektur muss für den aktuellen Gebrauch sichtbar werden."),
+        sceneLesson("ideenwerkstatt-0-3", "Kontinuität, wenn ein Mensch fehlt",
+          "Stell dir vor, die Person hinter einem Projekt antwortet eine Weile nicht. Der Grund ist unbekannt. Ein gutes Übergabesystem bewahrt offene Arbeit und Kontaktwege, ohne die Person zu vertreten oder selbst neue Verpflichtungen einzugehen.",
+          { title: "Die offene Übergabe", nodes: ["Letzter Stand", "Offene Arbeit", "Rückweg", "Neue Wirkung"], prompt: "Was bleibt möglich, solange der Grund der Abwesenheit unbekannt ist?", choices: [
+            { label: "Stand sichern", path: 3, result: "Aufgaben, Quellen und Rückkehrpunkt bleiben auffindbar. Niemandem wird eine neue Entscheidung zugeschrieben." },
+            { label: "In ihrem Namen handeln", path: 4, result: "Für neue Zusagen und Außenwirkung fehlt eine gebundene Vertretungsbefugnis." }
+          ] },
+          "Trenne beobachtete Nichtantwort, unbekannte Ursache und erlaubte Wartungsarbeit. Ein Continuity-Record enthält Zustand, Besitzer, nächste überprüfbare Handlung und einen Rückweg. Kontakt, Veröffentlichung oder Zahlung benötigen jeweils eine gesonderte Befugnis.",
+          "Die Person meldet sich nicht. Was ist direkt beobachtet?", ["Der Grund ihres Schweigens", "Dass innerhalb des benannten Zeitfensters keine Antwort eintraf", "Eine Vollmacht für neue Verträge"], 1,
+          "Eine ausgebliebene Antwort sagt zunächst nur etwas über das Beobachtungsfenster; Ursache und Handlungsvollmacht bleiben getrennt.")
+      ] },
+      { id: "ideenwerkstatt-1", stage: 1, title: "Vorstellung und Wirklichkeit", goal: "Du formulierst unterscheidbare Vorhersagen und bindest ein Ergebnis an seine Quelle.", lessons: [
+        sceneLesson("ideenwerkstatt-1-1", "Von der Vorstellung zum Experiment",
+          "Ein Portal, das einen Gegenstand sofort an einen anderen Ort bringt, ist eine starke Spielidee. Für eine physische Behauptung fehlen damit noch Messgröße, Mechanismus, Energie- und Materialbilanz. Das Bild zeigt, wo eine Hypothese zur prüfbaren Frage wird.",
+          { title: "Der Prüfpfad", nodes: ["Idee", "Vorhersage", "Messung", "Befund"], prompt: "Welcher nächste Schritt trennt Erzählung von physischem Test?", choices: [
+            { label: "Messsignal festlegen", path: 3, result: "Du benennst ein beobachtbares Signal, eine Gegenhypothese und eine Methode vor dem Versuch." },
+            { label: "Idee als Beweis nehmen", path: 1, result: "Ein klares inneres Bild ist wertvoll für Design, misst aber noch keinen Außenprozess." }
+          ] },
+          "Im Spiel kann das Portal als Regel vollständig funktionieren. In der Außenwelt benötigt die Hypothese einen Eingangsgegenstand, einen Ausgangsnachweis, einen Zeitvergleich und eine Bilanz. Wenn zwei Modelle dieselbe Beobachtung erwarten, suche eine neue, die sie unterscheidet.",
+          "Was würde eine physische Portalbehauptung stärken?", ["Nur eine anschauliche Metapher", "Ein vorher festgelegtes, reproduzierbares Messsignal mit Kontrollen", "Eine besonders schöne Animation"], 1,
+          "Ein Test braucht vorher definierte Beobachtungen, Kontrollen und eine mögliche Widerlegung. Animation und Metapher bleiben Designmittel."),
+        sceneLesson("ideenwerkstatt-1-2", "Simulation ist ein Werkzeug, kein Messgerät",
+          "Du stellst dir eine Reise in einer Minute vor, für die im Spiel nur eine Sekunde vergeht. Ein Simulator kann das berechnen und darstellen. Ob ein äußerer Vorgang dieselbe Zeitrelation besitzt, ist eine andere Frage.",
+          { title: "Zwei Uhren", nodes: ["Regel", "Simulation", "Anzeige", "Außenmessung"], prompt: "Was belegt eine schnelle Animation?", choices: [
+            { label: "Modellverhalten prüfen", path: 3, result: "Die Anzeige zeigt, dass das Programm seine gewählte Regel umgesetzt hat." },
+            { label: "Naturwirkung behaupten", path: 3, result: "Für eine äußere Zeitwirkung fehlt ein unabhängiger Messaufbau." }
+          ] },
+          "Gib beiden Uhren eine Einheit und einen Startpunkt. Dokumentiere, ob die zweite Uhr aus Code berechnet oder unabhängig gemessen wurde. Eine Simulation ist für Spiele und Forschung nützlich; ihre Reichweite hängt von Eingaben, Regeln und Validierung ab.",
+          "Zwei simulierte Uhren zeigen verschiedene Werte. Was folgt sicher?", ["Zeit außerhalb des Computers wurde verändert", "Die implementierten Regeln liefern verschiedene Anzeigen", "Die Simulation ist nutzlos"], 1,
+          "Beobachtet sind zunächst die zwei Anzeigen des Modells. Eine äußere Wirkung braucht eigene Messdaten."),
+        sceneLesson("ideenwerkstatt-1-3", "Eine Idee sauber übergeben",
+          "Du baust einen Prototyp und möchtest, dass andere ihn weiterführen können. Die Grafik führt von der ursprünglichen Skizze über einen laufenden Build zu einem überprüften Ergebnis. Jede Stufe braucht eine eigene Aussage.",
+          { title: "Vom Entwurf zum geteilten Ergebnis", nodes: ["Skizze", "Quellcode", "Build", "Live-Test"], prompt: "Welche Aussage ist nach einem lokalen Build gerechtfertigt?", choices: [
+            { label: "Lokal gestartet", path: 3, result: "Version und Startversuch sind gebunden. Ein öffentlicher Aufruf ist damit noch nicht geprüft." },
+            { label: "Öffentlich nutzbar", path: 3, result: "Dafür braucht es eine veröffentlichte Adresse und einen tatsächlichen Abruf auf dem Zielgerät." }
+          ] },
+          "Ein gutes Übergabepaket enthält Ziel, Quellenstand, Startweg, getestete Szene, offene Fehler und Rückweg. Commit, Push, Deployment und Nutzung durch andere sind verschiedene Ereignisse. Jede zusätzliche Behauptung verlangt die passende Beobachtung.",
+          "Der Build startet lokal. Was ist damit belegt?", ["Eine öffentliche Veröffentlichung", "Ein lokaler Start dieses Builds", "Zufriedenheit aller Spielenden"], 1,
+          "Der lokale Start ist konkret. Veröffentlichung und tatsächliche Benutzbarkeit werden separat beobachtet.")
+      ] }
+    ]
+  });
+}
+
 /* Für app.js global verfügbar machen */
 window.CURRICULUM = CURRICULUM;

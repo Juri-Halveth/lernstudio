@@ -142,7 +142,7 @@
     { id: "ki",        icon: "✳", name: "Künstliche Intelligenz",   tracks: ["ki"] },
     { id: "coding",    icon: "💻", name: "Programmieren",            tracks: ["html", "python", "js"] },
     { id: "security",  icon: "🛡️", name: "Digitale Sicherheit",       tracks: ["sec"] },
-    { id: "projekte",  icon: "🎮", name: "Projekte",                 tracks: ["atelier", "proj"] },
+    { id: "projekte",  icon: "🎮", name: "Projekte",                 tracks: ["ideenwerkstatt", "atelier", "proj"] },
     { id: "server",    icon: "🖥️", name: "Terminal, Linux & Server", tracks: ["srv"] },
     { id: "marketing", icon: "📈", name: "Marketing & Suche",        tracks: ["mktg", "seo"] },
   ];
@@ -2155,6 +2155,7 @@ document.getElementById("go").addEventListener("click", function(){
       weiter.textContent = weiterLabel();
       setWeiter(false);
       if (b.kind === "predict") beatPredict(b);
+      else if (b.kind === "ideaScene") beatIdeaScene(b);
       else if (b.kind === "hypothesisWorksheet") beatHypothesisWorksheet(b);
       else if (b.kind === "live") beatLive(b);
       else if (b.kind === "do") beatDo(b);
@@ -2172,7 +2173,7 @@ document.getElementById("go").addEventListener("click", function(){
       else if (b.kind === "plot") beatPlot(b);
       else if (b.kind === "rechner") beatRechner(b);
       else beatText(b);
-      if (b.kind !== "text") {
+      if (b.kind !== "text" && b.kind !== "ideaScene") {
         const hilfe = hilfeEinsetzen(stageEl.firstElementChild, b.kind, b);
         if (hilfe) stageEl.appendChild(hilfe);
       }
@@ -2183,6 +2184,34 @@ document.getElementById("go").addEventListener("click", function(){
     function beatText(b) {
       stageEl.appendChild(el(`<div class="beat-text lesson-reader-card is-entering">${b.html || '<p>Diese Unterlektion hat noch keinen Inhalt.</p>'}</div>`));
       setWeiter(true, weiterLabel());
+    }
+    function beatIdeaScene(b) {
+      const scene = el(`<section class="idea-scene" aria-label="Interaktives Gedankenbild">
+        <p class="idea-scene-kicker">GEDANKENBILD · WÄHLE EINEN WEG</p>
+        <h3>${esc(b.title)}</h3><p class="idea-scene-prompt">${esc(b.prompt)}</p>
+        <div class="idea-scene-path" role="img" aria-label="Vier Stationen des Gedankenwegs"></div>
+        <div class="idea-scene-choices" role="group" aria-label="Mögliche Wege"></div>
+        <p class="idea-scene-result" role="status" aria-live="polite">Wähle einen Weg, um seine Wirkung zu sehen.</p>
+      </section>`);
+      const path = scene.querySelector('.idea-scene-path');
+      b.nodes.forEach((label, i) => {
+        const station = el(`<div class="idea-scene-node"><span class="idea-scene-orb" aria-hidden="true">${i + 1}</span><span>${esc(label)}</span></div>`);
+        path.appendChild(station);
+      });
+      const choices = scene.querySelector('.idea-scene-choices');
+      const result = scene.querySelector('.idea-scene-result');
+      b.choices.forEach((choice, i) => {
+        const button = el(`<button type="button" class="idea-scene-choice" aria-pressed="false"><span aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>${esc(choice.label)} <span aria-hidden="true">↗</span></button>`);
+        button.addEventListener('click', () => {
+          choices.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+          path.querySelectorAll('.idea-scene-node').forEach((item, index) => item.classList.toggle('is-active', index < choice.path));
+          path.setAttribute('aria-label', `${choice.path} von ${b.nodes.length} Stationen: ${choice.result}`);
+          result.textContent = choice.result;
+          setWeiter(true);
+        });
+        choices.appendChild(button);
+      });
+      stageEl.appendChild(scene);
     }
     function beatHypothesisWorksheet(b) {
       const fields = [

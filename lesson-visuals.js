@@ -57,6 +57,9 @@
     if (lesson.type === "quiz" || text.startsWith("quiz")) {
       return make("Das hier ist keine Prüfung über deinen Wert. Du holst eine Idee kurz aus dem Gedächtnis, vergleichst sie mit der Erklärung und darfst es danach noch einmal versuchen.", ["In Ruhe erinnern", "Eine Antwort wählen", "Aus der Erklärung lernen"]);
     }
+    if (id === "ideenwerkstatt") {
+      return make("In einer Werkstatt liegt eine neue Idee auf dem Tisch. Du schaust, was du dir wünschst, probierst im Bild einen Weg aus und siehst, welche Frage vor einer echten Wirkung noch offen ist.", ["Idee ansehen", "Einen Weg wählen", "Wirkung prüfen"]);
+    }
     if (id === "atelier") {
       const scenes = {
         denken: "Auf dem Tisch liegen zwei Fotos derselben Pflanze. Du schaust zuerst genau hin, bevor du erzählst, warum sie anders aussieht. Dann suchst du einen kleinen Hinweis, der zwei Erklärungen trennt.",
@@ -177,6 +180,19 @@
         node("Rückmeldung", "Vergleiche Antwort und Erklärung."),
         node("Neu erklären", "Formuliere den Zusammenhang mit eigenen Worten.")
       ], "Kannst du auch erklären, warum die anderen Möglichkeiten nicht tragen?", [[0,1],[1,2],[2,3],[3,0]]);
+    }
+
+    if (id === "ideenwerkstatt") {
+      const scene = (lesson.beats || []).find(beat => beat.kind === "ideaScene");
+      if (scene && Array.isArray(scene.nodes) && scene.nodes.length === 4) {
+        return model("sequence", scene.title, "Das Gedankenbild zeigt vier Stationen. Die gewählte Route ist eine Modellentscheidung; der tatsächliche Effekt benötigt eine eigene Beobachtung.",
+          scene.nodes.map((label, index) => node(label, [
+            "Hier beginnt die Ausgangslage und die konkrete Frage.",
+            "Diese Station bindet den Kontext und mögliche Bedingungen.",
+            "Hier entsteht ein Vorschlag oder eine begrenzte Ausführung.",
+            "Die letzte Station verlangt passende Bestätigung und Beobachtung."
+          ][index])), "Welche Station ist direkt beobachtet und welche bleibt im Modell?");
+      }
     }
 
     if (id === "atelier") {

@@ -32,6 +32,15 @@ async function createApp(hash="",stored={},signedIn=true){
 (async()=>{
 const guest=await createApp('#lesson/html-0-magie',{},false);
 assert(guest.w.document.querySelector('.lesson-focus'),'Guest can open an actual lesson');assert.equal(guest.requests.length,0,'Browsing as guest sends no account request');
+guest.w.__test.go('lesson','ideenwerkstatt-0-1');
+assert(guest.w.document.querySelector('.beat-stage')?.textContent.includes('Burger'), 'New illustrated path is reachable');
+guest.w.document.querySelector('.beat-weiter').click();
+assert.equal(guest.w.document.querySelectorAll('.idea-scene-node').length,4,'Thought scene shows four stages');
+assert(guest.w.document.querySelector('.beat-weiter').hidden,'Scene waits for the learner to explore a route');
+guest.w.document.querySelector('.idea-scene-choice').click();
+assert.equal(guest.w.document.querySelector('.idea-scene-choice').getAttribute('aria-pressed'),'true');
+assert(guest.w.document.querySelector('.idea-scene-result').textContent.includes('Bestellung'),'Selection shows a specific consequence');
+assert(!guest.w.document.querySelector('.beat-weiter').hidden,'A selected route unlocks the next step');
 for(const track of guest.w.CURRICULUM.tracks)for(const stage of track.stages)for(const lesson of stage.lessons){
   guest.w.__test.go('lesson',lesson.id);assert(guest.w.document.querySelector('.lesson-focus'),lesson.id+': accessible without an account');
   assert(guest.w.document.querySelector('.lesson-model'),lesson.id+': visual model is available');

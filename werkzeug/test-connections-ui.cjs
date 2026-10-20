@@ -38,9 +38,9 @@ const cleanup = w.LernConnections.mount(main, { curriculum, state, go });
 const view = main.querySelector('.connections-view');
 const buttons = [...view.querySelectorAll('.connections-track')];
 try {
-  check('actual 14 tracks and all 727 lessons are aggregated', () => {
-    assert.equal(curriculum.tracks.length, 14);
-    assert.equal(all.length, 727);
+  check('actual 15 tracks and all 733 lessons are aggregated', () => {
+    assert.equal(curriculum.tracks.length, 15);
+    assert.equal(all.length, 733);
     assert.equal(buttons.length, curriculum.tracks.length);
     assert.equal(view.dataset.lessonCount, String(all.length));
     assert.equal(view.querySelector('.connections-total').textContent, String(all.length));
@@ -64,12 +64,12 @@ try {
       assert.equal(view.querySelector('.connections-context').getAttribute('href'), 'api/contexts/' + encodeURIComponent(track.id) + '.json');
       coverage += own.length;
     }
-    assert.equal(coverage, 727);
+    assert.equal(coverage, 733);
     assert.equal(calls.length, 0, 'Selecting a track never navigates');
     assert.equal(JSON.stringify(state), before, 'Selecting does not mark progress');
   });
   check('scoped lucide icons leave unrelated DOM alone', () => {
-    assert.equal(view.querySelectorAll('.connections-track svg').length, 14);
+    assert.equal(view.querySelectorAll('.connections-track svg').length, 15);
     assert(w.document.querySelector('aside i[data-lucide="compass"]'));
     assert(w.document.getElementById('sibling'));
   });
@@ -130,7 +130,7 @@ try {
     assert.equal(node.querySelector('.connections-continue span').textContent, 'Erneut lernen');
     assert.equal(node.querySelector('.connections-next p').textContent, 'Lernpfad abgeschlossen');
     assert.equal(node.querySelectorAll('[aria-current="step"]').length, 0);
-    assert.equal(node.querySelector('.connections-caption').lastChild.textContent, '727 abgeschlossen');
+    assert.equal(node.querySelector('.connections-caption').lastChild.textContent, '733 abgeschlossen');
     end();
   });
   check('changed progress is reread at the explicit continue boundary', () => {
