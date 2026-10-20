@@ -927,17 +927,6 @@
   function installLessonTitleIntro(wrap, title) {
     if (!wrap || !title) return;
     title.classList.add("lesson-focus-title");
-    title.setAttribute("data-title-state", "intro");
-    let ausgeblendet = false;
-    wrap.addEventListener("click", (event) => {
-      if (ausgeblendet) return;
-      const action = event.target && event.target.closest ? event.target.closest("button") : null;
-      if (!action || action.matches(".lesson-reader-back,.beat-zurueck")) return;
-      ausgeblendet = true;
-      title.hidden = true;
-      title.setAttribute("aria-hidden", "true");
-      title.setAttribute("data-title-state", "done");
-    });
   }
 
   function renderLesson(main, lessonId) {
@@ -2076,8 +2065,10 @@ document.getElementById("go").addEventListener("click", function(){
     const prog = el(`<div class="beat-prog" hidden aria-hidden="true"></div>`);
     beats.forEach(() => prog.appendChild(el(`<span class="seg"></span>`)));
     wrap.appendChild(prog);
-    const stepInfo = el(`<div class="beat-step" hidden aria-live="polite"></div>`);
-    wrap.appendChild(stepInfo);
+    const statusBar = el(`<div class="beat-status"></div>`);
+    const stepInfo = el(`<div class="beat-step" aria-live="polite"></div>`);
+    statusBar.appendChild(stepInfo);
+    wrap.appendChild(statusBar);
     const stageEl = el(`<div class="beat-stage"></div>`);
     wrap.appendChild(stageEl);
     const navRow = el(`<div class="beat-nav"></div>`);
@@ -2086,7 +2077,12 @@ document.getElementById("go").addEventListener("click", function(){
     navRow.appendChild(zurueck);
     navRow.appendChild(weiter);
     wrap.appendChild(navRow);
-    const thinking = el(`<details class="lesson-thinking"><summary>Mein Denkfeld · Frage, Notiz oder Gegenmodell</summary><div class="thinking-inner"><h3>Was würdest du prüfen?</h3><p class="thinking-prompt">Schau auf den aktuellen Gedanken. Welche Frage bleibt für dich offen?</p><label for="thinkingNote">Deine Notiz</label><textarea id="thinkingNote" rows="5" placeholder="Eine Frage, Vermutung oder Beobachtung …"></textarea><details class="thinking-models"><summary>Zwei Erklärungen vergleichen</summary><p>Beschreibe zwei Möglichkeiten. Welche spätere Beobachtung würde sie auseinanderhalten?</p><label for="thinkingModelA">Möglichkeit A</label><textarea id="thinkingModelA" rows="2"></textarea><label for="thinkingModelB">Möglichkeit B</label><textarea id="thinkingModelB" rows="2"></textarea><label for="thinkingDiscriminator">Unterscheidende Beobachtung</label><textarea id="thinkingDiscriminator" rows="2"></textarea></details><p class="thinking-privacy">Nur in dieser geöffneten Lektion. Die Felder werden nicht versendet.</p></div></details>`);
+    const noteButton = el(`<button class="beat-note-button" type="button" aria-haspopup="dialog">Gedanken notieren</button>`);
+    statusBar.appendChild(noteButton);
+    const thinking = el(`<dialog class="lesson-thinking" aria-labelledby="thinkingTitle"><div class="thinking-inner"><div class="thinking-top"><span class="thinking-kicker">DEIN RAUM</span><button class="thinking-close" type="button" aria-label="Denkfeld schließen">×</button></div><h3 id="thinkingTitle">Was würdest du prüfen?</h3><p class="thinking-prompt">Schau auf den aktuellen Gedanken. Welche Frage bleibt für dich offen?</p><label for="thinkingNote">Deine Notiz</label><textarea id="thinkingNote" rows="5" placeholder="Eine Frage, Vermutung oder Beobachtung …"></textarea><details class="thinking-models"><summary>Zwei Erklärungen vergleichen</summary><p>Beschreibe zwei Möglichkeiten. Welche spätere Beobachtung würde sie auseinanderhalten?</p><label for="thinkingModelA">Möglichkeit A</label><textarea id="thinkingModelA" rows="2"></textarea><label for="thinkingModelB">Möglichkeit B</label><textarea id="thinkingModelB" rows="2"></textarea><label for="thinkingDiscriminator">Unterscheidende Beobachtung</label><textarea id="thinkingDiscriminator" rows="2"></textarea></details><p class="thinking-privacy">Nur in dieser geöffneten Lektion. Die Felder werden nicht versendet.</p></div></dialog>`);
+    noteButton.addEventListener("click", () => thinking.showModal());
+    thinking.querySelector(".thinking-close").addEventListener("click", () => thinking.close());
+    thinking.addEventListener("click", event => { if (event.target === thinking) thinking.close(); });
     wrap.appendChild(thinking);
     main.appendChild(wrap);
 
@@ -3151,7 +3147,7 @@ document.getElementById("go").addEventListener("click", function(){
     const prog = el(`<div class="beat-prog" hidden aria-hidden="true"></div>`);
     qs.forEach(() => prog.appendChild(el(`<span class="seg"></span>`)));
     wrap.appendChild(prog);
-    const stepInfo = el(`<div class="beat-step" hidden aria-live="polite"></div>`);
+    const stepInfo = el(`<div class="beat-step" aria-live="polite"></div>`);
     wrap.appendChild(stepInfo);
     const stageEl = el(`<div class="beat-stage"></div>`);
     wrap.appendChild(stageEl);

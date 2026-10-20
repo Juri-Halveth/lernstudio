@@ -1,5 +1,6 @@
 /* Studio: quiet editorial surface, one learning action in the foreground. */
 body.studio-active, body.lesson-focus-active { background:var(--bg); background-image:none; }
+body.studio-active > .hub-navigation,body.lesson-focus-active > .hub-navigation { position:static; justify-content:flex-end; max-width:none; margin:0; padding:5px clamp(18px,4vw,70px); border:0; border-bottom:1px solid var(--line); border-radius:0; background:var(--bg); color:var(--muted); box-shadow:none; font-size:11px; }
 .studio-header { display:flex; align-items:center; gap:clamp(14px,3vw,42px); min-height:78px; padding:12px clamp(18px,4vw,70px); border-bottom:1px solid var(--line); background:var(--bg); color:var(--ink); }
 .studio-wordmark { display:flex; flex-direction:column; gap:2px; padding:0; border:0; background:none; color:var(--ink); text-align:left; font:900 18px/1.1 var(--sans); letter-spacing:.12em; cursor:pointer; }
 .studio-wordmark span { color:var(--muted); font:500 11px/1.2 var(--sans); letter-spacing:.02em; }
@@ -63,22 +64,43 @@ body.studio-active .open-lesson { display:grid; grid-template-columns:30px minma
 body.studio-active .open-lesson:hover { background:var(--accent-soft); }
 body.studio-active .ethics { border-radius:0; border-width:0 0 0 3px; background:transparent; }
 
-/* The lesson owns the screen. The optional thinking field opens below it. */
-body.lesson-focus-active .beatlesson.lesson-focus-layout { display:flex; flex-direction:column; align-items:stretch; width:min(100%,1280px); max-width:none; min-height:calc(100dvh - 150px); gap:0; }
-body.lesson-focus-active .beatlesson > h2,body.lesson-focus-active .beatlesson > h2.lesson-focus-title { max-width:100%; padding:0 0 17px; border-bottom:1px solid var(--line); font-size:clamp(32px,4vw,62px)!important; letter-spacing:-.045em; }
-body.lesson-focus-active .beatlesson > .beat-stage { flex:1; align-self:stretch; display:flex; flex-direction:column; justify-content:center; }
-body.lesson-focus-active .beatlesson .beat-stage > .beat-block,body.lesson-focus-active .beatlesson .beat-stage > .beat-text,body.lesson-focus-active .beatlesson .beat-stage > .beat-finish,body.lesson-focus-active .beatlesson .beat-stage > .lesson-reader-card { width:100%; max-width:none; min-width:0; margin:0; padding:clamp(18px,3vw,42px) 0; border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; backdrop-filter:none; }
-body.lesson-focus-active .beatlesson .beat-stage > .beat-text.lesson-reader-card { font-size:clamp(22px,2.8vw,36px); line-height:1.5; text-wrap:pretty; }
-body.lesson-focus-active .beatlesson .beat-stage > .beat-block { max-width:960px; }
-body.lesson-focus-active .beatlesson > .beat-nav { width:100%; padding-top:20px; border-top:1px solid var(--line); }
-body.lesson-focus-active .beatlesson > .lesson-thinking { position:static; width:100%; margin:25px 0 10px; padding:18px 0 0; border:0; border-top:1px solid var(--line); background:transparent; }
-body.lesson-focus-active .lesson-thinking > summary { color:var(--muted); font-weight:700; cursor:pointer; }
-body.lesson-focus-active .lesson-thinking[open] > summary { color:var(--accent); }
-body.lesson-focus-active .thinking-inner { max-width:780px; padding:20px 0; }
-body.lesson-focus-active .lesson-thinking textarea { border-radius:3px; background:transparent; }
+/* One step, one question, one action. Long-form tools stay in their own dialog. */
+body.lesson-focus-active .beatlesson.lesson-focus-layout { display:flex; flex-direction:column; align-items:stretch; width:min(100%,820px); max-width:820px; min-height:0; gap:0; padding-bottom:32px; }
+body.lesson-focus-active .beatlesson > h2.lesson-focus-title { width:100%; max-width:none; margin:12px 0 22px!important; padding:0; border:0; color:var(--muted); font-size:clamp(17px,2vw,22px)!important; font-weight:600; line-height:1.3; letter-spacing:-.02em; }
+body.lesson-focus-active .beatlesson > .beat-prog { width:100%; height:3px; gap:4px; margin:0 0 16px; }
+body.lesson-focus-active .beatlesson > .beat-status { display:flex; align-items:center; width:100%; min-height:32px; margin:0 0 23px; }
+body.lesson-focus-active .beatlesson > .beat-step,body.lesson-focus-active .beat-status .beat-step { display:flex; align-items:center; width:100%; min-height:32px; margin:0 0 23px; color:var(--muted); font:700 12px/1.4 var(--sans); letter-spacing:.02em; text-transform:none; }
+body.lesson-focus-active .beat-status .beat-step { width:auto; margin:0; }
+body.lesson-focus-active .beat-note-button { margin-left:auto; padding:5px 0; border:0; border-bottom:1px solid var(--line); background:none; color:var(--muted); font:600 13px var(--sans); letter-spacing:0; cursor:pointer; }
+body.lesson-focus-active .beat-note-button:hover { color:var(--ink); border-color:var(--ink); }
+body.lesson-focus-active .beatlesson > .beat-stage { display:block; flex:initial; align-self:stretch; width:100%; min-height:0; }
+body.lesson-focus-active .beatlesson .beat-stage > .beat-block,body.lesson-focus-active .beatlesson .beat-stage > .beat-text,body.lesson-focus-active .beatlesson .beat-stage > .beat-finish,body.lesson-focus-active .beatlesson .beat-stage > .lesson-reader-card { width:100%; max-width:none; min-width:0; margin:0; padding:0; border:0!important; border-radius:0!important; background:transparent!important; box-shadow:none!important; backdrop-filter:none; animation:none; }
+body.lesson-focus-active .beatlesson .beat-stage > .beat-text.lesson-reader-card { font-size:clamp(20px,2.3vw,29px); line-height:1.55; text-wrap:pretty; }
+body.lesson-focus-active .beatlesson .beat-q { max-width:700px; margin:0 0 25px; color:var(--ink); font-size:clamp(25px,3.2vw,38px); font-weight:690; line-height:1.24; text-align:left; letter-spacing:-.035em; text-wrap:balance; }
+body.lesson-focus-active .beatlesson .beat-opts { width:100%; max-width:700px; margin:0; gap:0; border-top:1px solid var(--line); }
+body.lesson-focus-active .beatlesson .beat-opt { width:100%; min-height:64px; justify-content:flex-start; gap:16px; padding:15px 6px; border:0; border-bottom:1px solid var(--line); border-radius:0; background:transparent; box-shadow:none; color:var(--ink); font:500 clamp(15px,1.4vw,17px)/1.4 var(--sans); text-align:left; transform:none; animation:none; }
+body.lesson-focus-active .beatlesson .beat-opt:hover:not(.locked),body.lesson-focus-active .beatlesson .beat-opt:focus-visible { background:var(--accent-soft); border-color:var(--line); transform:none; }
+body.lesson-focus-active .beatlesson .beat-opt .ol { width:25px; height:25px; border-radius:50%; background:var(--panel-2); color:var(--muted); font-size:11px; }
+body.lesson-focus-active .beatlesson .beat-opt.correct { background:rgba(63,185,80,.11); box-shadow:none; }
+body.lesson-focus-active .beatlesson .beat-opt.wrong { background:rgba(255,138,128,.09); }
+body.lesson-focus-active .beatlesson .beat-rev { max-width:700px; margin-top:20px; padding:0 0 0 18px; border:0; border-left:3px solid currentColor; border-radius:0; background:none; animation:none; line-height:1.55; }
+body.lesson-focus-active .beatlesson .beat-rev.ok { color:#5ec784; }
+body.lesson-focus-active .beatlesson .beat-rev.no { color:#e4aa6f; }
+:root[data-theme="light"] body.lesson-focus-active .beatlesson .beat-rev.ok { color:#196a3d; }
+:root[data-theme="light"] body.lesson-focus-active .beatlesson .beat-rev.no { color:#8b4c1b; }
+body.lesson-focus-active .beatlesson > .beat-nav { display:flex; justify-content:space-between; align-items:center; width:100%; margin:30px 0 0; padding:18px 0 0; border-top:1px solid var(--line); position:static; background:none; }
+body.lesson-focus-active .beatlesson .beat-zurueck { grid-column:auto; min-width:0; min-height:46px; padding:9px 12px 9px 0; border:0; background:none; color:var(--muted); box-shadow:none; }
+body.lesson-focus-active .beatlesson .beat-weiter { grid-column:auto; min-width:155px; min-height:48px; padding:10px 20px; border-radius:4px; box-shadow:none; }
+body.lesson-focus-active .beatlesson :is(.beat-opt,.beat-note-button,.beat-zurueck,.beat-weiter):focus-visible { outline:3px solid var(--accent); outline-offset:3px; }
+body.lesson-focus-active .beatlesson > dialog.lesson-thinking { position:fixed; inset:0; width:min(100% - 32px,620px); max-width:620px; max-height:min(90dvh,760px); margin:auto; padding:clamp(22px,4vw,38px); border:1px solid var(--line); border-radius:12px; background:var(--bg); color:var(--ink); overflow-y:auto; box-shadow:0 24px 90px #0009; }
+body.lesson-focus-active .beatlesson > dialog.lesson-thinking:not([open]) { display:none; }
+body.lesson-focus-active dialog.lesson-thinking::backdrop { background:rgba(0,0,0,.7); }
+body.lesson-focus-active .thinking-inner { max-width:none; padding:0; }
+body.lesson-focus-active .thinking-top { display:flex; justify-content:space-between; align-items:center; }
+body.lesson-focus-active .thinking-kicker { color:var(--accent); font:800 11px var(--mono); letter-spacing:.14em; }
+body.lesson-focus-active .thinking-close { width:40px; height:40px; border:0; background:none; color:var(--ink); font-size:29px; cursor:pointer; }
+body.lesson-focus-active .lesson-thinking textarea { border-radius:4px; background:var(--panel); }
 body.lesson-focus-active .lesson-reader-card { background:transparent; box-shadow:none; border:0; }
-body.lesson-focus-active .beat-opt { border-radius:3px; background:transparent; box-shadow:none; }
-body.lesson-focus-active .beat-weiter { border-radius:3px; box-shadow:none; }
 
 @media(max-width:700px) {
   .studio-header { gap:12px; min-height:65px; padding:9px 16px; }
@@ -100,5 +122,11 @@ body.lesson-focus-active .beat-weiter { border-radius:3px; box-shadow:none; }
   .studio-track-arrow { grid-column:3; grid-row:1 / 3; }
   .studio-track-copy strong { font-size:25px; }
   .studio-track-copy > span { font-size:13px; }
-  body.lesson-focus-active .beatlesson .beat-stage > .beat-text.lesson-reader-card { font-size:clamp(21px,5.2vw,26px); }
+  body.lesson-focus-active .beatlesson.lesson-focus-layout { width:min(100% - 32px,820px); }
+  body.lesson-focus-active .beatlesson > h2.lesson-focus-title { margin:8px 0 18px!important; }
+  body.lesson-focus-active .beatlesson > .beat-step,body.lesson-focus-active .beatlesson > .beat-status { margin-bottom:18px; }
+  body.lesson-focus-active .beatlesson .beat-q { font-size:clamp(23px,6vw,30px); }
+  body.lesson-focus-active .beatlesson .beat-stage > .beat-text.lesson-reader-card { font-size:clamp(20px,5.2vw,26px); }
+  body.lesson-focus-active .beatlesson > .beat-nav { gap:8px; }
+  body.lesson-focus-active .beatlesson .beat-weiter { min-width:0; }
 }

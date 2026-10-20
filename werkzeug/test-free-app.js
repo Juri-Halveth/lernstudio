@@ -56,6 +56,23 @@ assert.equal(w.document.querySelectorAll(".studio-track").length,w.CURRICULUM.tr
 const studioSearch=w.document.getElementById('studioSearch');studioSearch.value='Python';studioSearch.dispatchEvent(new w.Event('input'));
 assert(w.document.querySelectorAll('.studio-track').length>=1,'Catalogue search narrows the learning routes');
 assert(w.document.querySelector('.studio-search-status').textContent.includes('gefunden'));
+const focusCheck=await createApp('#lesson/einstieg-0-3',{},false);
+const focusW=focusCheck.w;
+const focusTitle=focusW.document.querySelector('.beatlesson .lesson-focus-title');
+const noteDialog=focusW.document.querySelector('.beatlesson dialog.lesson-thinking');
+assert(focusTitle&&!focusTitle.hidden,'Lesson title stays visible as orientation');
+assert(noteDialog&&!noteDialog.open,'Thinking field starts outside the learning flow');
+focusW.document.querySelector('.beat-note-button').click();
+assert(noteDialog.open,'Thinking field opens deliberately');
+noteDialog.querySelector('#thinkingNote').value='Meine Frage';
+noteDialog.querySelector('.thinking-close').click();
+assert(!noteDialog.open,'Thinking field can be closed');
+const lessonNext=focusW.document.querySelector('.beat-weiter');
+if(!lessonNext.hidden){lessonNext.click();assert(!focusTitle.hidden,'Advancing does not erase the lesson title');}
+focusW.document.querySelector('.beat-note-button').click();
+assert.equal(noteDialog.querySelector('#thinkingNote').value,'Meine Frage','Local note survives a step change');
+noteDialog.close();
+focusCheck.dom.window.close();
 w.__test.go('expedition');
 assert.equal(w.document.querySelectorAll(".mission-choices").length,1);
 for (const station of w.LernExpedition.stations) {
