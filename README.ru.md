@@ -1,6 +1,6 @@
 [Original / Deutsch](README.md) · [English](README.en.md) · [Русский](README.ru.md)
 
-# Lernstudio — Wissen gehört allen
+# Lernstudio – интерактивное обучение и собственные учебные пути
 
 **Краткий путеводитель по проекту · EN / RU**
 

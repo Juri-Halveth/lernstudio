@@ -2,15 +2,11 @@
 [Original / Deutsch](README.md) · [English](README.en.md) · [Русский](README.ru.md)
 <!-- /HUB_LANGUAGES_V1 -->
 
-# Lernstudio — Wissen gehört allen
+# Lernstudio – interaktiv lernen und eigene Lernwege entdecken
 
-<!-- HALVETH_WORK_CERTIFICATES_V1_1 -->
-## Juri Janovski / Juri Halveth – Privates HALVETH-Werkzertifikat
+Eine kostenlose Lernplattform mit interaktiven Lektionen, Missionen und eigenen Lernpfaden. Bestehende Konten bleiben optional; die Lerninhalte sind direkt zugänglich.
 
-[Privates HALVETH-Werkzertifikat: Dokumentierte Lernplattform und Testorganisation – Lernstudio](https://juri-halveth.github.io/werkzertifikate/#werk-lernstudio).
-
-HALVETH VERACHEL STUDIOS · Quellstand, dokumentierte Ergebnisse und SHA-256-Belege stehen im Werkzertifikat. Private, mit Codex erstellte Werkdokumentation; keine ISTQB- oder sonstige Personenzertifizierung.
-<!-- /HALVETH_WORK_CERTIFICATES_V1_1 -->
+[**Projekt öffnen →**](https://juri-halveth.github.io/lernstudio/) · [Arbeitsproben](https://juri-halveth.github.io/koennen/) · [Portfolio](https://juri-halveth.github.io/)
 
 
 Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, Marketing ohne Werbebudget und selbst gestaltbaren Tier-Avataren. Ohne Pflichtkonto direkt loslernen: Alle veröffentlichten Lerninhalte sind ohne Kauf, Abonnement oder Zahlungsdaten verfügbar. Bestehende Lernstudio-Konten bleiben optional nutzbar. Ohne Konto liegt dein Fortschritt nur in deinem Browser.
