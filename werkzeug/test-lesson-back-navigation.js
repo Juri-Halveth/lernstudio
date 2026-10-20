@@ -125,10 +125,6 @@ function testBeatNavigation() {
   assert(!next.disabled, "Beat: Textschritt muss weitergehen koennen");
 
   next.click();
-  assert(back.hidden === false, "Beat: innerhalb eines langen Textes muss Zurueck sichtbar werden");
-  assert(info.textContent === "Schritt 1 von 2", "Beat: zweiter Textgedanke darf noch keinen neuen Beat vortaeuschen");
-
-  next.click();
   assert(!back.disabled, "Beat: Zurueck muss ab Schritt 2 aktiv sein");
   assert(info.textContent === "Schritt 2 von 2", "Beat: zweiter Schritt fehlt");
 
@@ -136,11 +132,8 @@ function testBeatNavigation() {
   assert(info.textContent === "Schritt 1 von 2", "Beat: Ruecksprung auf Schritt 1 fehlgeschlagen");
   assert(!next.disabled, "Beat: bereits gemeisterter Schritt darf nicht erneut sperren");
 
-  back.click();
-  assert(info.textContent === "Schritt 1 von 2", "Beat: Ruecksprung innerhalb des ersten Textes fehlgeschlagen");
-
   next.click();
-  next.click();
+  assert(info.textContent === "Schritt 2 von 2", "Beat: Rueckweg zur zweiten Unterlektion fehlt");
   next.click();
   assert(info.textContent === "Fertig", "Beat: Ergebnisbildschirm fehlt");
   assert(!back.disabled, "Beat: Vom Ergebnis muss man zurueckblicken koennen");

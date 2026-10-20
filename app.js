@@ -731,17 +731,52 @@
     const p = trackProgress(tr);
     const top = el(`<div class="rmhead"><button class="text-button" id="bk">← Alle Lernpfade</button><h1>${tr.icon} ${esc(tr.name)}</h1><p class="sub">${esc(tr.subtitle)}</p><p>${p.done} von ${p.total} Lektionen · ${p.pct}%</p></div>`);
     top.querySelector("#bk").addEventListener("click", () => go("home")); main.appendChild(top);
+    const entrance = el(`<section class="learning-entrance" aria-labelledby="entrance-title"><div><p class="eyebrow">DEIN EINSTIEG</p><h2 id="entrance-title">Womit willst du beginnen?</h2><p>Du schätzt selbst ein, was du schon kannst. Die Wahl ändert nur diese Übersicht, nicht deinen Lernstand.</p></div><div class="entrance-options" role="group" aria-label="Einstieg wählen"><button type="button" data-entry="all">Alles zeigen</button><button type="button" data-entry="practice">Direkt üben</button><button type="button" data-entry="expert">Fortgeschritten starten</button></div><p class="entrance-status" role="status"></p></section>`);
+    main.appendChild(entrance);
+    const entryKey = 'ls_entry_v1:' + tr.id;
+    let entry = 'all';
+    try { entry = localStorage.getItem(entryKey) || 'all'; } catch (_) {}
+    if (!['all', 'practice', 'expert'].includes(entry)) entry = 'all';
+    const sections = [];
+    const refreshEntry = () => {
+      entrance.querySelectorAll('[data-entry]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.entry === entry)));
+      const firstAdvanced = Math.max(1, Math.floor(tr.stages.length / 2));
+      sections.forEach(({element, stage, index}) => {
+        const show = entry !== 'expert' || index >= firstAdvanced;
+        element.hidden = !show;
+      });
+      entrance.querySelector('.entrance-status').textContent = entry === 'expert'
+        ? 'Frühere Stufen sind eingeklappt. Mit „Alles zeigen“ holst du sie jederzeit zurück.'
+        : entry === 'practice' ? 'Übungen und Quizfragen stehen in jeder Stufe zuerst.'
+        : 'Alle Stufen sind sichtbar.';
+    };
+    entrance.querySelectorAll('[data-entry]').forEach(button => button.addEventListener('click', () => {
+      entry = button.dataset.entry;
+      try { localStorage.setItem(entryKey, entry); } catch (_) {}
+      sections.forEach(({element}) => {
+        const list = element.querySelector('.open-lessons');
+        const buttons = [...list.children];
+        buttons.sort((a, b) => entry === 'practice' ? Number(b.dataset.practice === 'true') - Number(a.dataset.practice === 'true') : Number(a.dataset.order) - Number(b.dataset.order));
+        buttons.forEach(item => list.appendChild(item));
+      });
+      refreshEntry();
+    }));
     if (tr.id === "sec") main.appendChild(el(`<p class="ethics">Die Übungen laufen in lokalen Lernumgebungen. Wende Sicherheitstests nur an eigenen oder ausdrücklich dafür freigegebenen Systemen an.</p>`));
     if (p.total && p.done === p.total) { const cert = el(`<button class="btn">Teilnahmebestätigung erstellen</button>`); cert.addEventListener("click", () => go("cert",tr.id)); main.appendChild(cert); }
-    for (const st of tr.stages) {
+    for (const [stageIndex, st] of tr.stages.entries()) {
       if (!st.lessons.length) continue;
       const stage = el(`<section class="open-stage"><h2>${esc(stufeLabel(st))} · ${esc(st.title)}</h2><p class="muted">${esc(st.goal || "")}</p><div class="open-lessons"></div></section>`);
-      for (const lesson of st.lessons) {
+      for (const [lessonIndex, lesson] of st.lessons.entries()) {
         const button = el(`<button class="open-lesson" type="button"><span class="lesson-dot" aria-hidden="true">${isDone(lesson.id) ? "✓" : "○"}</span><span>${esc(lesson.title)}<small>${lesson.type === "quiz" ? "Quiz" : "Lektion"}${isDone(lesson.id) ? " · abgeschlossen" : ""}</small></span><span aria-hidden="true">↗</span></button>`);
+        button.dataset.order = String(lessonIndex);
+        button.dataset.practice = String(lesson.type === 'quiz' || !!lesson.task || !!lesson.beats?.some(beat => beat.kind && beat.kind !== 'text'));
         button.addEventListener("click", () => go("lesson",lesson.id)); stage.querySelector(".open-lessons").appendChild(button);
       }
       main.appendChild(stage);
+      sections.push({element:stage, stage:st, index:stageIndex});
     }
+    if (entry === 'practice') entrance.querySelector('[data-entry="practice"]').click();
+    else refreshEntry();
   }
 
 
@@ -1999,10 +2034,11 @@ document.getElementById("go").addEventListener("click", function(){
     navRow.appendChild(zurueck);
     navRow.appendChild(weiter);
     wrap.appendChild(navRow);
+    const thinking = el(`<aside class="lesson-thinking" aria-label="Dein Denkfeld"><p class="eyebrow">DEIN BLICK</p><h3>Was würdest du prüfen?</h3><p class="thinking-prompt">Schau auf den aktuellen Gedanken. Welche Frage bleibt für dich offen?</p><label for="thinkingNote">Deine Notiz</label><textarea id="thinkingNote" rows="5" placeholder="Eine Frage, Vermutung oder Beobachtung …"></textarea><details class="thinking-models"><summary>Zwei Erklärungen vergleichen</summary><p>Beschreibe zwei Möglichkeiten. Welche spätere Beobachtung würde sie auseinanderhalten?</p><label for="thinkingModelA">Möglichkeit A</label><textarea id="thinkingModelA" rows="2"></textarea><label for="thinkingModelB">Möglichkeit B</label><textarea id="thinkingModelB" rows="2"></textarea><label for="thinkingDiscriminator">Unterscheidende Beobachtung</label><textarea id="thinkingDiscriminator" rows="2"></textarea></details><p class="thinking-privacy">Nur in dieser geöffneten Lektion. Die Felder werden nicht versendet.</p></aside>`);
+    wrap.appendChild(thinking);
     main.appendChild(wrap);
 
     let idx = 0, weitesterSchritt = 0, zeigtErgebnis = false;
-    const textPositions = new Map();
     const hypothesisDraft = Object.create(null);
     function weiterLabel() { return idx < beats.length - 1 ? "Weiter →" : "Geschafft →"; }
     function setWeiter(on, label) {
@@ -2015,8 +2051,7 @@ document.getElementById("go").addEventListener("click", function(){
       else if (frei) weiter.textContent = weiterLabel();
     }
     function setZurueck() {
-      const textPos = textPositions.get(idx) || 0;
-      const frei = zeigtErgebnis || idx > 0 || textPos > 0;
+      const frei = zeigtErgebnis || idx > 0;
       zurueck.disabled = !frei;
       zurueck.hidden = !frei;
     }
@@ -2024,16 +2059,6 @@ document.getElementById("go").addEventListener("click", function(){
 
     function vorwaerts() {
       if (weiter.disabled) return;
-      const beat = beats[idx];
-      if ((!beat.kind || beat.kind === "text")) {
-        const fragments = lessonFocusFragments(beat.html || "");
-        const position = textPositions.get(idx) || 0;
-        if (position < fragments.length - 1) {
-          textPositions.set(idx, position + 1);
-          renderBeat();
-          return;
-        }
-      }
       weitesterSchritt = Math.max(weitesterSchritt, idx + 1);
       if (idx < beats.length - 1) { idx++; renderBeat(); }
       else finish();
@@ -2042,9 +2067,6 @@ document.getElementById("go").addEventListener("click", function(){
       if (zeigtErgebnis) {
         zeigtErgebnis = false;
         idx = beats.length - 1;
-        renderBeat();
-      } else if ((textPositions.get(idx) || 0) > 0) {
-        textPositions.set(idx, (textPositions.get(idx) || 0) - 1);
         renderBeat();
       } else if (idx > 0) {
         idx--;
@@ -2081,6 +2103,7 @@ document.getElementById("go").addEventListener("click", function(){
       stepInfo.textContent = "Schritt " + (idx + 1) + " von " + beats.length;
       stageEl.innerHTML = "";
       const b = beats[idx];
+      thinking.querySelector('.thinking-prompt').textContent = b.kind === 'predict' ? 'Entscheide zuerst selbst. Was spricht für deine Antwort?' : b.kind === 'text' ? 'Welche Aussage würdest du mit einem eigenen Beispiel prüfen?' : 'Was erwartest du vor dem Ausprobieren – und was beobachtest du danach?';
       weiter.textContent = weiterLabel();
       setWeiter(false);
       if (b.kind === "predict") beatPredict(b);
@@ -2110,11 +2133,8 @@ document.getElementById("go").addEventListener("click", function(){
       window.scrollTo(0, 0);
     }
     function beatText(b) {
-      const fragments = lessonFocusFragments(b.html || "");
-      const position = Math.min(textPositions.get(idx) || 0, fragments.length - 1);
-      textPositions.set(idx, position);
-      stageEl.appendChild(el(`<div class="beat-text lesson-reader-card is-entering">${fragments[position]}</div>`));
-      setWeiter(true, position < fragments.length - 1 ? "Weiter →" : weiterLabel());
+      stageEl.appendChild(el(`<div class="beat-text lesson-reader-card is-entering">${b.html || '<p>Diese Unterlektion hat noch keinen Inhalt.</p>'}</div>`));
+      setWeiter(true, weiterLabel());
     }
     function beatHypothesisWorksheet(b) {
       const fields = [
