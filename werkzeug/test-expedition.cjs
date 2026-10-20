@@ -33,10 +33,10 @@ function deepFreeze(value) {
 }
 deepFreeze(curriculum);
 
-test("all 702 real lessons retain their exact existing hash routes, including Unicode IDs", () => {
-  assert.equal(curriculum.tracks.length, 13);
-  assert.equal(entries.length, 702);
-  assert.equal(ids.size, 702);
+test("all 727 real lessons retain their exact existing hash routes, including Unicode IDs", () => {
+  assert.equal(curriculum.tracks.length, 14);
+  assert.equal(entries.length, 727);
+  assert.equal(ids.size, 727);
   assert(entries.some(lesson => /[^\x00-\x7f]/.test(lesson.id)));
   for (const lesson of entries) {
     const route = Expedition.routeForLesson(curriculum, lesson.id);
@@ -208,7 +208,7 @@ test("the real profile and curriculum stay unchanged after every onboarding answ
   const store = Profile.createStore({ getItem: key => storage.get(key) ?? null, setItem: (key, value) => storage.set(key, value) }, curriculum);
   const state = deepFreeze(store.read());
   const before = snapshot({ curriculum, state, storage: [...storage] });
-  assert.equal(store.lessonCount, 702);
+  assert.equal(store.lessonCount, 727);
   for (const station of Expedition.stations) {
     for (const choice of station.choices) Expedition.evaluate(station.id, choice.id);
     const lesson = Expedition.nextLesson(curriculum, state, station.lessonId);

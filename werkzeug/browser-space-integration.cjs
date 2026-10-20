@@ -34,7 +34,7 @@ const server = http.createServer((req, res) => {
       });
       await page.goto(base + "#connections", {waitUntil:"domcontentloaded"});
       await page.waitForSelector(".connections-track");
-      assert.equal(await page.locator(".connections-track").count(), 13);
+      assert.equal(await page.locator(".connections-track").count(), 14);
       assert.equal(await page.locator(".sidebar,.mission-choices").count(), 0, "Overview is optional, not mixed with the current task");
       await page.locator('[data-track-id="python"]').click();
       assert.equal(await page.locator(".connections-view").getAttribute("data-selected-track"), "python");

@@ -142,7 +142,7 @@
     { id: "ki",        icon: "✳", name: "Künstliche Intelligenz",   tracks: ["ki"] },
     { id: "coding",    icon: "💻", name: "Programmieren",            tracks: ["html", "python", "js"] },
     { id: "security",  icon: "🛡️", name: "Digitale Sicherheit",       tracks: ["sec"] },
-    { id: "projekte",  icon: "🎮", name: "Projekte",                 tracks: ["proj"] },
+    { id: "projekte",  icon: "🎮", name: "Projekte",                 tracks: ["atelier", "proj"] },
     { id: "server",    icon: "🖥️", name: "Terminal, Linux & Server", tracks: ["srv"] },
     { id: "marketing", icon: "📈", name: "Marketing & Suche",        tracks: ["mktg", "seo"] },
   ];
@@ -243,7 +243,7 @@
     const head = el(`<header class="app universe-header">
       <button class="iconbtn mobile-nav-btn" id="mobileNavBtn" type="button" aria-controls="studioSidebar" aria-expanded="false" aria-label="Lernpfade öffnen">☰</button>
       <button class="brand-button" id="brandHome" type="button"><img src="icon-192.png" width="40" height="40" alt=""><span><b>Lernstudio</b><small>Wissen gehört allen.</small></span></button>
-      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="#home">Sternenbucht</a><a href="#map">Lernkarte</a><a href="#lab">Code-Werkstatt</a><a href="#bridge">Wissensbrücke</a></nav>
+      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="#home">Lernwege</a><a href="#map">Lernkarte</a><a href="#lab">Code-Werkstatt</a><a href="#bridge">Wissensbrücke</a></nav>
       <span class="spacer"></span>${accountReady ? `<span class="xp" title="Deine Erfahrungspunkte">✦ <b>${totalXp()}</b> XP</span>` : ""}
       <button class="account" id="acctBtn" type="button" aria-label="Lernprofil öffnen" title="Lernprofil öffnen"><i data-lucide="user-round" aria-hidden="true"></i><span class="aname">${activeUser ? esc(state.name === "Lernender" ? "Mein Konto" : state.name) : "Mein Lernstand"}</span></button>
       ${themeSwitchMarkup("themeBtn")}
@@ -255,6 +255,20 @@
     return head;
   }
 
+
+  function renderStudioHeader() {
+    const head = el(`<header class="studio-header" aria-label="Lernstudio-Navigation">
+      <button class="studio-wordmark" id="studioHome" type="button">LERNSTUDIO<span>Wissen gehört allen.</span></button>
+      <nav aria-label="Lernbereiche"><a href="#home">Lernwege</a><a href="#lab/">Werkstatt</a></nav>
+      <span class="studio-header-space"></span>
+      <button class="studio-profile" id="studioProfile" type="button">Mein Lernstand</button>
+      ${themeSwitchMarkup("studioTheme")}
+    </header>`);
+    head.querySelector('#studioHome').addEventListener('click', () => go('home'));
+    head.querySelector('#studioProfile').addEventListener('click', openProfile);
+    head.querySelector('#studioTheme').addEventListener('click', toggleTheme);
+    return head;
+  }
 
   function renderFocusHeader(context) {
     const { track, stage, lesson } = context;
@@ -272,8 +286,8 @@
           </span>
         </button>
         <span class="focus-spacer"></span>
-        <button class="focus-exit" id="focusExit" type="button" aria-label="Lernmodus verlassen und zur Sternenbucht zurückkehren">
-          <span>Bucht</span><b aria-hidden="true">×</b>
+        <button class="focus-exit" id="focusExit" type="button" aria-label="Lernmodus verlassen und zur Übersicht zurückkehren">
+          <span>Übersicht</span><b aria-hidden="true">×</b>
         </button>
       </header>
     `);
@@ -361,7 +375,7 @@
       login.onclick = () => { dialog.close(); go('login'); };
       dialog.appendChild(login);
     }
-    dialog.addEventListener("close", () => { dialog.remove(); if (current.view === "home") render(); const opener = document.getElementById("acctBtn") || document.getElementById("focusExit"); if (opener) opener.focus(); });
+    dialog.addEventListener("close", () => { dialog.remove(); if (current.view === "home") render(); const opener = document.getElementById("studioProfile") || document.getElementById("acctBtn") || document.getElementById("focusExit"); if (opener) opener.focus(); });
     document.body.appendChild(dialog); dialog.showModal();
   }
   function exportProgress() {
@@ -589,18 +603,21 @@
     const lessonContext = !authRequired && current.view === "lesson" ? findLesson(current.arg) : null;
     if (lessonContext && state.lastLesson !== current.arg) { state.lastLesson = current.arg; save(); }
     const focusMode = !!lessonContext;
-    const journeyMode = !authRequired && ["home", "expedition"].includes(current.view);
-    const singleTask = !authRequired && (journeyMode || focusMode || ["lab", "bridge", "connections"].includes(current.view));
+    const studioMode = !authRequired && ["home", "roadmap"].includes(current.view);
+    const journeyMode = !authRequired && current.view === "expedition";
+    const singleTask = !authRequired && (studioMode || journeyMode || focusMode || ["lab", "bridge", "connections"].includes(current.view));
     document.body.classList.toggle("lesson-focus-active", focusMode);
     document.body.classList.toggle("journey-active", journeyMode);
+    document.body.classList.toggle("studio-active", studioMode);
     document.body.classList.toggle("single-task-active", singleTask);
-    root.appendChild(focusMode ? renderFocusHeader(lessonContext) : singleTask && window.LernJourney ? window.LernJourney.header({go,onProfile:openProfile,onTheme:toggleTheme}) : renderHeader());
+    root.appendChild(focusMode ? renderFocusHeader(lessonContext) : studioMode ? renderStudioHeader() : singleTask && window.LernJourney ? window.LernJourney.header({go,onProfile:openProfile,onTheme:toggleTheme}) : renderHeader());
     const layout = el(`<div class="layout ${focusMode ? "lesson-focus" : ""}"></div>`);
     const activeLesson = lessonContext ? current.arg : null;
     if (!singleTask) layout.appendChild(renderSidebar(activeLesson));
     const main = el(`<main id="main-content" tabindex="-1" class="content ${focusMode ? "lesson-focus-content" : ""}"></main>`);
     if (authRequired) renderAuth(main);
-    else if (journeyMode) renderHome(main);
+    else if (studioMode && current.view === "home") renderHome(main);
+    else if (journeyMode) viewCleanup = window.LernJourney.mount(main, {curriculum:C,state,go,namespace:activeUser || 'guest',forceIntro:false});
     else if (current.view === "map") renderMap(main);
     else if (current.view === "connections") viewCleanup = window.LernConnections.mount(main, {curriculum:C,state,go});
     else if (current.view === "bridge") viewCleanup = window.LernJourney.mountBridge(main, {curriculum:C,state,go});
@@ -665,8 +682,43 @@
   }
 
   function renderHome(main) {
-    if (!window.LernJourney) { renderMap(main); return; }
-    viewCleanup = window.LernJourney.mount(main, {curriculum:C,state,go,namespace:activeUser || 'guest',forceIntro:current.view === 'expedition'});
+    const groups = rubrikGruppen();
+    const total = C.tracks.reduce((sum, track) => sum + trackProgress(track).total, 0);
+    const recent = state.lastLesson ? findLesson(state.lastLesson) : null;
+    const firstLesson = C.tracks.flatMap(track => allLessons(track))[0]?.lesson;
+    const start = recent?.lesson || firstLesson;
+    const rows = groups.flatMap(group => group.tracks.map(track => ({group, track})));
+    const home = el(`<section class="studio-home">
+      <div class="studio-intro"><p class="studio-kicker">FREI LERNEN · ${C.tracks.length} WEGE · ${total} LEKTIONEN</p>
+        <h1>Eine Frage. <em>Ein neuer Blick.</em></h1>
+        <p>Wähle einen Weg und arbeite an einem Gedanken nach dem anderen. Lies, probiere aus und prüfe, was du wirklich verstanden hast.</p>
+        <div class="studio-intro-actions"><button type="button" class="studio-primary" id="studioStart">${recent ? 'Weiterlernen' : 'Erste Lektion starten'} <span aria-hidden="true">↗</span></button><button type="button" class="studio-jump" id="studioJump">Alle Lernwege ansehen ↓</button></div>
+        <p class="studio-progress">${Object.keys(state.done || {}).filter(id => !!state.done[id]).length} Lektionen in deinem Lernstand · kostenlos · Konto freiwillig</p>
+      </div>
+      <div class="studio-catalogue" id="studio-catalogue"><div class="studio-catalogue-head"><div><p class="studio-kicker">DIE BIBLIOTHEK</p><h2>Finde deinen Einstieg.</h2></div><label for="studioSearch">Lernweg suchen<input id="studioSearch" type="search" autocomplete="off" placeholder="Thema oder Weg …"></label></div>
+        <p class="studio-search-status" role="status" aria-live="polite"></p><div class="studio-track-list"></div>
+      </div>
+      <p class="studio-secondary-link"><a href="#expedition/">Experimentelle Entdeckungsreise öffnen ↗</a></p>
+    </section>`);
+    home.querySelector('#studioStart').addEventListener('click', () => start && go('lesson', start.id));
+    home.querySelector('#studioJump').addEventListener('click', () => home.querySelector('#studio-catalogue').scrollIntoView({behavior:'smooth'}));
+    const list = home.querySelector('.studio-track-list');
+    const search = home.querySelector('#studioSearch');
+    const status = home.querySelector('.studio-search-status');
+    function paint() {
+      const query = search.value.trim().toLocaleLowerCase('de');
+      const shown = rows.filter(({group, track}) => `${group.name} ${track.name} ${track.subtitle}`.toLocaleLowerCase('de').includes(query));
+      list.replaceChildren();
+      shown.forEach(({group, track}, index) => {
+        const progress = trackProgress(track);
+        const row = el(`<button class="studio-track" type="button"><span class="studio-track-no">${String(index + 1).padStart(2, '0')}</span><span class="studio-track-copy"><small>${esc(group.name)}</small><strong>${esc(track.name)}</strong><span>${esc(track.subtitle)}</span></span><span class="studio-track-progress">${progress.done}/${progress.total}<small>gelernt</small></span><span class="studio-track-arrow" aria-hidden="true">↗</span></button>`);
+        row.addEventListener('click', () => go('roadmap', track.id));
+        list.appendChild(row);
+      });
+      status.textContent = query ? `${shown.length} von ${rows.length} Lernwegen gefunden.` : `${rows.length} Lernwege stehen offen.`;
+    }
+    search.addEventListener('input', paint);
+    paint(); main.appendChild(home);
   }
   function renderMap(main) {
     return window.LearningSpace.mount(main, {curriculum:C, state, go, progress:trackProgress, groups:rubrikGruppen(), persistent:profileStore.canPersist() && !profileStore.recovered()});
@@ -731,17 +783,52 @@
     const p = trackProgress(tr);
     const top = el(`<div class="rmhead"><button class="text-button" id="bk">← Alle Lernpfade</button><h1>${tr.icon} ${esc(tr.name)}</h1><p class="sub">${esc(tr.subtitle)}</p><p>${p.done} von ${p.total} Lektionen · ${p.pct}%</p></div>`);
     top.querySelector("#bk").addEventListener("click", () => go("home")); main.appendChild(top);
+    const entrance = el(`<section class="learning-entrance" aria-labelledby="entrance-title"><div><p class="eyebrow">DEIN EINSTIEG</p><h2 id="entrance-title">Womit willst du beginnen?</h2><p>Du schätzt selbst ein, was du schon kannst. Die Wahl ändert nur diese Übersicht, nicht deinen Lernstand.</p></div><div class="entrance-options" role="group" aria-label="Einstieg wählen"><button type="button" data-entry="all">Alles zeigen</button><button type="button" data-entry="practice">Direkt üben</button><button type="button" data-entry="expert">Fortgeschritten starten</button></div><p class="entrance-status" role="status"></p></section>`);
+    main.appendChild(entrance);
+    const entryKey = 'ls_entry_v1:' + tr.id;
+    let entry = 'all';
+    try { entry = localStorage.getItem(entryKey) || 'all'; } catch (_) {}
+    if (!['all', 'practice', 'expert'].includes(entry)) entry = 'all';
+    const sections = [];
+    const refreshEntry = () => {
+      entrance.querySelectorAll('[data-entry]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.entry === entry)));
+      const firstAdvanced = Math.floor(tr.stages.length / 2);
+      sections.forEach(({element, stage, index}) => {
+        const show = entry !== 'expert' || index >= firstAdvanced;
+        element.hidden = !show;
+      });
+      entrance.querySelector('.entrance-status').textContent = entry === 'expert'
+        ? 'Frühere Stufen sind eingeklappt. Mit „Alles zeigen“ holst du sie jederzeit zurück.'
+        : entry === 'practice' ? 'Übungen und Quizfragen stehen in jeder Stufe zuerst.'
+        : 'Alle Stufen sind sichtbar.';
+    };
+    entrance.querySelectorAll('[data-entry]').forEach(button => button.addEventListener('click', () => {
+      entry = button.dataset.entry;
+      try { localStorage.setItem(entryKey, entry); } catch (_) {}
+      sections.forEach(({element}) => {
+        const list = element.querySelector('.open-lessons');
+        const buttons = [...list.children];
+        buttons.sort((a, b) => entry === 'practice' ? Number(b.dataset.practice === 'true') - Number(a.dataset.practice === 'true') : Number(a.dataset.order) - Number(b.dataset.order));
+        buttons.forEach(item => list.appendChild(item));
+      });
+      refreshEntry();
+    }));
     if (tr.id === "sec") main.appendChild(el(`<p class="ethics">Die Übungen laufen in lokalen Lernumgebungen. Wende Sicherheitstests nur an eigenen oder ausdrücklich dafür freigegebenen Systemen an.</p>`));
     if (p.total && p.done === p.total) { const cert = el(`<button class="btn">Teilnahmebestätigung erstellen</button>`); cert.addEventListener("click", () => go("cert",tr.id)); main.appendChild(cert); }
-    for (const st of tr.stages) {
+    for (const [stageIndex, st] of tr.stages.entries()) {
       if (!st.lessons.length) continue;
       const stage = el(`<section class="open-stage"><h2>${esc(stufeLabel(st))} · ${esc(st.title)}</h2><p class="muted">${esc(st.goal || "")}</p><div class="open-lessons"></div></section>`);
-      for (const lesson of st.lessons) {
+      for (const [lessonIndex, lesson] of st.lessons.entries()) {
         const button = el(`<button class="open-lesson" type="button"><span class="lesson-dot" aria-hidden="true">${isDone(lesson.id) ? "✓" : "○"}</span><span>${esc(lesson.title)}<small>${lesson.type === "quiz" ? "Quiz" : "Lektion"}${isDone(lesson.id) ? " · abgeschlossen" : ""}</small></span><span aria-hidden="true">↗</span></button>`);
+        button.dataset.order = String(lessonIndex);
+        button.dataset.practice = String(lesson.type === 'quiz' || !!lesson.task || !!lesson.beats?.some(beat => beat.kind && beat.kind !== 'text'));
         button.addEventListener("click", () => go("lesson",lesson.id)); stage.querySelector(".open-lessons").appendChild(button);
       }
       main.appendChild(stage);
+      sections.push({element:stage, stage:st, index:stageIndex});
     }
+    if (entry === 'practice') entrance.querySelector('[data-entry="practice"]').click();
+    else refreshEntry();
   }
 
 
@@ -1999,10 +2086,11 @@ document.getElementById("go").addEventListener("click", function(){
     navRow.appendChild(zurueck);
     navRow.appendChild(weiter);
     wrap.appendChild(navRow);
+    const thinking = el(`<details class="lesson-thinking"><summary>Mein Denkfeld · Frage, Notiz oder Gegenmodell</summary><div class="thinking-inner"><h3>Was würdest du prüfen?</h3><p class="thinking-prompt">Schau auf den aktuellen Gedanken. Welche Frage bleibt für dich offen?</p><label for="thinkingNote">Deine Notiz</label><textarea id="thinkingNote" rows="5" placeholder="Eine Frage, Vermutung oder Beobachtung …"></textarea><details class="thinking-models"><summary>Zwei Erklärungen vergleichen</summary><p>Beschreibe zwei Möglichkeiten. Welche spätere Beobachtung würde sie auseinanderhalten?</p><label for="thinkingModelA">Möglichkeit A</label><textarea id="thinkingModelA" rows="2"></textarea><label for="thinkingModelB">Möglichkeit B</label><textarea id="thinkingModelB" rows="2"></textarea><label for="thinkingDiscriminator">Unterscheidende Beobachtung</label><textarea id="thinkingDiscriminator" rows="2"></textarea></details><p class="thinking-privacy">Nur in dieser geöffneten Lektion. Die Felder werden nicht versendet.</p></div></details>`);
+    wrap.appendChild(thinking);
     main.appendChild(wrap);
 
     let idx = 0, weitesterSchritt = 0, zeigtErgebnis = false;
-    const textPositions = new Map();
     const hypothesisDraft = Object.create(null);
     function weiterLabel() { return idx < beats.length - 1 ? "Weiter →" : "Geschafft →"; }
     function setWeiter(on, label) {
@@ -2015,8 +2103,7 @@ document.getElementById("go").addEventListener("click", function(){
       else if (frei) weiter.textContent = weiterLabel();
     }
     function setZurueck() {
-      const textPos = textPositions.get(idx) || 0;
-      const frei = zeigtErgebnis || idx > 0 || textPos > 0;
+      const frei = zeigtErgebnis || idx > 0;
       zurueck.disabled = !frei;
       zurueck.hidden = !frei;
     }
@@ -2024,16 +2111,6 @@ document.getElementById("go").addEventListener("click", function(){
 
     function vorwaerts() {
       if (weiter.disabled) return;
-      const beat = beats[idx];
-      if ((!beat.kind || beat.kind === "text")) {
-        const fragments = lessonFocusFragments(beat.html || "");
-        const position = textPositions.get(idx) || 0;
-        if (position < fragments.length - 1) {
-          textPositions.set(idx, position + 1);
-          renderBeat();
-          return;
-        }
-      }
       weitesterSchritt = Math.max(weitesterSchritt, idx + 1);
       if (idx < beats.length - 1) { idx++; renderBeat(); }
       else finish();
@@ -2042,9 +2119,6 @@ document.getElementById("go").addEventListener("click", function(){
       if (zeigtErgebnis) {
         zeigtErgebnis = false;
         idx = beats.length - 1;
-        renderBeat();
-      } else if ((textPositions.get(idx) || 0) > 0) {
-        textPositions.set(idx, (textPositions.get(idx) || 0) - 1);
         renderBeat();
       } else if (idx > 0) {
         idx--;
@@ -2081,6 +2155,7 @@ document.getElementById("go").addEventListener("click", function(){
       stepInfo.textContent = "Schritt " + (idx + 1) + " von " + beats.length;
       stageEl.innerHTML = "";
       const b = beats[idx];
+      thinking.querySelector('.thinking-prompt').textContent = b.kind === 'predict' ? 'Entscheide zuerst selbst. Was spricht für deine Antwort?' : b.kind === 'text' ? 'Welche Aussage würdest du mit einem eigenen Beispiel prüfen?' : 'Was erwartest du vor dem Ausprobieren – und was beobachtest du danach?';
       weiter.textContent = weiterLabel();
       setWeiter(false);
       if (b.kind === "predict") beatPredict(b);
@@ -2110,11 +2185,8 @@ document.getElementById("go").addEventListener("click", function(){
       window.scrollTo(0, 0);
     }
     function beatText(b) {
-      const fragments = lessonFocusFragments(b.html || "");
-      const position = Math.min(textPositions.get(idx) || 0, fragments.length - 1);
-      textPositions.set(idx, position);
-      stageEl.appendChild(el(`<div class="beat-text lesson-reader-card is-entering">${fragments[position]}</div>`));
-      setWeiter(true, position < fragments.length - 1 ? "Weiter →" : weiterLabel());
+      stageEl.appendChild(el(`<div class="beat-text lesson-reader-card is-entering">${b.html || '<p>Diese Unterlektion hat noch keinen Inhalt.</p>'}</div>`));
+      setWeiter(true, weiterLabel());
     }
     function beatHypothesisWorksheet(b) {
       const fields = [

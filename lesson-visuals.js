@@ -37,7 +37,8 @@
     seo: "Jemand tippt eine Frage in eine Suche. Eine gute Seite antwortet so klar, dass sie gefunden und verstanden werden kann.",
     proj: "Denk an ein Brettspiel: Erst siehst du, wie alles liegt. Dann geschieht ein Zug, eine Regel greift und danach sieht es anders aus.",
     srv: "Ein Server ist erst einmal nur ein anderer Computer. Er wartet auf eine Aufgabe, erledigt sie und meldet zurück, was passiert ist.",
-    matheanfassen: "Zahlen beschreiben etwas, das du sehen oder vergleichen kannst. Wir verändern eine Sache und beobachten gemeinsam, was dadurch anders wird."
+    matheanfassen: "Zahlen beschreiben etwas, das du sehen oder vergleichen kannst. Wir verändern eine Sache und beobachten gemeinsam, was dadurch anders wird.",
+    atelier: "In einer kleinen Werkstatt liegt eine Aufgabe vor dir. Du schaust zuerst, was tatsächlich da ist, probierst einen überschaubaren Schritt und siehst dir seine Wirkung an."
   };
 
   function describeBeginnerLayer(context) {
@@ -55,6 +56,18 @@
 
     if (lesson.type === "quiz" || text.startsWith("quiz")) {
       return make("Das hier ist keine Prüfung über deinen Wert. Du holst eine Idee kurz aus dem Gedächtnis, vergleichst sie mit der Erklärung und darfst es danach noch einmal versuchen.", ["In Ruhe erinnern", "Eine Antwort wählen", "Aus der Erklärung lernen"]);
+    }
+    if (id === "atelier") {
+      const scenes = {
+        denken: "Auf dem Tisch liegen zwei Fotos derselben Pflanze. Du schaust zuerst genau hin, bevor du erzählst, warum sie anders aussieht. Dann suchst du einen kleinen Hinweis, der zwei Erklärungen trennt.",
+        software: "Du baust ein kleines Spielzeug aus Teilen. Ein Knopf löst einen Schritt aus, und du schaust nach, ob der richtige Teil sich bewegt hat. Danach probierst du einen Fall aus, der schiefgehen könnte.",
+        sprachen: "Du gibst einem sehr wörtlichen Helfer eine Anweisung. Ein Wort steht für einen Wert, eine Frage wählt einen Weg, und eine Wiederholung macht denselben Schritt mehrmals.",
+        sicherheit: "Du besitzt zwei eigene Schubladen mit Testzetteln. Du prüfst, welche Tür zu welcher Schublade führt, und ob ein Schild auch wirklich eine Erlaubnis bedeutet.",
+        marketing: "Ein Mensch hat eine konkrete Frage. Du hörst zu, schreibst eine verständliche Antwort und prüfst danach, ob der nächste Schritt gefunden wurde. Niemand muss dafür etwas kaufen."
+      };
+      const axis = Object.keys(scenes).find(key => lesson.id.endsWith("-" + key));
+      return make(scenes[axis] || BEGINNER_SCENES.atelier,
+        ["Eine konkrete Sache ansehen", "Einen kleinen Schritt versuchen", "Wirkung und offenen Rest benennen"]);
     }
     if ((id === "python" || id === "js") && includes(text, ["schleife", "loop", "while", "wiederhol"])) {
       return make("Stell dir einen Stapel Teller vor. Solange noch ein Teller da ist, nimmst du einen herunter und machst denselben kleinen Handgriff noch einmal.", ["Schauen, ob noch etwas da ist", "Einen Schritt machen", "Noch einmal nachsehen"]);
@@ -164,6 +177,43 @@
         node("Rückmeldung", "Vergleiche Antwort und Erklärung."),
         node("Neu erklären", "Formuliere den Zusammenhang mit eigenen Worten.")
       ], "Kannst du auch erklären, warum die anderen Möglichkeiten nicht tragen?", [[0,1],[1,2],[2,3],[3,0]]);
+    }
+
+    if (id === "atelier") {
+      const axis = lesson.id.split("-").at(-1);
+      const shapes = {
+        denken: model("branch", "Beobachtung und zwei Deutungen", "Ein sichtbarer Zustand kann zu mehreren Erklärungen passen. Erst eine unterscheidende Beobachtung gibt einer Deutung mehr Gewicht.", [
+          node("Beobachtung", "Beschreibe, was an dieser Stelle tatsächlich zu sehen ist."),
+          node("Modell A", "Eine mögliche Erklärung macht eine konkrete Vorhersage."),
+          node("Modell B", "Eine andere Erklärung macht eine abweichende Vorhersage."),
+          node("Prüfung", "Vergleiche beide Vorhersagen mit derselben Beobachtung.")
+        ], "Welche Beobachtung würde die beiden Erklärungen trennen?", [[0,1],[0,2],[1,3],[2,3]]),
+        software: model("sequence", "Vom Eingang zum überprüften Ergebnis", "Eine Softwarehandlung erhält einen Eingang und verändert einen Zustand. Der sichtbare Ausgang wird am vereinbarten Vertrag gemessen.", [
+          node("Eingang", "Ein konkreter Wert oder eine Aktion startet den Ablauf."),
+          node("Vertrag", "Vorher ist festgelegt, was bei diesem Eingang gelten soll."),
+          node("Ausführung", "Das Programm verarbeitet den Eingang und verändert Zustände."),
+          node("Prüfung", "Normalfall und sicherer Gegenfall werden beobachtet.")
+        ], "Wo könnte ein Fehler trotz erfolgreicher Ausführung verborgen bleiben?"),
+        sprachen: model("layers", "Von Zeichen zu Programmwirkung", "Dieselbe Aufgabe kann in mehreren Sprachen formuliert werden. Typen, Laufzeit und Zielplattform bestimmen ihre tatsächliche Wirkung.", [
+          node("Quelltext", "Die Zeichen folgen der Syntax einer gewählten Sprache."),
+          node("Typen", "Werte haben erlaubte Operationen und Umwandlungen."),
+          node("Laufzeit", "Ein Interpreter, Browser oder Compiler setzt Regeln um."),
+          node("Wirkung", "Das Ergebnis wird gegen Beispiele und Grenzen geprüft.")
+        ], "Welcher Grenzfall kann sich beim Sprachwechsel anders verhalten?"),
+        sicherheit: model("branch", "Identität, Recht und Wirkung", "Eine Identitätsbehauptung ist noch kein erlaubter Zugriff. An jeder Grenze wird die tatsächlich erteilte Fähigkeit separat geprüft.", [
+          node("Anfrage", "Eine eigene Testaktion wird mit Ziel und Zeit gebunden."),
+          node("Identität", "Der Dienst stellt fest, welches Testkonto vorliegt."),
+          node("Erlaubt", "Das Testkonto darf genau dieses Objekt lesen oder ändern."),
+          node("Abgelehnt", "Ein anderes Testobjekt bleibt ohne Datenwirkung geschützt.")
+        ], "Wo muss die Entscheidung über das konkrete Objekt fallen?", [[0,1],[1,2],[1,3]]),
+        marketing: model("cycle", "Von der Frage zur echten Rückmeldung", "Ein hilfreicher Beitrag beantwortet zuerst eine konkrete Frage. Freiwillige Rückmeldung führt zu einer überprüfbaren Verbesserung.", [
+          node("Frage", "Eine benannte Zielgruppe sucht Hilfe in einer Situation."),
+          node("Antwort", "Ein Inhalt löst einen kleinen Teil der Frage verständlich."),
+          node("Nutzung", "Menschen finden und verwenden den freiwilligen Schritt."),
+          node("Rückmeldung", "Beobachteter Nutzen und offene Hürden fließen zurück.")
+        ], "Welche Rückmeldung zeigt Nutzen besser als eine bloße Aufrufzahl?", [[0,1],[1,2],[2,3],[3,0]])
+      };
+      if (shapes[axis]) return shapes[axis];
     }
 
     if (id === "ki") {

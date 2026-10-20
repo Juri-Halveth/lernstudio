@@ -115,10 +115,10 @@ function checkResources(result, files) {
   }
 }
 
-test("real source: all 702 lessons belong exactly once to 13 tracks and their declared stages", () => {
+test("real source: all 727 lessons belong exactly once to 14 tracks and their declared stages", () => {
   checkMembership(data, curriculum);
-  assert.equal(data.space.counts.lessons, 702);
-  assert.equal(data.space.counts.tracks, 13);
+  assert.equal(data.space.counts.lessons, 727);
+  assert.equal(data.space.counts.tracks, 14);
 });
 
 test("two synthetic tracks retain quiz membership, Unicode IDs and stage boundaries", () => {
@@ -224,7 +224,7 @@ test("unprojected lesson body changes update source binding without invalidating
   assert.deepEqual(plain(after.catalogue.lessons), plain(before.catalogue.lessons));
 });
 
-test("LF and CRLF representations of the real source preserve all 13 contexts and every generated output", () => {
+test("LF and CRLF representations of the real source preserve all 14 contexts and every generated output", () => {
   const lf = sourceBytes.toString("utf8").replace(/\r\n/g, "\n");
   const crlf = lf.replace(/\n/g, "\r\n");
   assert.notEqual(sha256(lf), sha256(crlf));
@@ -232,7 +232,7 @@ test("LF and CRLF representations of the real source preserve all 13 contexts an
   assert.equal(lfData.space.curriculumDigestMode, "UTF8_LF_NORMALIZED");
   assert.equal(lfData.space.curriculumSha256, sha256(lf));
   assert.equal(crlfData.space.curriculumSha256, lfData.space.curriculumSha256);
-  assert.equal(crlfData.contexts.size, 13);
+  assert.equal(crlfData.contexts.size, 14);
   assert.deepEqual(plain(crlfData.space.tracks), plain(lfData.space.tracks));
   assert.deepEqual(filesFor(crlfData), filesFor(lfData));
 });
@@ -265,7 +265,7 @@ test("source projections omit extra fields at every curriculum level", () => {
 test("published API allowlist is exactly generated outputs plus the two explicit packet files", () => {
   const generated = Array.from(builder.outputs(data).keys());
   const expected = [...generated, "api/learning-contract.v1.json", "api/example-learning-packet.json"].sort();
-  assert.equal(generated.length, 16);
+  assert.equal(generated.length, 17);
   assert.equal(new Set(publicFiles).size, publicFiles.length, "No duplicate public paths");
   assert.deepEqual(publicFiles.filter(file => file.startsWith("api/")).sort(), expected);
   for (const file of generated) assert(publicFiles.includes(file), file);

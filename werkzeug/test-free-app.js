@@ -50,8 +50,13 @@ const returningGuest=await createApp('#lesson/html-0-magie',{[guestKey]:guestSta
 assert.equal(returningGuest.w.__test.getState().done['html-0-magie'],true);
 returningGuest.w.__test.go('home');returningGuest.w.__test.openProfile();assert(returningGuest.w.document.querySelector('dialog[open]'));assert(returningGuest.w.document.getElementById('pp-logout').hidden);returningGuest.dom.window.close();
 const {dom,w,errors,requests}=await createApp();
-assert(w.document.querySelector(".journey-screen"),"Home is a single mission, not a catalogue");
+assert(w.document.querySelector(".studio-home"),"Home opens the direct learning catalogue");
 assert.equal(w.document.querySelectorAll(".world-card,.sidebar").length,0);
+assert.equal(w.document.querySelectorAll(".studio-track").length,w.CURRICULUM.tracks.length);
+const studioSearch=w.document.getElementById('studioSearch');studioSearch.value='Python';studioSearch.dispatchEvent(new w.Event('input'));
+assert(w.document.querySelectorAll('.studio-track').length>=1,'Catalogue search narrows the learning routes');
+assert(w.document.querySelector('.studio-search-status').textContent.includes('gefunden'));
+w.__test.go('expedition');
 assert.equal(w.document.querySelectorAll(".mission-choices").length,1);
 for (const station of w.LernExpedition.stations) {
   assert.equal(w.document.querySelector(".mission-content h1").textContent,station.title);
@@ -65,8 +70,8 @@ for (const station of w.LernExpedition.stations) {
 assert(w.document.querySelector("#missionContinue"),"Arrival connects to a real lesson");
 assert.equal(w.document.activeElement,w.document.querySelector(".mission-content h1"),"Focus reaches the final recommendation");
 assert.equal(Object.keys(w.__test.getState().done).length,0,"Arrival does not complete curriculum lessons");
-w.__test.go("home");assert(w.document.querySelector("#missionContinue"),"Arrival state survives navigation");
-w.__test.go("expedition");assert(w.document.querySelector(".mission-choices"),"Arrival can be replayed without resetting lesson progress");
+w.__test.go("home");assert(w.document.querySelector(".studio-home"),"Direct catalogue survives navigation");
+w.__test.go("expedition");assert(w.document.querySelector("#missionContinue"),"Finished arrival resumes without resetting lesson progress");
 w.__test.go("bridge");assert(w.document.querySelector("#packetFile"),"Explicit learning-note import is reachable");
 w.__test.go("map");
 assert.equal(w.document.querySelectorAll(".world-card").length,w.CURRICULUM.tracks.length);
@@ -113,16 +118,17 @@ assert.equal(Object.keys(w.__test.getState().done).length,1,"Repeated completion
 w.__test.go("home");w.__test.openProfile();assert(w.document.querySelector("dialog[open]"));
 w.document.querySelector('[data-animal="🐢"]').click();assert.equal(w.__test.getState().avatar,"🐢");
 w.document.querySelector('[data-color="mint"]').click();assert.equal(w.__test.getState().color,"mint");
-w.document.querySelector("dialog").close();assert.equal(w.document.activeElement.id,"acctBtn");
+w.document.querySelector("dialog").close();assert.equal(w.document.activeElement.id,"studioProfile");
 const accountKey='lernstudio_account_fixture-a:'+w.LearningProfile.KEY;
 const saved=w.localStorage.getItem(accountKey);assert(saved);dom.window.close();
 const storageBlocked=await createApp('',{},false);
 storageBlocked.w.localStorage.setItem('lernstudio_expedition_v1:guest',JSON.stringify({version:1,solved:[]}));
 storageBlocked.w.Storage.prototype.setItem=function(){throw new Error('Storage denied by test');};
+storageBlocked.w.__test.go('expedition');
 const firstStation=storageBlocked.w.LernExpedition.stations[0];
 storageBlocked.w.document.querySelector('[data-choice="'+firstStation.correctChoice+'"]').click();
 assert(storageBlocked.w.document.querySelector('.mission-note').textContent.includes('Sitzung'));
-storageBlocked.w.__test.go('map');storageBlocked.w.__test.go('home');
+storageBlocked.w.__test.go('map');storageBlocked.w.__test.go('expedition');
 assert.equal(storageBlocked.w.document.querySelector('.mission-content h1').textContent,storageBlocked.w.LernExpedition.stations[1].title,"In-memory progress survives a view change when storage is blocked");
 storageBlocked.dom.window.close();
 const second=await createApp("#lesson/"+first,{[accountKey]:saved});assert.equal(second.w.__test.getState().lastLesson,first);assert.equal(second.w.__test.getState().avatar,"🐢");second.dom.window.close();
