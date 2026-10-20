@@ -37,9 +37,9 @@ Exakte direkte Abhängigkeiten:
 | Paket | Version |
 | --- | --- |
 | `@openzeppelin/contracts` | `4.9.6` |
-| `ethers` | `6.15.0` |
+| `ethers` | `6.17.0` |
 | `ganache` | `7.9.2` |
-| `solc` | `0.8.26` |
+| `solc` | `0.8.37` |
 
 Compiler und lokale EVM verwenden Shanghai. Direkte Versionen und transitive
 Abhängigkeiten sind im mitgelieferten npm-Lockfile gebunden. Am 08.09.2026 wurde
@@ -65,6 +65,8 @@ Unter Node 24 kann Ganache melden, dass sein optionales natives µWS-Modul nicht
 passt. Es verwendet dann den ausgewiesenen JavaScript-Fallback. Dieser lokale
 Testpfad benötigt keinen WebSocket-Server. Das ist eine Laufzeitbeobachtung,
 keine Behauptung über aktuelle Produktversionen oder Produktionskompatibilität.
+
+Aktueller Abhängigkeitsreview vom 10.10.2026: [lokale Toolchain-Befunde und offene Ganache-Restpunkte](DEPENDENCY-REVIEW-2026-10-10.md).
 
 ## Illustrative Testwerte
 
