@@ -4,6 +4,8 @@
 
 # Lernstudio – interaktiv lernen und eigene Lernwege entdecken
 
+**Person: Juri. Projekt: HALVETH.** [Namenszuordnung](IDENTITY.md).
+
 Eine kostenlose Lernplattform mit interaktiven Lektionen, Missionen und eigenen Lernpfaden. Bestehende Konten bleiben optional; die Lerninhalte sind direkt zugänglich.
 
 [**Projekt öffnen →**](https://juri-halveth.github.io/lernstudio/) · [Arbeitsproben](https://juri-halveth.github.io/koennen/) · [Portfolio](https://juri-halveth.github.io/)
@@ -11,7 +13,7 @@ Eine kostenlose Lernplattform mit interaktiven Lektionen, Missionen und eigenen 
 
 Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, Marketing ohne Werbebudget und selbst gestaltbaren Tier-Avataren. Ohne Pflichtkonto direkt loslernen: Alle veröffentlichten Lerninhalte sind ohne Kauf, Abonnement oder Zahlungsdaten verfügbar. Bestehende Lernstudio-Konten bleiben optional nutzbar. Ohne Konto liegt dein Fortschritt nur in deinem Browser.
 
-**HALVETH authorship and participation:** Juri Halveth (Juri Janovski) claims the rights in original platform design, lesson selection and arrangement, original prose, models, diagrams and new code contributions. Evidence or teaching boundaries are not rights waivers. Historical ISC permissions remain effective; protected new HALVETH contributions require a written commercial license and participation agreement.
+**HALVETH authorship and participation:** Juri Janovski (Projekt HALVETH) claims the rights in original platform design, lesson selection and arrangement, original prose, models, diagrams and new code contributions. Evidence or teaching boundaries are not rights waivers. Historical ISC permissions remain effective; protected new HALVETH contributions require a written commercial license and participation agreement.
 
 - [Lernstudio öffnen](https://juri-halveth.github.io/lernstudio/)
 - [Community](https://github.com/Juri-Halveth/lernstudio/discussions)
