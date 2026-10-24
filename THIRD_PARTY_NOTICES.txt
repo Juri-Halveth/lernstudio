@@ -1,9 +1,16 @@
 Lernstudio - third-party and separate-license notices
-Release baseline: 2026-09-08
+Original notice baseline: 2026-09-08
+License-map clarification: 2026-10-24
 
-Original platform sources and original published lesson content: ISC;
-see LICENSE.txt. Emoji are rendered by the visitor's operating system;
-no third-party emoji artwork is bundled.
+Original platform sources and published lesson content through commit
+48db86421040d47cc066953df53b61a23be7342e remain licensed under ISC;
+see LICENSE.txt. Distinguishable new original HALVETH contributions after that
+parent and files with their own notices are mapped separately in LICENSES.md.
+The historical ISC grant remains effective, including commercial use of that
+historical material. This clarification does not change existing license grants.
+
+Emoji are rendered by the visitor's operating system; no third-party emoji
+artwork is bundled.
 
 Existing ambient audio (optional music in the learning journey and thematic previews):
 - Music: "Elevate", Fupi, OpenGameArt, CC0.
