@@ -37,9 +37,11 @@ Exakte direkte Abhängigkeiten:
 | Paket | Version |
 | --- | --- |
 | `@openzeppelin/contracts` | `4.9.6` |
-| `ethers` | `6.15.0` |
+| `ethers` | `6.17.0` |
 | `ganache` | `7.9.2` |
 | `solc` | `0.8.26` |
+
+Aktueller Werkzeugreview und verbleibende Ganache-Bündelrisiken: [DEPENDENCY_REVIEW_20261024.md](DEPENDENCY_REVIEW_20261024.md). `npm run test:tooling` prüft Compiler und Signaturpfad ohne EVM-Start; die 18 Transaktionstests bleiben eine getrennte Abnahme. Die Compiler-Helfer `tmp` und `follow-redirects` sind separat auf 0.2.7 und 1.16.1 gebunden.
 
 Compiler und lokale EVM verwenden Shanghai. Direkte Versionen und transitive
 Abhängigkeiten sind im mitgelieferten npm-Lockfile gebunden. Am 08.09.2026 wurde
