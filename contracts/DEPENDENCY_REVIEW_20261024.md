@@ -22,10 +22,23 @@ temporary-file API; assert that no Ganache execution bundle or network connectio
 was used. Source identity uses explicit UTF-8/LF normalization to allow Windows
 and Linux checkouts. Original checkout bytes are not claimed to be identical.
 
-**Validation ceiling:** those four tooling tests were run. The eighteen EVM
-transaction tests were not rerun as part of this compiler/signature-only review.
-This candidate is not a completed EVM regression approval or a production-safety
-assessment.
+The initial compiler/signature-only review ran those four tooling tests. A
+separately authorized local follow-up on **24 October 2026, 13:57 UTC** then ran
+the unchanged eighteen-case transaction fixture against candidate
+`42be5bcbc221ff26757a82e514c6d6edbd765748`: **18/18 passed**, followed by **4/4
+tooling tests**. The in-process Ganache fixture used fresh synthetic accounts,
+Shanghai/chain 31337, and socket/listener/TLS/fetch guards. Its receipt reports
+unchanged bound sources and an empty blocked-network-attempt list. No public
+chain, external RPC, injected wallet or existing account was used. On Node 24,
+Ganache reported the already documented optional native µWS mismatch and used
+its JavaScript fallback; no native module was installed for this run.
+
+A minimized, source-bound result is in
+[`validation/local-compatibility-20261024.json`](validation/local-compatibility-20261024.json).
+Raw synthetic chain state remains outside Git. **Validation ceiling:** these
+twenty-two named local checks establish their own compatibility cases. They do
+not clear remaining bundled-code advisories, exhaust every execution path,
+monitor all operating-system activity or establish production safety.
 
 ## Advisory and actual consumer map
 

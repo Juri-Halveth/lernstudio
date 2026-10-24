@@ -1,0 +1,243 @@
+{
+  "schema": "eve.local-compatibility.v1",
+  "state": "22_NAMED_LOCAL_CHECKS_PASS",
+  "testedSourceCommit": "42be5bcbc221ff26757a82e514c6d6edbd765748",
+  "transactionReceiptRecordedAt": "2026-10-24T13:57:44.097Z",
+  "minimizedRecordWrittenAt": "2026-10-24T13:59:18.212699+00:00",
+  "originReceiptSha256": "520d0ecd61bd048b1d98b7d91488b21e1bac6340336f4cd59824a1aaed861104",
+  "provenance": "Minimized from the unchanged local harness receipt; raw synthetic LevelDB/compiler artifacts remain ignored and private. No account addresses or keys are exported here.",
+  "node": "v24.18.0",
+  "compiler": "0.8.26+commit.8a97fa7a.Emscripten.clang",
+  "versions": {
+    "openzeppelin": "4.9.6",
+    "solc": "0.8.26",
+    "ethers": "6.17.0",
+    "ganache": "7.9.2"
+  },
+  "scope": "IN_PROCESS_EVM_ONLY",
+  "evmVersion": "shanghai",
+  "chainId": 31337,
+  "checks": [
+    {
+      "name": "01 canonical ERC20 metadata, empty initial supply and immutable illustrative parameters",
+      "status": "PASS"
+    },
+    {
+      "name": "02 authorized signed voucher mints the fixed amount and records learner plus lesson",
+      "status": "PASS"
+    },
+    {
+      "name": "03 repeated learner plus lesson rejects even with a fresh signed nonce",
+      "status": "PASS"
+    },
+    {
+      "name": "04 a used learner nonce cannot authorize a different lesson",
+      "status": "PASS"
+    },
+    {
+      "name": "05 unauthorized signer rejects without consuming claim state",
+      "status": "PASS"
+    },
+    {
+      "name": "06 caller must be the voucher learner",
+      "status": "PASS"
+    },
+    {
+      "name": "07 replacing the signed recipient invalidates the attestation",
+      "status": "PASS"
+    },
+    {
+      "name": "08 expired vouchers reject",
+      "status": "PASS"
+    },
+    {
+      "name": "09 voucher signed for one contract rejects on another contract",
+      "status": "PASS"
+    },
+    {
+      "name": "10 wrong chain and named signing domain reject",
+      "status": "PASS"
+    },
+    {
+      "name": "11 hard cap rejects the next reward and rolls back nonce and lesson state",
+      "status": "PASS"
+    },
+    {
+      "name": "12 non-admin cannot grant or revoke the attestor role",
+      "status": "PASS"
+    },
+    {
+      "name": "13 admin revocation rejects old attestations and an explicitly granted replacement can sign",
+      "status": "PASS"
+    },
+    {
+      "name": "14 ordinary transfer moves the exact amount with zero token tax and unchanged supply",
+      "status": "PASS"
+    },
+    {
+      "name": "15 different learners can each claim the same lesson; no person-uniqueness claim",
+      "status": "PASS"
+    },
+    {
+      "name": "16 empty lessons and malformed signatures reject",
+      "status": "PASS"
+    },
+    {
+      "name": "17 no payable purchase surface, public mint function, receive or fallback in ABI",
+      "status": "PASS"
+    },
+    {
+      "name": "18 invalid constructor economics and zero authority addresses reject",
+      "status": "PASS"
+    }
+  ],
+  "toolingChecks": {
+    "command": "npm --prefix contracts run test:tooling",
+    "passed": 4,
+    "failed": 0,
+    "scope": "Compiler/ABI,disconnected EIP712 signing,fixed helper API,and no EVM execution/network in this separate test process"
+  },
+  "sourceIntegrity": [
+    {
+      "name": "src/EveLearningRewardsResearch.sol",
+      "expected": "0eb11cec24a9b79d8ad552ef844deea346da191ffaf819d48792a99b6eb6b658",
+      "actual": "0eb11cec24a9b79d8ad552ef844deea346da191ffaf819d48792a99b6eb6b658",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/token/ERC20/ERC20.sol",
+      "expected": "d20d52b4be98738b8aa52b5bb0f88943f62128969b33d654fbca731539a7fe0a",
+      "actual": "d20d52b4be98738b8aa52b5bb0f88943f62128969b33d654fbca731539a7fe0a",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/token/ERC20/extensions/ERC20Capped.sol",
+      "expected": "00d9364a71bfb7590fdeb7e097fe84159f4fc002c4f603b036c61f91e6368861",
+      "actual": "00d9364a71bfb7590fdeb7e097fe84159f4fc002c4f603b036c61f91e6368861",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/access/AccessControl.sol",
+      "expected": "afd98330d27bddff0db7cb8fcf42bd4766dda5f60b40871a3bec6220f9c9edf7",
+      "actual": "afd98330d27bddff0db7cb8fcf42bd4766dda5f60b40871a3bec6220f9c9edf7",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/cryptography/EIP712.sol",
+      "expected": "6403cb83154d37ce7030e1b94f07766a6dd20835c4a691bcff87870810df15e2",
+      "actual": "6403cb83154d37ce7030e1b94f07766a6dd20835c4a691bcff87870810df15e2",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/cryptography/ECDSA.sol",
+      "expected": "445963619903cee339e49aa2d7a0b07cfad90959529fff136394429c4a92d554",
+      "actual": "445963619903cee339e49aa2d7a0b07cfad90959529fff136394429c4a92d554",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/access/IAccessControl.sol",
+      "expected": "d03c1257f2094da6c86efa7aa09c1c07ebd33dd31046480c5097bc2542140e45",
+      "actual": "d03c1257f2094da6c86efa7aa09c1c07ebd33dd31046480c5097bc2542140e45",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/Context.sol",
+      "expected": "b2cfee351bcafd0f8f27c72d76c054df9b571b62cfac4781ed12c86354e2a56c",
+      "actual": "b2cfee351bcafd0f8f27c72d76c054df9b571b62cfac4781ed12c86354e2a56c",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/Strings.sol",
+      "expected": "cb2df477077a5963ab50a52768cb74ec6f32177177a78611ddbbe2c07e2d36de",
+      "actual": "cb2df477077a5963ab50a52768cb74ec6f32177177a78611ddbbe2c07e2d36de",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/introspection/ERC165.sol",
+      "expected": "8806a632d7b656cadb8133ff8f2acae4405b3a64d8709d93b0fa6a216a8a6154",
+      "actual": "8806a632d7b656cadb8133ff8f2acae4405b3a64d8709d93b0fa6a216a8a6154",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/token/ERC20/IERC20.sol",
+      "expected": "7ebde70853ccafcf1876900dad458f46eb9444d591d39bfc58e952e2582f5587",
+      "actual": "7ebde70853ccafcf1876900dad458f46eb9444d591d39bfc58e952e2582f5587",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol",
+      "expected": "af5c8a77965cc82c33b7ff844deb9826166689e55dc037a7f2f790d057811990",
+      "actual": "af5c8a77965cc82c33b7ff844deb9826166689e55dc037a7f2f790d057811990",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/ShortStrings.sol",
+      "expected": "0f1abe1770f7e80f0b9221aac780424a42e5c64b9814aa735d28115a0f549915",
+      "actual": "0f1abe1770f7e80f0b9221aac780424a42e5c64b9814aa735d28115a0f549915",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/interfaces/IERC5267.sol",
+      "expected": "72424d3a7a9b7d1c3584d4ec83bf116f30dfaf7180298a32669eefacb55ccb92",
+      "actual": "72424d3a7a9b7d1c3584d4ec83bf116f30dfaf7180298a32669eefacb55ccb92",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/math/Math.sol",
+      "expected": "85a2caf3bd06579fb55236398c1321e15fd524a8fe140dff748c0f73d7a52345",
+      "actual": "85a2caf3bd06579fb55236398c1321e15fd524a8fe140dff748c0f73d7a52345",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/math/SignedMath.sol",
+      "expected": "420a5a5d8d94611a04b39d6cf5f02492552ed4257ea82aba3c765b1ad52f77f6",
+      "actual": "420a5a5d8d94611a04b39d6cf5f02492552ed4257ea82aba3c765b1ad52f77f6",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/introspection/IERC165.sol",
+      "expected": "701e025d13ec6be09ae892eb029cd83b3064325801d73654847a5fb11c58b1e5",
+      "actual": "701e025d13ec6be09ae892eb029cd83b3064325801d73654847a5fb11c58b1e5",
+      "unchanged": true
+    },
+    {
+      "name": "@openzeppelin/contracts/utils/StorageSlot.sol",
+      "expected": "51c993d87ee6096af06f8701d8497272751c8cc9c9c2b31e67a3087d5f2302df",
+      "actual": "51c993d87ee6096af06f8701d8497272751c8cc9c9c2b31e67a3087d5f2302df",
+      "unchanged": true
+    }
+  ],
+  "sourceDigestSemantics": "Harness SHA256 of the exact checkout source bytes read before/after the run; not original authorship, external authority or complete behavior proof.",
+  "guardedNetworkAttempts": [],
+  "guardCoverage": "In-process throwing guards for net.Socket.connect,net.Server.listen,tls.connect,global fetch. This is not an operating-system-wide network capture.",
+  "fixtureIsolation": {
+    "publicChainDeployment": false,
+    "externalRpc": false,
+    "listener": false,
+    "mainnetFork": false,
+    "existingWalletAccess": false,
+    "privateKeysPersistedByHarness": false,
+    "ephemeralTestSigners": true
+  },
+  "providerAdapter": "ethers BrowserProvider wraps only the owned in-process Ganache object; no injected browser-wallet provider.",
+  "optionalRuntimeFallback": "Observed on Node24.18.0: optional native uWS ABI137 module unavailable; Ganache used its documented JavaScript fallback. No native installation performed.",
+  "illustrativeTestParameters": {
+    "standardCapEve": "100",
+    "capBoundaryEve": "20",
+    "rewardPerClaimEve": "10",
+    "tokenomicsAgreed": false
+  },
+  "remainingDependencyDebt": "Ganache7.9.2 remains archived and contains affected-version bundled elliptic,secp256k1,pbkdf2 and other modules. These local checks do not remediate those advisories.",
+  "coverage": "18 named example checks, executed local transactions and rejected static calls; source hashes before/after. No exhaustive model, adversarial audit, verifier service, frontend, gas sponsor or production observation.",
+  "limitations": [
+    "Authorized attestor claims, not proof of human understanding; attestor may issue false vouchers.",
+    "No Sybil prevention or independent uniqueness of human learners.",
+    "Attestor supports ECDSA EOAs only; no ERC1271 contract attestors.",
+    "Admin can add/remove attestors and admins; key custody and governance are unresolved.",
+    "Lesson identifiers are issuer-defined and not bound to an audited public curriculum registry.",
+    "No bridges, crosschain supply accounting, rewards valuation or public-chain deployment.",
+    "No pause mechanism, emergency recovery or per-voucher revocation; role revocation blocks that signer.",
+    "No gas sponsorship; zero transfer tax is separate from network gas fees.",
+    "OpenZeppelin is the locally inspected 4.9.6 snapshot, not a claim of latest release or dependency audit."
+  ]
+}
