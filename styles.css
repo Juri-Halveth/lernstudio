@@ -622,12 +622,12 @@ aside.sidebar::-webkit-scrollbar-thumb:hover{ background:color-mix(in srgb,var(-
 .crumbs{ color:var(--muted); font-size:14px; margin-bottom:10px; }
 .crumbs a{ color:var(--accent); cursor:pointer; text-decoration:none; font-weight:600; }
 .crumbs a:hover{ text-decoration:underline; }
-.lesson h2{ font-size:27px; font-weight:800; letter-spacing:-.5px; margin:0 0 6px; text-wrap:balance; }
+.lesson h2,.lesson h1.lesson-focus-title{ font-size:27px; font-weight:800; letter-spacing:-.5px; margin:0 0 6px; text-wrap:balance; overflow-wrap:anywhere; }
 .lesson-focus-layout{
   min-height:calc(100dvh - 134px); display:grid; align-content:center;
   position:relative; width:100%; padding-block:18px;
 }
-.lesson-focus-layout > h2{
+.lesson-focus-layout > :is(h1,h2){
   width:min(100%,780px); margin:0 auto 22px; text-align:center;
 }
 .lesson-focus-title[hidden]{display:none}
@@ -675,7 +675,7 @@ aside.sidebar::-webkit-scrollbar-thumb:hover{ background:color-mix(in srgb,var(-
 @keyframes lessonThoughtIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 @media(max-width:650px){
   .lesson-focus-layout{min-height:calc(100svh - 118px);padding-block:12px}
-  .lesson-focus-layout > h2{font-size:clamp(23px,7.2vw,30px);margin-bottom:18px}
+  .lesson-focus-layout > :is(h1,h2){font-size:clamp(23px,7.2vw,30px);margin-bottom:18px}
   .lesson-reader{min-height:0;padding:0}
   .lesson-reader-card{font-size:19px;line-height:1.58}
   .lesson-reader-actions{align-items:stretch}
@@ -913,7 +913,7 @@ main.content.lesson-focus-content{width:100%;max-width:none;padding:clamp(12px,2
 body.lesson-focus-active main.content.lesson-focus-content{max-width:none!important;width:100%}
 body.lesson-focus-active.single-task-active .layout.lesson-focus{max-width:none;width:100%;margin:0}
 body.lesson-focus-active.single-task-active .layout.lesson-focus > main.content{max-width:none;width:100%;padding:clamp(14px,2vw,28px) clamp(16px,2.5vw,48px) 38px}
-body.lesson-focus-active .beatlesson > h2.lesson-focus-title{width:100%;max-width:none;margin:4px 0 22px!important;text-align:left;font-size:clamp(25px,2.6vw,42px)!important}
+body.lesson-focus-active .beatlesson > :is(h1,h2).lesson-focus-title{width:100%;max-width:none;margin:4px 0 22px!important;text-align:left;font-size:clamp(25px,2.6vw,42px)!important}
 body.lesson-focus-active .beatlesson .beat-stage > .lesson-reader-card{width:100%;max-width:none;margin:0;padding:clamp(25px,4vw,52px);background:linear-gradient(100deg,var(--accent-soft),transparent 18%),var(--panel);border:1px solid var(--line);border-radius:6px 22px 22px 6px!important;box-shadow:inset 7px 0 var(--accent),0 14px 40px rgba(0,0,0,.12)!important;text-align:left}
 @media(max-width:850px){.beatlesson.lesson-focus-layout{grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto auto auto auto;min-height:0}.beatlesson > .lesson-thinking{grid-column:1;grid-row:auto;position:static;margin-top:30px;border-left:0;border-top:1px solid var(--line);padding-inline:0}.beatlesson > h2{grid-column:1}.beatlesson .beat-stage > .beat-block,.beatlesson .beat-stage > .beat-text,.beatlesson .beat-stage > .beat-finish{padding:22px;border-radius:18px;box-shadow:inset 4px 0 var(--accent)}}
 .beatlesson > h2 { margin: 2px 0 14px; font-size: 26px; letter-spacing: -.5px; }
