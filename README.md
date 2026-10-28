@@ -18,7 +18,7 @@ Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, 
 - [Lernstudio öffnen](https://juri-halveth.github.io/lernstudio/)
 - [Community](https://github.com/Juri-Halveth/lernstudio/discussions)
 - [EVE-Forschung](contracts/README.md)
-- [HALVETH Research: Forschung prüfen, Entscheidungen erklären](https://github.com/Juri-Halveth/open-research-branches/blob/main/reports/HALVETH_RESEARCH_2026-09-18.md)
+- [Öffentliche HALVETH-Forschungsbeispiele: Quellen und Entscheidungen](https://juri-halveth.github.io/halveth-forschungslabor/wissen/) — die früher verlinkte Archivnotiz wurde am 28.10.2026 als privat festgestellt; die öffentliche Übersicht ist keine Kopie davon.
 
 ## Lokal starten
 
