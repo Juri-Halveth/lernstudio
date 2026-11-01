@@ -93,7 +93,7 @@ test.after(async () => {
   provider?.destroy();
   await evm?.close();
   const sourceIntegrity = endpointIntegrity(compiled?.sources || []);
-  const localFiles = ['src/EveLearningRewardsResearch.sol', 'lib/runtime.cjs', 'test/local-contract.test.cjs', 'hardhat.config.ts', 'package.json', 'package-lock.json', 'README.md', '.gitignore', 'LICENSE'];
+  const localFiles = ['src/EveLearningRewardsResearch.sol', 'lib/runtime.cjs', 'test/local-contract.test.cjs', 'test/tooling-boundary.test.cjs', 'test/verify-receipt.cjs', 'hardhat.config.ts', 'package.json', 'package-lock.json', 'README.md', '.gitignore', 'LICENSE'];
   const receipt = {
     state: checks.length === 18 && checks.every(c => c.status === 'PASS') && sourceIntegrity.every(s => s.unchanged)
       && blockedNetworkAttempts.length === 0 ? '18_NAMED_LOCAL_CHECKS_PASS' : 'INCOMPLETE_OR_FAILED',

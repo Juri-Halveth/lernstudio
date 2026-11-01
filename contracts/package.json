@@ -9,7 +9,8 @@
   },
   "scripts": {
     "test": "node --test --test-concurrency=1 test/local-contract.test.cjs",
-    "test:tooling": "node --test test/tooling-boundary.test.cjs"
+    "test:tooling": "node --test test/tooling-boundary.test.cjs",
+    "verify:receipt": "node test/verify-receipt.cjs"
   },
   "devDependencies": {
     "@openzeppelin/contracts": "4.9.6",
