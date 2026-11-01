@@ -689,7 +689,7 @@
     const start = recent?.lesson || firstLesson;
     const rows = groups.flatMap(group => group.tracks.map(track => ({group, track})));
     const home = el(`<section class="studio-home">
-      <div class="studio-intro"><p class="studio-kicker">FREI LERNEN · ${C.tracks.length} WEGE · ${total} LEKTIONEN</p>
+      <div class="studio-intro"><a class="studio-netz-entry" href="https://juri-halveth.github.io/universum/" aria-label="Lernstudio im HALVETH NETZ Starship Lab öffnen"><img src="HALVETH_NETZ_HERO.svg" alt="" width="1200" height="300"><span>LERNE IM HALVETH NETZ<small>Starship Lab öffnen ↗</small></span></a><p class="studio-kicker">FREI LERNEN · ${C.tracks.length} WEGE · ${total} LEKTIONEN</p>
         <h1>Eine Frage. <em>Ein neuer Blick.</em></h1>
         <p>Wähle einen Weg und arbeite an einem Gedanken nach dem anderen. Lies, probiere aus und prüfe, was du wirklich verstanden hast.</p>
         <div class="studio-intro-actions"><button type="button" class="studio-primary" id="studioStart">${recent ? 'Weiterlernen' : 'Erste Lektion starten'} <span aria-hidden="true">↗</span></button><button type="button" class="studio-jump" id="studioJump">Alle Lernwege ansehen ↓</button></div>
