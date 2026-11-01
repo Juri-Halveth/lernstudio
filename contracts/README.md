@@ -17,15 +17,16 @@ Blockchain sind davon getrennt; das Paket enthält keine Gasfinanzierung.
 
 ## Lokal ausführen
 
-Voraussetzungen: Node.js 22 bis 24 und npm. Lokale Läufe verwenden Node.js 24.
+Voraussetzungen: Node.js ab 22.13 bis unter 25 und npm. Lokale Läufe verwenden Node.js 24.
 
 ```sh
 npm ci --ignore-scripts
+npm run test:tooling
 npm test
 ```
 
 Die Installation lädt npm-Abhängigkeiten. Der anschließende Testlauf verwendet
-ausschließlich Ganache im selben Prozess. Er startet keinen RPC-Server, nutzt
+ausschließlich Hardhats EDR als simuliertes In-Process-Netz. Er startet keinen RPC-Server, nutzt
 keinen Fork und sendet nichts an eine öffentliche Blockchain. Es gibt kein
 Deploymentskript und keine Mainnet-Konfiguration. Vorhandene Wallets oder
 Schlüssel werden nicht benötigt. Der Test erzeugt synthetische Accounts und
@@ -38,35 +39,39 @@ Exakte direkte Abhängigkeiten:
 | --- | --- |
 | `@openzeppelin/contracts` | `4.9.6` |
 | `ethers` | `6.17.0` |
-| `ganache` | `7.9.2` |
+| `hardhat` | `3.21.2` |
 | `solc` | `0.8.26` |
 
-Aktueller Werkzeugreview und verbleibende Ganache-Bündelrisiken: [DEPENDENCY_REVIEW_20261024.md](DEPENDENCY_REVIEW_20261024.md). `npm run test:tooling` prüft Compiler und Signaturpfad ohne EVM-Start; die 18 Transaktionstests bleiben eine getrennte Abnahme. Die Compiler-Helfer `tmp` und `follow-redirects` sind separat auf 0.2.7 und 1.16.1 gebunden.
+Der [aktuelle EDR-Adapterreview](DEPENDENCY_REVIEW_20261101.md) bindet Ersatz und Tests; der [Ganache-Review vom 24.10.](DEPENDENCY_REVIEW_20261024.md) bleibt als historischer Beleg erhalten. `npm run test:tooling` prüft Compiler, Signaturpfad und die EVM-Root-Grenze; die 18 Transaktionstests bleiben eine getrennte Abnahme. Die Compiler-Helfer `tmp` und `follow-redirects` sind auf 0.2.7 und 1.16.2 gebunden. Hardhats `zod` wird wegen [GHSA-mrhx-c7xc-m3w5](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5) auf 4.6.7 überschrieben; dieser Major-Override ist nur für den benannten Harness-Pfad geprüft.
 
 Compiler und lokale EVM verwenden Shanghai. Direkte Versionen und transitive
-Abhängigkeiten sind im mitgelieferten npm-Lockfile gebunden. Am 08.09.2026 wurde
-dieser Bestand frisch mit deaktivierten Installationsskripten installiert.
-Frühere lokale Läufe verwendeten vorhandene Pakete über die optionalen Overrides.
+Abhängigkeiten sind im mitgelieferten npm-Lockfile gebunden. Die EDR-Konfiguration
+enthält nur `eveLocal` mit Chain-ID 31337, drei frisch generierten Testkonten,
+keinem Fork und keiner HTTP-URL. Fehlgeschlagene Transaktionen liefern einen
+Status-0-Receipt, damit der bestehende Rollback-Test denselben Oracle behält.
 
-Der npm-Audit dieser Entwicklungsabhängigkeiten meldete am 08.09.2026 insgesamt
-36 Befunde (2 niedrig, 6 mittel, 23 hoch, 5 kritisch). Die alte lokale EVM-Werkzeugkette
-ist deshalb ausschließlich für die beschriebenen synthetischen, netzgesperrten
-Tests gebunden und keine Empfehlung für einen erreichbaren Dienst. Diese
-Abhängigkeiten gelangen nicht in die veröffentlichte Browseranwendung. Vor einer
-öffentlichen Blockchain-Ausgabe sind eine aktuelle Werkzeugkette und ein eigener
-Abhängigkeitsreview nötig; ein Testpass beseitigt diese Befunde nicht.
+Der frühere Ganache-Auditstand ist im historischen Review dokumentiert. Ein frischer
+lokaler `npm audit` für den neuen Lockfile meldete am 01.11.2026 keine Befunde.
+Das bindet den geprüften Registry- und Lockfile-Stand, nicht sämtliche künftigen
+Advisories oder jede Laufzeitwirkung. Diese Entwicklungsabhängigkeiten gelangen
+nicht in die veröffentlichte Browseranwendung. Vor einer öffentlichen
+Blockchain-Ausgabe bleiben ein eigener Abhängigkeitsreview und ein vollständiger
+Sicherheitsprozess nötig.
 
-Wer bereits passende Pakete installiert hat, kann `EVE_DEPENDENCY_ROOT` auf deren
-Projektverzeichnis setzen. Normalerweise wird vollständig aus diesem Paket
-aufgelöst. `EVE_OPENZEPPELIN_ROOT` kann zusätzlich auf das Verzeichnis zeigen,
+Der EVM-Test lädt EDR und seine Konfiguration ausschließlich aus diesem Paket;
+ein fremder `EVE_DEPENDENCY_ROOT` wird vor dem Providerstart abgelehnt. Für den
+reinen Compiler-/Signaturtest kann ein passender `EVE_DEPENDENCY_ROOT` weiter
+verwendet werden. `EVE_OPENZEPPELIN_ROOT` kann auf das Verzeichnis zeigen,
 das die `package.json` von `@openzeppelin/contracts` und dessen Solidity-Ordner
 enthält. Die Overrides ändern die erwarteten Versionen nicht. Ihre absoluten
-Werte erscheinen nicht in den erzeugten JSON-Receipts.
+Werte erscheinen nicht in den erzeugten JSON-Receipts. Ein fremder
+`EVE_OPENZEPPELIN_ROOT` bindet Name, Version und gelesene Quellhashes, aber
+beweist keine Herkunft aus dem npm-Lockfile-Tarball; der Standardlauf nutzt
+den lokalen Paketroot.
 
-Unter Node 24 kann Ganache melden, dass sein optionales natives µWS-Modul nicht
-passt. Es verwendet dann den ausgewiesenen JavaScript-Fallback. Dieser lokale
-Testpfad benötigt keinen WebSocket-Server. Das ist eine Laufzeitbeobachtung,
-keine Behauptung über aktuelle Produktversionen oder Produktionskompatibilität.
+EDR benötigt eine passende native Plattformkomponente. Der lokale Windows-Lauf
+und der separate Linux-Contracts-CI-Lauf prüfen ihre jeweilige Installation;
+ein Erfolg auf einer Plattform belegt nicht alle anderen Architekturen.
 
 ## Illustrative Testwerte
 
@@ -96,8 +101,8 @@ Fehlen einer zahlbaren Kaufoberfläche geprüft.
   tatsächlicher Ausgabe werden durch den Testpass nicht beantwortet.
 
 Jeder Lauf schreibt in einen eigenen Ordner unter `evidence/`. Dort liegen
-Compiler-Input, ABI/Bytecode, Quellhashes, Ergebnis und der synthetische lokale
-Ganache-Chainzustand. `latest-receipt.json` enthält den relativen Pfad zum jüngsten
+Compiler-Input, ABI/Bytecode, Quellhashes und Ergebnis. Der synthetische EDR-
+Chainzustand verbleibt im Prozessspeicher. `latest-receipt.json` enthält den relativen Pfad zum jüngsten
 Ergebnis. Diese Laufdateien und `node_modules/` sind von Git ausgeschlossen.
 Die eingebauten Socket-/TLS-/Fetch-Sperren begrenzen den Testpfad; sie sind kein
 vollständiger Nachweis sämtlicher Betriebssystemaktivität.

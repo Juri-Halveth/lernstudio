@@ -53,7 +53,7 @@ test('compiler helper pins resolve to fixed versions and retain the normal tempo
   const { createRequire } = require('node:module');
   const solcRequire = createRequire(dependencyRequire.resolve('solc'));
   assert.equal(solcRequire('tmp/package.json').version, '0.2.7');
-  assert.equal(solcRequire('follow-redirects/package.json').version, '1.16.1');
+  assert.equal(solcRequire('follow-redirects/package.json').version, '1.16.2');
   assert.equal(dependencyRequire('ws/package.json').version, '8.21.0');
   const tmp = solcRequire('tmp');
   const file = tmp.fileSync({ postfix: '.smt2' });
@@ -62,7 +62,21 @@ test('compiler helper pins resolve to fixed versions and retain the normal tempo
   assert.throws(() => tmp.tmpNameSync({ prefix: ['inert-non-string'] }));
 });
 
-test('tooling checks never import the Ganache execution bundle or touch the network', () => {
-  assert(!Object.keys(require.cache).some(file => /[\\/]ganache[\\/]dist[\\/]node[\\/]/.test(file)));
+test('tooling checks never import the EDR execution runtime or touch the network', () => {
+  assert(!Object.keys(require.cache).some(file => /[\\/]hardhat[\\/]dist[\\/]src[\\/]index\.js$/.test(file)));
   assert.deepEqual(attempts, []);
+});
+
+test('EVM harness rejects an external dependency root before starting a provider', () => {
+  const { spawnSync } = require('node:child_process');
+  const env = { ...process.env, EVE_DEPENDENCY_ROOT: path.join(root, 'external-dependencies') };
+  delete env.NODE_TEST_CONTEXT;
+  const result = spawnSync(process.execPath, ['test/local-contract.test.cjs'], {
+    cwd: root,
+    env,
+    encoding: 'utf8',
+  });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stdout + result.stderr, /External EVE_DEPENDENCY_ROOT is unsupported/);
+  assert.doesNotMatch(result.stdout + result.stderr, /18_NAMED_LOCAL_CHECKS_PASS/);
 });
