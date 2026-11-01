@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 'use strict';
-// Only Ganache's in-process provider is used. No listener, remote RPC or fork.
+// Only Hardhat's in-process EDR provider is used. No listener, remote RPC or fork.
 const net = require('node:net');
 const tls = require('node:tls');
 const blockedNetworkAttempts = [];
@@ -9,13 +9,18 @@ net.Socket.prototype.connect = block('net.Socket.connect');
 net.Server.prototype.listen = block('net.Server.listen');
 tls.connect = block('tls.connect');
 globalThis.fetch = block('fetch');
+process.env.HARDHAT_DISABLE_TELEMETRY = 'true';
 
 const fs = require('node:fs');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
+const localPackageRoot = path.resolve(__dirname, '..');
+if (process.env.EVE_DEPENDENCY_ROOT && path.resolve(process.env.EVE_DEPENDENCY_ROOT) !== localPackageRoot) {
+  throw new Error('External EVE_DEPENDENCY_ROOT is unsupported for the in-process EDR test');
+}
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { root, dependencyRequire, versions, compile, sha256, endpointIntegrity, portableError } = require('../lib/runtime.cjs');
-const ganache = dependencyRequire('ganache');
 const { BrowserProvider, ContractFactory, Wallet, ZeroAddress, ZeroHash, id, parseEther } = dependencyRequire('ethers');
 
 const runId = new Date().toISOString().replaceAll(':', '-');
@@ -67,14 +72,17 @@ test.before(async () => {
     abi: compiled.artifact.abi, bytecode: '0x' + compiled.artifact.evm.bytecode.object,
     deployedBytecode: '0x' + compiled.artifact.evm.deployedBytecode.object,
   }, null, 2) + '\n');
-  evm = ganache.provider({
-    chain: { chainId: CHAIN_ID, hardfork: 'shanghai' }, logging: { quiet: true },
-    // Explicit path confines Ganache's local test state to this research root.
-    // Random provider accounts and disconnected attestors are generated fresh.
-    database: { dbPath: path.join(output, 'local-evm-state') },
-    wallet: { totalAccounts: 3, defaultBalance: 1000 },
-  });
-  provider = new BrowserProvider(evm, undefined, { cacheTimeout: -1 });
+  // The local-only config binds chain 31337, Shanghai and three fresh funded accounts.
+  const { network } = await import(pathToFileURL(dependencyRequire.resolve('hardhat')).href);
+  evm = await network.create({ network: 'eveLocal' });
+  assert.equal(evm.networkName, 'eveLocal');
+  assert.equal(evm.networkConfig.type, 'edr-simulated');
+  assert.equal(evm.networkConfig.chainType, 'l1');
+  assert.equal(evm.networkConfig.hardfork, 'shanghai');
+  assert.equal(evm.networkConfig.forking, undefined);
+  assert.equal(evm.networkConfig.url, undefined);
+  assert.equal(await evm.provider.request({ method: 'eth_chainId' }), `0x${CHAIN_ID.toString(16)}`);
+  provider = new BrowserProvider(evm.provider, undefined, { cacheTimeout: -1 });
   provider.pollingInterval = 10;
   [admin, learner, other] = await Promise.all([0, 1, 2].map(i => provider.getSigner(i)));
   attestor = Wallet.createRandom();
@@ -83,9 +91,9 @@ test.before(async () => {
 
 test.after(async () => {
   provider?.destroy();
-  await evm?.disconnect();
+  await evm?.close();
   const sourceIntegrity = endpointIntegrity(compiled?.sources || []);
-  const localFiles = ['src/EveLearningRewardsResearch.sol', 'lib/runtime.cjs', 'test/local-contract.test.cjs', 'package.json', 'README.md', '.gitignore', 'LICENSE'];
+  const localFiles = ['src/EveLearningRewardsResearch.sol', 'lib/runtime.cjs', 'test/local-contract.test.cjs', 'test/tooling-boundary.test.cjs', 'test/verify-receipt.cjs', 'hardhat.config.ts', 'package.json', 'package-lock.json', 'README.md', '.gitignore', 'LICENSE'];
   const receipt = {
     state: checks.length === 18 && checks.every(c => c.status === 'PASS') && sourceIntegrity.every(s => s.unchanged)
       && blockedNetworkAttempts.length === 0 ? '18_NAMED_LOCAL_CHECKS_PASS' : 'INCOMPLETE_OR_FAILED',
@@ -97,7 +105,7 @@ test.after(async () => {
     warnings: compiled?.warnings, blockedNetworkAttempts, publicChainDeployment: false,
     externalRpc: false, listener: false, mainnetFork: false, existingWalletAccess: false,
     privateKeysPersistedByHarness: false, ephemeralTestSigners: true,
-    localStateStorage: 'Ganache LevelDB inside this run directory; synthetic local chain data only',
+    localStateStorage: 'Hardhat EDR in-process memory; synthetic local chain data only',
     coverage: '18 named example checks, executed local transactions and rejected static calls; source hashes before/after. No exhaustive model, adversarial audit, verifier service, frontend, gas sponsor or production observation.',
     limitations: [
       'Authorized attestor claims, not proof of human understanding; attestor may issue false vouchers.',

@@ -12,7 +12,7 @@ const dependencyRoot = path.resolve(process.env.EVE_DEPENDENCY_ROOT || root);
 const dependencyRequire = createRequire(path.join(dependencyRoot, 'package.json'));
 const readJson = file => JSON.parse(fs.readFileSync(file, 'utf8').replace(/^\uFEFF/, ''));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
-const expected = { solc: '0.8.26', ethers: '6.17.0', ganache: '7.9.2', openzeppelin: '4.9.6' };
+const expected = { solc: '0.8.26', ethers: '6.17.0', hardhat: '3.21.2', openzeppelin: '4.9.6' };
 
 function packageDirectory(name) {
   let directory = path.dirname(dependencyRequire.resolve(name));
@@ -31,7 +31,7 @@ const ozRoot = process.env.EVE_OPENZEPPELIN_ROOT
 const ozPackage = readJson(path.join(ozRoot, 'package.json'));
 if (ozPackage.name !== '@openzeppelin/contracts') throw new Error('Expected the @openzeppelin/contracts package root');
 const versions = { openzeppelin: ozPackage.version };
-for (const name of ['solc', 'ethers', 'ganache']) {
+for (const name of ['solc', 'ethers', 'hardhat']) {
   versions[name] = readJson(path.join(packageDirectory(name), 'package.json')).version;
 }
 for (const [name, version] of Object.entries(expected)) {

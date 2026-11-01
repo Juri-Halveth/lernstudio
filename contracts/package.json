@@ -5,22 +5,25 @@
   "description": "Portable local EVE learning-voucher research prototype; no public deployment",
   "license": "MIT",
   "engines": {
-    "node": ">=22 <25"
+    "node": ">=22.13 <25"
   },
   "scripts": {
     "test": "node --test --test-concurrency=1 test/local-contract.test.cjs",
-    "test:tooling": "node --test test/tooling-boundary.test.cjs"
+    "test:tooling": "node --test test/tooling-boundary.test.cjs",
+    "verify:receipt": "node test/verify-receipt.cjs"
   },
   "devDependencies": {
     "@openzeppelin/contracts": "4.9.6",
     "ethers": "6.17.0",
-    "ganache": "7.9.2",
+    "hardhat": "3.21.2",
     "solc": "0.8.26"
   },
   "overrides": {
     "solc": {
       "tmp": "0.2.7",
-      "follow-redirects": "1.16.1"
-    }
-  }
+      "follow-redirects": "1.16.2"
+    },
+    "zod": "4.6.7"
+  },
+  "type": "module"
 }
