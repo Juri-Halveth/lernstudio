@@ -4,6 +4,10 @@
 
 # Lernstudio – interaktiv lernen und eigene Lernwege entdecken
 
+![HALVETH / NETZ – Lernstudio: geöffnetes Buch mit einem Weg aus Lernstationen](HALVETH_NETZ_HERO.svg)
+
+**HALVETH / NETZ · Lernen.** [Starship Lab öffnen](https://juri-halveth.github.io/universum/) und dort die Projektkarte „LERNSTUDIO“ auswählen.
+
 **Person: Juri. Projekt: HALVETH.** [Namenszuordnung](IDENTITY.md).
 
 Eine kostenlose Lernplattform mit interaktiven Lektionen, Missionen und eigenen Lernpfaden. Bestehende Konten bleiben optional; die Lerninhalte sind direkt zugänglich.
