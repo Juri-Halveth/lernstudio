@@ -4,18 +4,15 @@
 
 # Lernstudio – interaktiv lernen und eigene Lernwege entdecken
 
-![HALVETH / NETZ – Lernstudio: geöffnetes Buch mit einem Weg aus Lernstationen](HALVETH_NETZ_HERO.svg)
+Kostenlose Lernplattform mit interaktiven Lektionen und eigenen Lernpfaden. Veröffentlichte Inhalte sind ohne Pflichtkonto oder Kauf direkt zugänglich; bestehende Konten bleiben optional. Ohne Konto liegt der Lernfortschritt im Browser.
 
-**HALVETH / NETZ · Lernen.** [Starship Lab öffnen](https://juri-halveth.github.io/universum/) und dort die Projektkarte „LERNSTUDIO“ auswählen.
+[**Lernstudio direkt öffnen**](https://juri-halveth.github.io/lernstudio/) · [Lokal starten](#lokal-starten) · [Quellcode](https://github.com/Juri-Halveth/lernstudio/tree/main)
 
 **Person: Juri. Projekt: HALVETH.** [Namenszuordnung](IDENTITY.md).
 
-Eine kostenlose Lernplattform mit interaktiven Lektionen, Missionen und eigenen Lernpfaden. Bestehende Konten bleiben optional; die Lerninhalte sind direkt zugänglich.
+![Lernstudio: geöffnetes Buch mit einem Weg aus Lernstationen](HALVETH_NETZ_HERO.svg)
 
-[**Projekt öffnen →**](https://juri-halveth.github.io/lernstudio/) · [Arbeitsproben](https://juri-halveth.github.io/koennen/) · [Portfolio](https://juri-halveth.github.io/)
-
-
-Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, Marketing ohne Werbebudget und selbst gestaltbaren Tier-Avataren. Ohne Pflichtkonto direkt loslernen: Alle veröffentlichten Lerninhalte sind ohne Kauf, Abonnement oder Zahlungsdaten verfügbar. Bestehende Lernstudio-Konten bleiben optional nutzbar. Ohne Konto liegt dein Fortschritt nur in deinem Browser.
+[Starship Lab als optionaler HALVETH-Überblick](https://juri-halveth.github.io/universum/)
 
 **HALVETH authorship and participation:** Juri Janovski (Projekt HALVETH) claims the rights in original platform design, lesson selection and arrangement, original prose, models, diagrams and new code contributions. Evidence or teaching boundaries are not rights waivers. Historical ISC permissions remain effective; protected new HALVETH contributions require a written commercial license and participation agreement.
 
