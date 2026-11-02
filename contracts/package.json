@@ -10,6 +10,7 @@
   "scripts": {
     "test": "node --test --test-concurrency=1 test/local-contract.test.cjs",
     "test:tooling": "node --test test/tooling-boundary.test.cjs",
+    "test:receipt": "node --test test/receipt-integrity.test.cjs",
     "verify:receipt": "node test/verify-receipt.cjs"
   },
   "devDependencies": {

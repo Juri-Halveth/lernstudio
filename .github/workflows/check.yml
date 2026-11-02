@@ -33,4 +33,5 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run test:tooling
       - run: npm test
+      - run: npm run test:receipt
       - run: npm run verify:receipt

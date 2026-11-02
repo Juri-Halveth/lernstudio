@@ -30,6 +30,15 @@ const ozRoot = process.env.EVE_OPENZEPPELIN_ROOT
   : path.dirname(dependencyRequire.resolve('@openzeppelin/contracts/package.json'));
 const ozPackage = readJson(path.join(ozRoot, 'package.json'));
 if (ozPackage.name !== '@openzeppelin/contracts') throw new Error('Expected the @openzeppelin/contracts package root');
+const sourceName = 'src/EveLearningRewardsResearch.sol';
+const ozPrefix = '@openzeppelin/contracts/';
+function sourcePath(name) {
+  if (name === sourceName) return path.join(root, sourceName);
+  if (!name.startsWith(ozPrefix)) throw new Error('Source outside pinned OpenZeppelin source root');
+  const file = path.resolve(ozRoot, name.slice(ozPrefix.length));
+  if (!file.startsWith(path.resolve(ozRoot) + path.sep)) throw new Error('Import path escaped pinned root');
+  return file;
+}
 const versions = { openzeppelin: ozPackage.version };
 for (const name of ['solc', 'ethers', 'hardhat']) {
   versions[name] = readJson(path.join(packageDirectory(name), 'package.json')).version;
@@ -41,7 +50,6 @@ for (const [name, version] of Object.entries(expected)) {
 const boundSourceFiles = new Map();
 function compile() {
   const solc = dependencyRequire('solc');
-  const sourceName = 'src/EveLearningRewardsResearch.sol';
   const reads = new Map();
   function readBound(file, name) {
     const content = fs.readFileSync(file, 'utf8');
@@ -51,7 +59,7 @@ function compile() {
   }
   const input = {
     language: 'Solidity',
-    sources: { [sourceName]: { content: readBound(path.join(root, sourceName), sourceName) } },
+    sources: { [sourceName]: { content: readBound(sourcePath(sourceName), sourceName) } },
     settings: {
       optimizer: { enabled: true, runs: 200 }, evmVersion: 'shanghai',
       outputSelection: { '*': { '*': ['abi', 'evm.bytecode.object', 'evm.deployedBytecode.object', 'metadata'] } },
@@ -59,9 +67,10 @@ function compile() {
   };
   const importedSources = {};
   const output = JSON.parse(solc.compile(JSON.stringify(input), { import(name) {
-    if (!name.startsWith('@openzeppelin/contracts/')) return { error: 'Import outside pinned OpenZeppelin source root' };
-    const file = path.resolve(ozRoot, name.slice('@openzeppelin/contracts/'.length));
-    if (!file.startsWith(path.resolve(ozRoot) + path.sep)) return { error: 'Import path escaped pinned root' };
+    if (!name.startsWith(ozPrefix)) return { error: 'Import outside pinned OpenZeppelin source root' };
+    let file;
+    try { file = sourcePath(name); }
+    catch { return { error: 'Import path escaped pinned root' }; }
     try {
       const content = readBound(file, name);
       importedSources[name] = { content };
@@ -91,4 +100,4 @@ function portableError(error) {
   }
   return message;
 }
-module.exports = { root, dependencyRequire, versions, compile, sha256, endpointIntegrity, portableError };
+module.exports = { root, ozRoot, sourcePath, dependencyRequire, versions, compile, sha256, endpointIntegrity, portableError };
