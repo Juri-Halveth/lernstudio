@@ -4,13 +4,15 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const { createHash } = require('node:crypto');
+const { sourcePath } = require('../lib/runtime.cjs');
 
 const root = path.resolve(__dirname, '..');
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const expectedFiles = [
   'src/EveLearningRewardsResearch.sol', 'lib/runtime.cjs',
   'test/local-contract.test.cjs', 'test/tooling-boundary.test.cjs',
-  'test/verify-receipt.cjs', 'hardhat.config.ts', 'package.json',
+  'test/verify-receipt.cjs', 'test/receipt-integrity.test.cjs',
+  'hardhat.config.ts', 'package.json',
   'package-lock.json', 'README.md', '.gitignore', 'LICENSE',
 ];
 const expectedSources = [
@@ -45,6 +47,14 @@ assert.equal(receipt.checks.length, 18);
 assert(receipt.checks.every(check => check.status === 'PASS'));
 assert.deepEqual(receipt.sourceIntegrity.map(source => source.name).sort(), [...expectedSources].sort());
 assert(receipt.sourceIntegrity.every(source => source.unchanged && source.expected === source.actual));
+assert.deepEqual(receipt.sources.map(source => source.name).sort(), [...expectedSources].sort());
+const compiledHashes = new Map(receipt.sources.map(source => [source.name, source.sha256]));
+for (const source of receipt.sourceIntegrity) {
+  assert.equal(source.expected, compiledHashes.get(source.name), `${source.name}: compilation hash`);
+  const currentBytes = fs.readFileSync(sourcePath(source.name));
+  assert.equal(sha256(currentBytes), source.actual, `${source.name}: current source hash`);
+  assert.equal(sha256(currentBytes.toString('utf8')), source.expected, `${source.name}: current compiler input hash`);
+}
 assert.deepEqual(receipt.blockedNetworkAttempts, []);
 assert.deepEqual(receipt.localFiles.map(item => item.name).sort(), [...expectedFiles].sort());
 for (const item of receipt.localFiles) {

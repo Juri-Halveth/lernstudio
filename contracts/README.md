@@ -23,6 +23,7 @@ Voraussetzungen: Node.js ab 22.13 bis unter 25 und npm. Lokale Läufe verwenden 
 npm ci --ignore-scripts
 npm run test:tooling
 npm test
+npm run test:receipt
 npm run verify:receipt
 ```
 
