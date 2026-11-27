@@ -4,7 +4,7 @@ const {JSDOM,VirtualConsole}=require("jsdom");
 const root=path.resolve(__dirname,"..");
 async function createApp(hash="",stored={},signedIn=true){
   const errors=[],requests=[];const virtualConsole=new VirtualConsole();virtualConsole.on("jsdomError",e=>errors.push(e));
-  const dom=new JSDOM('<!doctype html><html><body><div id="app"></div></body></html>',{url:"https://local.example/"+hash,runScripts:"outside-only",virtualConsole});
+  const dom=new JSDOM('<!doctype html><html><body><a class="skip-link" href="#main-content">Zum Lernen</a><div id="app"></div></body></html>',{url:"https://local.example/"+hash,runScripts:"outside-only",virtualConsole});
   const w=dom.window;
   w.structuredClone=value=>w.JSON.parse(w.JSON.stringify(value));
   w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=()=>{};w.confirm=()=>true;w.alert=()=>{};
@@ -31,6 +31,13 @@ async function createApp(hash="",stored={},signedIn=true){
 }
 (async()=>{
 const guest=await createApp('#lesson/html-0-magie',{},false);
+const lessonHref=guest.w.location.href;
+const lessonMain=guest.w.document.getElementById('main-content');
+guest.w.document.querySelector('.skip-link').click();
+await new Promise(resolve=>guest.w.setTimeout(resolve,10));
+assert.equal(guest.w.location.href,lessonHref,'Skip link preserves the current lesson route');
+assert.equal(guest.w.document.activeElement,lessonMain,'Skip link focuses the existing main content');
+
 assert(guest.w.document.querySelector('.lesson-focus'),'Guest can open an actual lesson');assert.equal(guest.requests.length,0,'Browsing as guest sends no account request');
 function visitExercise(w, lesson, selector) {
   w.__test.go('lesson', lesson);
