@@ -3638,6 +3638,16 @@ document.getElementById("go").addEventListener("click", function(){
   readRoute(); render();
   window.learningAccountReady = bootAccount(callbackHash);
   window.addEventListener("popstate", () => { readRoute(); render(); });
+  // Routes and the skip link share a fragment. Focus the rendered content
+  // directly so a keyboard shortcut cannot change lessons or discard a beat.
+  document.querySelector('.skip-link[href="#main-content"]')?.addEventListener("click", event => {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+    const content = document.getElementById("main-content");
+    if (!content) return;
+    event.preventDefault();
+    content.focus({ preventScroll: true });
+    content.scrollIntoView({ block: "start" });
+  });
   window.addEventListener("hashchange", () => { readRoute(); render(); });
   window.addEventListener("storage", event => {
     if (event.key === window.LearningAccount.SESSION_KEY || event.key === null) { ++accountEpoch; bootAccount(""); return; }
