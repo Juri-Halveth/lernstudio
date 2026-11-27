@@ -53,13 +53,25 @@
     document.querySelectorAll("[data-account-status]").forEach(node => { node.textContent = message; });
   }
   function extraForSync() { return { ...extraState, appearance: { color: state.color, accessory: state.accessory } }; }
+  function extraCacheKey(userId) {
+    return userId ? LS_ACCOUNT_PREFIX + userId + ":extra" : "lernstudio_guest:extra";
+  }
+  function readExtraCache(userId) {
+    try { return window.LSAccountProgress.cleanExtraState(JSON.parse(localStorage.getItem(extraCacheKey(userId)) || "{}")); }
+    catch (_) { return {}; }
+  }
   function saveExtraCache() {
-    if (activeUser) { try { localStorage.setItem(LS_ACCOUNT_PREFIX + activeUser + ":extra", JSON.stringify(extraForSync())); } catch (_) {} }
+    try {
+      const data = window.LSAccountProgress.encodeExtraState(extraForSync());
+      localStorage.setItem(extraCacheKey(activeUser), data);
+      return true;
+    } catch (_) { return false; }
   }
   function planeFortschrittSync() {
-    if (!accountReady || !activeUser || auth.getSession()?.user_id !== activeUser) return;
-    saveExtraCache(); setAccountMessage("Änderungen werden gespeichert …"); clearTimeout(syncTimer);
+    if (!accountReady || !activeUser || auth.getSession()?.user_id !== activeUser) return false;
+    const cached = saveExtraCache(); setAccountMessage("Änderungen werden gespeichert …"); clearTimeout(syncTimer);
     syncTimer = setTimeout(syncFortschrittJetzt, 350);
+    return cached;
   }
   function syncFortschrittJetzt() {
     clearTimeout(syncTimer);
@@ -74,11 +86,10 @@
   }
   async function activateAccount() {
     const run = ++accountEpoch, session = auth.getSession();
-    accountReady = false; activeUser = session?.user_id || null; extraState = {};
+    accountReady = false; activeUser = session?.user_id || null; extraState = readExtraCache(activeUser);
     profileStore = scopedStore(activeUser); state = profileStore.read();
     if (!activeUser) { accountBusy = false; accountReady = true; setAccountMessage("Auf diesem Gerät gespeichert."); render(); return; }
     accountBusy = true; setAccountMessage("Dein Lernstand wird geladen …"); render();
-    try { extraState = window.LSAccountProgress.cleanExtraState(JSON.parse(localStorage.getItem(LS_ACCOUNT_PREFIX + activeUser + ":extra") || "{}")); } catch (_) {}
     const result = await progressClient.load(state, extraState);
     if (run !== accountEpoch || session.user_id !== auth.getSession()?.user_id) return;
     accountBusy = false;
@@ -100,12 +111,12 @@
       await auth.restore(callbackHash);
       if (auth.isRecovery()) { authMode = "password"; current = { view: "login", arg: null }; accountBusy = false; render(); }
       else await activateAccount();
-    } catch (error) { activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); accountBusy = false; accountReady = true; authMessage = error.message; render(); }
+    } catch (error) { activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); extraState = readExtraCache(null); accountBusy = false; accountReady = true; authMessage = error.message; render(); }
   }
   async function logout() {
     await syncFortschrittJetzt();
     ++accountEpoch; clearTimeout(syncTimer); accountReady = false; activeUser = null;
-    const pending = auth.signOut(); profileStore = scopedStore(null); state = profileStore.read(); extraState = {}; accountReady = true;
+    const pending = auth.signOut(); profileStore = scopedStore(null); state = profileStore.read(); extraState = readExtraCache(null); accountReady = true;
     document.querySelector(".profile-dialog")?.close(); go("home");
     const revoked = await pending;
     if (!revoked) { authMessage = "Auf diesem Gerät abgemeldet. Die serverseitige Abmeldung konnte nicht bestätigt werden."; go("login"); }
@@ -334,6 +345,7 @@
       <fieldset><legend>Deine Farbe</legend><div class="choice-row">${window.LearningProfile.COLORS.map(c => `<button type="button" data-color="${c}" class="swatch buddy-${c}" aria-label="${colorLabels[c]}" aria-pressed="${c === state.color}"></button>`).join("")}</div></fieldset>
       <fieldset><legend>Ein kleines Extra</legend><div class="emoji-row">${window.LearningProfile.ACCESSORIES.map((a,i) => `<button type="button" data-accessory="${a}" aria-label="${["Kein Extra", "Pflänzchen", "Stern", "Blume", "Kopfhörer", "Krone"][i]}" aria-pressed="${a === state.accessory}">${a || "–"}</button>`).join("")}</div></fieldset>
       <p class="local-note">${activeUser ? 'Dein Lernstand wird in deinem Konto gespeichert. Auf einem anderen Gerät meldest du dich mit derselben E-Mail-Adresse an.' : 'Dein Lernstand bleibt in diesem Browser. Eine Sicherung schützt ihn vor gelöschten Browserdaten. Ein Konto ist freiwillig; Gast- und Kontostand bleiben getrennt.'}</p>
+      <p class="local-note">Die Dateisicherung enthält dein Lernprofil und deine Abschlüsse. Marketing-Brief, Suchvorschau und Checklisten werden separat im Browser oder im angemeldeten Konto gespeichert.</p>
       <div class="profile-actions"><button class="btn" id="pp-export" type="button">Sicherung herunterladen</button><button class="btn" id="pp-import" type="button">Sicherung laden</button></div>
       <p id="profileMessage" data-account-status role="status">${esc(accountMessage)}</p>
       <button class="text-button" id="pp-sync" type="button">Speicherung erneut versuchen</button>
@@ -366,7 +378,7 @@
         await auth.deleteAccount();
         const prefix = LS_ACCOUNT_PREFIX + activeUser + ":";
         try { Object.keys(localStorage).filter(key => key.startsWith(prefix) || key === "lernstudio_v2_account_" + activeUser).forEach(key => localStorage.removeItem(key)); } catch (_) {}
-        activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); extraState = {}; accountReady = true; dialog.close(); go("home");
+        activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); extraState = readExtraCache(null); accountReady = true; dialog.close(); go("home");
       } catch (error) { accountReady = true; event.target.disabled = false; setAccountMessage(error.message + " Bei weiteren Problemen nutze bitte unsere Kontaktseite."); }
     });
     if (!activeUser) {
@@ -2046,7 +2058,15 @@ document.getElementById("go").addEventListener("click", function(){
 
   /* ---------------- MARKETING/SEO: geteilter Projekt-Zustand (eigener localStorage-Namespace, unabhaengig vom App-State) ---------------- */
   function mktgGet() { return extraState.marketing || {}; }
-  function mktgSet(patch) { const s = { ...mktgGet() }; Object.keys(patch || {}).forEach(k => { s[k] = (patch[k] && typeof patch[k] === "object" && !Array.isArray(patch[k])) ? Object.assign({}, s[k], patch[k]) : patch[k]; }); extraState.marketing = s; planeFortschrittSync(); return s; }
+  function mktgSet(patch) {
+    const next = { ...mktgGet() };
+    for (const [key, value] of Object.entries(patch)) {
+      next[key] = { ...next[key], ...value };
+    }
+    extraState.marketing = next;
+    if (activeUser) return planeFortschrittSync();
+    return accountReady && saveExtraCache();
+  }
   /* SERP-Pixelmessung wie Google (canvas.measureText). Google schneidet nach PIXELN ab, nicht nach Zeichen. */
   let _serpCanvas = null;
   function serpMeasure(text, fontPx, family) { _serpCanvas = _serpCanvas || document.createElement("canvas"); const cx = _serpCanvas.getContext("2d"); cx.font = fontPx + "px " + (family || "arial, sans-serif"); return Math.round(cx.measureText(String(text || "")).width); }
@@ -2609,8 +2629,8 @@ document.getElementById("go").addEventListener("click", function(){
       c.querySelector(".act-brief").addEventListener("click", () => {
         const brief = {};
         form.querySelectorAll("[data-k]").forEach(i => { brief[i.getAttribute("data-k")] = i.value.trim(); });
-        mktgSet({ brief: brief });
-        c.querySelector(".brief-msg").textContent = "Gespeichert. Ab jetzt personalisiert dein Produkt beide Pfade, Suche und Wachstum.";
+        const saved = mktgSet({ brief });
+        c.querySelector(".brief-msg").textContent = saved ? "Auf diesem Gerät gespeichert. Dein Produkt personalisiert Suche und Wachstum." : "Auf diesem Gerät gerade nicht gespeichert. Der Brief bleibt in der geöffneten Ansicht.";
         setWeiter(true, idx < beats.length - 1 ? "Weiter →" : "Geschafft →");
       });
       stageEl.appendChild(c);
@@ -2646,7 +2666,7 @@ document.getElementById("go").addEventListener("click", function(){
       tin.value = saved.title || b.title || (brief.produkt ? (brief.produkt + " kaufen") : "");
       din.value = saved.desc || b.desc || "";
       const urlText = String(brief.url || b.url || "deinewebsite.de").replace(/^https?:\/\//, "").replace(/\/$/, "");
-      function render() {
+      function render(event) {
         const t = tin.value, d = din.value;
         const tpx = serpMeasure(t, 20, "arial, sans-serif");
         const tOk = tpx <= TITLE_MAX && t.trim().length > 0;
@@ -2659,7 +2679,9 @@ document.getElementById("go").addEventListener("click", function(){
         let dprev = d || "Deine Meta-Beschreibung erscheint hier. Schreib etwas, das zum Klicken einlädt.";
         if (dprev.length > DESC_HARD) dprev = dprev.slice(0, DESC_HARD - 1).replace(/\s+\S*$/, "") + " …";
         pd.textContent = dprev;
-        mktgSet({ serp: { title: t, desc: d } });
+        if (event && !mktgSet({ serp: { title: t, desc: d } })) {
+          dmeter.append(" · Auf diesem Gerät gerade nicht gespeichert.");
+        }
         const ok = tOk && dlen > 0;
         setWeiter(ok, ok ? (idx < beats.length - 1 ? "Weiter →" : "Geschafft →") : null);
       }
@@ -2678,14 +2700,16 @@ document.getElementById("go").addEventListener("click", function(){
         state[i] = !!store[i];
         const row = el(`<label style="display:flex;gap:11px;align-items:flex-start;cursor:pointer;background:var(--panel,#141518);border:1px solid var(--line,#262730);border-radius:10px;padding:11px 13px"><input type="checkbox" style="margin-top:2px;width:18px;height:18px;flex:none;accent-color:var(--good,#7ee787)"><span style="font-size:14.5px;line-height:1.5">${it}</span></label>`);
         const cb = row.querySelector("input"); cb.checked = state[i];
-        cb.addEventListener("change", () => { state[i] = cb.checked; sync(); });
+        cb.addEventListener("change", () => { state[i] = cb.checked; sync(true); });
         list.appendChild(row);
       });
-      function sync() {
+      function sync(changed) {
         const n = items.length, ok = items.filter((x, i) => state[i]).length;
         fill.style.width = (n ? Math.round(ok / n * 100) : 0) + "%";
         msg.textContent = ok + " von " + n + " erledigt";
-        const checks = mktgGet().checks || {}; checks[key] = state; mktgSet({ checks: checks });
+        if (changed && !mktgSet({ checks: { [key]: state } })) {
+          msg.append(" · Auf diesem Gerät gerade nicht gespeichert.");
+        }
         const all = n > 0 && ok === n;
         done.innerHTML = all ? ('<div class="beat-rev ok">' + (b.erklaerung || "Stark. Alles erledigt.") + '</div>') : "";
         setWeiter(all, all ? (idx < beats.length - 1 ? "Weiter →" : "Geschafft →") : null);

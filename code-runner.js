@@ -10,12 +10,17 @@
     return new Promise(resolve => {
       const frame = document.createElement('iframe');
       frame.hidden = true; frame.title = 'Isolierte Codeausführung'; frame.sandbox = 'allow-scripts';
-      let timer, ended = false;
+      let timer, ended = false, started = false;
       const id = crypto.randomUUID();
       const finish = result => { if (ended) return; ended = true; clearTimeout(timer); root.removeEventListener('message', receive); frame.remove(); if (active === finish) active = null; resolve(result); };
       const receive = event => {
         if (event.source !== frame.contentWindow || event.data?.id !== id) return;
-        if (event.data.type === 'ready') { clearTimeout(timer); timer = setTimeout(() => finish({ok:false,output:'Zeitlimit nach 8 Sekunden. Prüfe Schleifen und Abbruchbedingungen.'}),8000); onStatus('Programm läuft …'); }
+        if (event.data.type === 'ready' && !started) {
+          started = true;
+          clearTimeout(timer);
+          timer = setTimeout(() => finish({ok:false,output:'Zeitlimit nach 8 Sekunden. Prüfe Schleifen und Abbruchbedingungen.'}),8000);
+          onStatus('Programm läuft …');
+        }
         if (event.data.type === 'result') finish({ok:event.data.ok === true,output:String(event.data.output).slice(0,34000)});
       };
       active = finish;

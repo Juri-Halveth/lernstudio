@@ -32,6 +32,42 @@ async function createApp(hash="",stored={},signedIn=true){
 (async()=>{
 const guest=await createApp('#lesson/html-0-magie',{},false);
 assert(guest.w.document.querySelector('.lesson-focus'),'Guest can open an actual lesson');assert.equal(guest.requests.length,0,'Browsing as guest sends no account request');
+function visitExercise(w, lesson, selector) {
+  w.__test.go('lesson', lesson);
+  for (let i = 0; i < 5 && !w.document.querySelector(selector); i++) {
+    w.document.querySelector('.beat-opt')?.click();
+    w.document.querySelector('.beat-weiter').click();
+  }
+  const exercise = w.document.querySelector(selector);
+  assert(exercise, 'Expected exercise ' + lesson);
+  return exercise;
+}
+const draftProduct = 'Gastprojekt';
+visitExercise(guest.w, 'seo-0-1', '.brief-form').querySelector('[data-k="produkt"]').value = draftProduct;
+guest.w.document.querySelector('.act-brief').click();
+assert.match(guest.w.document.querySelector('.brief-msg').textContent, /Auf diesem Gerät gespeichert/);
+const serpTitle = visitExercise(guest.w, 'seo-1-1', '.serp-title');
+serpTitle.value = 'Ein eigener Titel';
+serpTitle.dispatchEvent(new guest.w.Event('input'));
+visitExercise(guest.w, 'html-2-5', '.check-list input').click();
+const exerciseKey = 'lernstudio_guest:extra';
+const guestExercises = guest.w.localStorage.getItem(exerciseKey);
+const restored = await createApp('', {[exerciseKey]: guestExercises}, false);
+assert.equal(visitExercise(restored.w, 'seo-0-1', '.brief-form').querySelector('[data-k="produkt"]').value, draftProduct);
+assert.equal(visitExercise(restored.w, 'seo-1-1', '.serp-title').value, 'Ein eigener Titel');
+assert.equal(visitExercise(restored.w, 'html-2-5', '.check-list input').checked, true);
+assert.equal(restored.requests.length, 0, 'Guest exercise persistence stays local');
+restored.dom.window.close();
+const isolated = await createApp('', {[exerciseKey]: guestExercises}, true);
+assert.equal(visitExercise(isolated.w, 'seo-0-1', '.brief-form').querySelector('[data-k="produkt"]').value, '', 'Account starts separately');
+assert.equal(isolated.w.localStorage.getItem(exerciseKey), guestExercises, 'Guest cache survives sign-in');
+isolated.dom.window.close();
+const blocked = await createApp('', {}, false);
+visitExercise(blocked.w, 'seo-0-1', '.brief-form').querySelector('[data-k="produkt"]').value = 'Entwurf';
+blocked.w.Storage.prototype.setItem = () => { throw new Error('Storage unavailable'); };
+blocked.w.document.querySelector('.act-brief').click();
+assert.match(blocked.w.document.querySelector('.brief-msg').textContent, /gerade nicht gespeichert/);
+blocked.dom.window.close();
 guest.w.__test.go('lesson','ideenwerkstatt-0-1');
 assert(guest.w.document.querySelector('.beat-stage')?.textContent.includes('Burger'), 'New illustrated path is reachable');
 guest.w.document.querySelector('.beat-weiter').click();
