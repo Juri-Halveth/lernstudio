@@ -25,12 +25,15 @@
     return out;
   }
 
+  function encodeExtraState(value) {
+    if (!value || typeof value !== "object" || Array.isArray(value)) throw new TypeError("Ungültige Zusatzdaten.");
+    const text = JSON.stringify(value);
+    if (text.length > MAX_EXTRA_BYTES) throw new RangeError("Die Zusatzdaten sind zu groß.");
+    return text;
+  }
   function cleanExtraState(value) {
-    if (!value || typeof value !== "object" || Array.isArray(value)) return {};
     try {
-      const text = JSON.stringify(value);
-      if (text.length > MAX_EXTRA_BYTES) return {};
-      return JSON.parse(text);
+      return JSON.parse(encodeExtraState(value));
     } catch (e) {
       return {};
     }
@@ -198,6 +201,7 @@
 
   return {
     cleanBoolMap,
+    encodeExtraState,
     cleanExtraState,
     normalizeState,
     mergeState,
