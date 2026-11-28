@@ -17,7 +17,7 @@
     "@openzeppelin/contracts": "4.9.6",
     "ethers": "6.17.0",
     "hardhat": "3.21.2",
-    "solc": "0.8.26"
+    "solc": "0.8.39"
   },
   "overrides": {
     "solc": {
