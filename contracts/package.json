@@ -16,7 +16,7 @@
   "devDependencies": {
     "@openzeppelin/contracts": "4.9.6",
     "ethers": "6.17.0",
-    "hardhat": "3.21.2",
+    "hardhat": "3.22.0",
     "solc": "0.8.26"
   },
   "overrides": {
