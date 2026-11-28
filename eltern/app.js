@@ -1,7 +1,7 @@
 (function(){
   'use strict';
   const data=window.ParentLessons,model=window.ParentProgress,main=document.getElementById('main');
-  let state=model.empty(),memoryOnly=false,loadWarning='',pendingImport=null,retainedRaw=null;
+  let state=model.empty(),memoryOnly=false,loadWarning='',retainedRaw=null;
   try{const raw=localStorage.getItem(model.KEY);if(raw){retainedRaw=raw;const parsed=model.validate(JSON.parse(raw),data);state=parsed.state;if(parsed.unknown.length){localStorage.setItem(model.KEY+'.previous',raw);loadWarning='В учебнике появились изменения. Известные занятия сохранены. Предыдущая запись с отсутствующими занятиями сохранена отдельно в этом браузере.';}}}
   catch{if(retainedRaw){try{localStorage.setItem(model.KEY+'.previous',retainedRaw);}catch{memoryOnly=true;}}else memoryOnly=true;loadWarning='Сохранённый прогресс сейчас недоступен. Можно заниматься дальше и сохранить новый файл прогресса.';}
   function node(tag,text,attrs={}){const e=document.createElement(tag);if(text!==null)e.textContent=text;for(const [k,v]of Object.entries(attrs))e.setAttribute(k,String(v));return e;}
@@ -45,7 +45,38 @@
     const actions=node('div',null,{class:'actions'}),notice=node('p','',{class:'feedback',role:'status',hidden:''});
     actions.append(button('Сохранить файл прогресса',()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=link('Файл прогресса',url);a.download='мой-учебный-прогресс.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);feedback(notice,'Браузер получил файл для сохранения. Посмотрите список загрузок или выбранную папку.',true);},{class:'primary',id:'export-progress'}));
     const input=node('input',null,{type:'file',id:'progress-file',accept:'.json,application/json'}),label=node('label','Открыть файл прогресса',{for:'progress-file',class:'file-label'});transfer.append(actions,label,input,notice);
-    input.addEventListener('change',()=>{pendingImport=null;const file=input.files[0];if(!file)return;if(file.size>200000){feedback(notice,'Этот файл слишком большой для учебного прогресса. Выберите сохранённый JSON-файл.');return;}const reader=new FileReader();reader.onerror=()=>feedback(notice,'Браузер не смог прочитать файл. Попробуйте выбрать его снова.');reader.onload=()=>{try{const result=model.validate(JSON.parse(reader.result),data);pendingImport=result;feedback(notice,'Файл прочитан. Найдено пройденных занятий: '+result.state.done.length+'.'+(result.unknown.length?' Некоторые названия отсутствуют в текущем учебнике: '+result.unknown.join(', ')+'. Они остаются в вашем исходном файле.':''));const apply=button('Добавить этот прогресс',()=>{if(!pendingImport)return;state=model.merge(state,pendingImport.state);pendingImport=null;preferences();save();feedback(notice,'Прогресс добавлен. Ваши ранее пройденные занятия сохранены.',true);apply.remove();},{class:'primary',id:'confirm-import'});transfer.querySelector('#confirm-import')?.remove();transfer.append(apply);}catch(e){transfer.querySelector('#confirm-import')?.remove();feedback(notice,e.message==='Unexpected end of JSON input'?'Файл повреждён. Текущий прогресс сохранён.':'Файл не подошёл. '+(e instanceof SyntaxError?'Нужен JSON-файл прогресса этого учебника.':e.message));}};reader.readAsText(file);});main.append(transfer);
+    let pendingImport=null,importVersion=0;
+    input.addEventListener('change',()=>{
+      const version=++importVersion;
+      pendingImport=null;
+      transfer.querySelector('#confirm-import')?.remove();
+      const file=input.files[0];
+      if(!file)return;
+      if(file.size>200000){feedback(notice,'Этот файл слишком большой для учебного прогресса. Выберите сохранённый JSON-файл.');return;}
+      const reader=new FileReader();
+      const current=()=>version===importVersion&&transfer.isConnected;
+      reader.onerror=()=>{if(current())feedback(notice,'Браузер не смог прочитать файл. Попробуйте выбрать его снова.');};
+      reader.onload=()=>{
+        if(!current())return;
+        try{
+          const result=model.validate(JSON.parse(reader.result),data);
+          pendingImport=result;
+          feedback(notice,'Файл прочитан. Найдено пройденных занятий: '+result.state.done.length+'.'+(result.unknown.length?' Некоторые названия отсутствуют в текущем учебнике: '+result.unknown.join(', ')+'. Они остаются в вашем исходном файле.':''));
+          const apply=button('Добавить этот прогресс',()=>{
+            if(!pendingImport)return;
+            state=model.merge(state,pendingImport.state);
+            pendingImport=null;preferences();save();
+            feedback(notice,'Прогресс добавлен. Ваши ранее пройденные занятия сохранены.',true);
+            apply.remove();
+          },{class:'primary',id:'confirm-import'});
+          transfer.append(apply);
+        }catch(e){
+          feedback(notice,e.message==='Unexpected end of JSON input'?'Файл повреждён. Текущий прогресс сохранён.':'Файл не подошёл. '+(e instanceof SyntaxError?'Нужен JSON-файл прогресса этого учебника.':e.message));
+        }
+      };
+      reader.readAsText(file);
+    });
+    main.append(transfer);
     const glossary=node('section',null,{class:'paper'});glossary.append(node('h2','Частые слова на немецком экране'));const dl=node('dl',null,{class:'glossary'});for(const [de,ru]of [['Einstellungen','Настройки'],['Speichern','Сохранить'],['Abbrechen','Отменить'],['Schließen','Закрыть'],['Suchen','Искать'],['Downloads / Herunterladen','Загрузки / Скачать'],['Zurück','Назад'],['Weiter','Дальше']])dl.append(node('dt',de,{lang:'de'}),node('dd',ru));glossary.append(dl);main.append(glossary);
     const sources=node('section',null,{class:'paper'});sources.append(node('h2','Если хочется узнать больше'),node('p','Следующие ссылки открывают настоящие сайты. Их вид и правила могут меняться. Справка помогает свериться с текущими настройками.'));const list=node('ul',null,{class:'source-list'});for(const source of data.sources){const li=node('li');li.append(link(source.title+' ↗',source.url));list.append(li);}sources.append(list);main.append(sources);
   }

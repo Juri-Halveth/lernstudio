@@ -2,7 +2,25 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {JSDOM,VirtualConsole}=require('jsdom'),data=require('../eltern/lessons.js'),model=require('../eltern/progress.js');
 const root=path.resolve(__dirname,'..'),read=name=>fs.readFileSync(path.join(root,name),'utf8');
-const flush=()=>new Promise(resolve=>setTimeout(resolve,20));
+// Keep the browser's real FileReader, but control when each read starts.
+// Tests wait for its loadend event rather than assuming any fixed I/O duration.
+function deferFileReads(w){
+  const NativeReader=w.FileReader,reads=[];
+  w.FileReader=class extends NativeReader{
+    readAsText(...args){
+      const done=new Promise(resolve=>this.addEventListener('loadend',resolve,{once:true}));
+      reads.push({start:()=>super.readAsText(...args),done});
+    }
+  };
+  return reads;
+}
+function selectFile(app,input,file){
+  Object.defineProperty(input,'files',{configurable:true,value:[file]});
+  input.dispatchEvent(new app.w.Event('change'));
+}
+function progressFile(app,done){
+  return new app.w.File([JSON.stringify({...model.empty(),done})],'progress.json',{type:'application/json'});
+}
 function create({hash='',stored=null,blocked=false}={}){
   const errors=[],network=[],vc=new VirtualConsole();vc.on('jsdomError',error=>errors.push(error.message));
   const dom=new JSDOM(read('eltern/index.html'),{url:'https://juri-halveth.github.io/lernstudio/eltern/'+hash,runScripts:'outside-only',pretendToBeVisual:true,virtualConsole:vc});
@@ -57,8 +75,54 @@ test('import validates before changing state, merges completions and exposes rem
 test('catalog changes retain the previous cached record while current progress uses available lessons',()=>{
  const raw=JSON.stringify({...model.empty(),done:['first-click','retired-lesson']});const app=create({stored:raw});try{assert.equal(app.w.localStorage.getItem(model.KEY+'.previous'),raw);app.doc.getElementById('start').click();assert.deepEqual(JSON.parse(app.w.localStorage.getItem(model.KEY)).done,['first-click']);assert.equal(app.w.localStorage.getItem(model.KEY+'.previous'),raw);}finally{app.dom.window.close();}
 });
-test('file import needs an explicit second click and a corrupt file preserves current progress',async()=>{
-  const stored=JSON.stringify({...model.empty(),done:['first-click']});const app=create({stored,hash:'#help'});try{const input=app.doc.getElementById('progress-file');Object.defineProperty(input,'files',{configurable:true,value:[new app.w.File([JSON.stringify({...model.empty(),done:['windows']})],'progress.json',{type:'application/json'})]});input.dispatchEvent(new app.w.Event('change'));await flush();assert.deepEqual(JSON.parse(app.w.localStorage.getItem(model.KEY)).done,['first-click']);assert(app.doc.getElementById('confirm-import'));app.doc.getElementById('confirm-import').click();assert.deepEqual(JSON.parse(app.w.localStorage.getItem(model.KEY)).done,['first-click','windows']);const before=app.w.localStorage.getItem(model.KEY);Object.defineProperty(input,'files',{configurable:true,value:[new app.w.File(['broken'],'bad.json')]});input.dispatchEvent(new app.w.Event('change'));await flush();assert.equal(app.w.localStorage.getItem(model.KEY),before);assert(!app.doc.getElementById('confirm-import'));}finally{app.dom.window.close();}
+test('file import needs an explicit second click and a corrupt file preserves current progress',{timeout:5000},async()=>{
+  const stored=JSON.stringify({...model.empty(),done:['first-click']});
+  const app=create({stored,hash:'#help'}),reads=deferFileReads(app.w);
+  try{
+    const input=app.doc.getElementById('progress-file');
+    selectFile(app,input,progressFile(app,['windows']));
+    assert.deepEqual(JSON.parse(app.w.localStorage.getItem(model.KEY)).done,['first-click']);
+    assert(!app.doc.getElementById('confirm-import'));
+    reads[0].start();await reads[0].done;
+    assert.deepEqual(JSON.parse(app.w.localStorage.getItem(model.KEY)).done,['first-click']);
+    assert(app.doc.getElementById('confirm-import'));
+    app.doc.getElementById('confirm-import').click();
+    assert.deepEqual(JSON.parse(app.w.localStorage.getItem(model.KEY)).done,['first-click','windows']);
+    const before=app.w.localStorage.getItem(model.KEY);
+    selectFile(app,input,new app.w.File(['broken'],'bad.json'));
+    reads[1].start();await reads[1].done;
+    assert.equal(app.w.localStorage.getItem(model.KEY),before);
+    assert(!app.doc.getElementById('confirm-import'));
+  }finally{app.dom.window.close();}
+});
+test('a late earlier file cannot replace the latest selected import',{timeout:5000},async()=>{
+  const stored=JSON.stringify({...model.empty(),done:['first-click']});
+  const app=create({stored,hash:'#help'}),reads=deferFileReads(app.w);
+  try{
+    const input=app.doc.getElementById('progress-file');
+    selectFile(app,input,progressFile(app,['windows']));
+    selectFile(app,input,progressFile(app,['tabs']));
+    reads[1].start();await reads[1].done;
+    reads[0].start();await reads[0].done;
+    assert.equal(app.w.localStorage.getItem(model.KEY),stored);
+    app.doc.getElementById('confirm-import').click();
+    assert.deepEqual(JSON.parse(app.w.localStorage.getItem(model.KEY)).done,['first-click','tabs']);
+  }finally{app.dom.window.close();}
+});
+test('a late earlier file cannot revive a rejected newer import',{timeout:5000},async()=>{
+  const stored=JSON.stringify({...model.empty(),done:['first-click']});
+  const app=create({stored,hash:'#help'}),reads=deferFileReads(app.w);
+  try{
+    const input=app.doc.getElementById('progress-file');
+    selectFile(app,input,progressFile(app,['windows']));
+    selectFile(app,input,new app.w.File(['broken'],'bad.json'));
+    reads[1].start();await reads[1].done;
+    const message=app.doc.querySelector('#main .feedback').textContent;
+    reads[0].start();await reads[0].done;
+    assert.equal(app.w.localStorage.getItem(model.KEY),stored);
+    assert(!app.doc.getElementById('confirm-import'));
+    assert.equal(app.doc.querySelector('#main .feedback').textContent,message);
+  }finally{app.dom.window.close();}
 });
 test('typed markup stays text in the draft, with no script or image activation',()=>{
   const app=create({hash:'#lesson/message'});try{app.doc.getElementById('practice-text').value='<img src=x onerror=alert(1)> Stuhl?';app.doc.querySelector('form').dispatchEvent(new app.w.Event('submit',{cancelable:true}));assert(app.doc.querySelector('.message-preview').textContent.includes('<img'));assert(!app.doc.querySelector('.message-preview img'));assert.deepEqual(app.network,[]);}finally{app.dom.window.close();}
