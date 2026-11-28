@@ -1,10 +1,10 @@
 {
   "schema": "lernstudio.read-api.v1",
   "baseURL": "https://juri-halveth.github.io/lernstudio/",
-  "curriculumSha256": "a368a6fc7da04ab8b2e590cd933ea17fd7bd8678a26bcb65f1a17c5938c3b4b5",
+  "curriculumSha256": "2b24f02a2b800ba5f4d4788ccc3a143b4174c88554f8e60b051484e3ade277d4",
   "curriculumDigestMode": "UTF8_LF_NORMALIZED",
-  "lessonCount": 702,
-  "trackCount": 13,
+  "lessonCount": 733,
+  "trackCount": 15,
   "endpoints": {
     "lessons": "https://juri-halveth.github.io/lernstudio/api/lessons.json",
     "agentSpace": "https://juri-halveth.github.io/lernstudio/api/space.json",

@@ -2,25 +2,24 @@
 [Original / Deutsch](README.md) · [English](README.en.md) · [Русский](README.ru.md)
 <!-- /HUB_LANGUAGES_V1 -->
 
-# Lernstudio — Wissen gehört allen
+# Lernstudio – interaktiv lernen und eigene Lernwege entdecken
 
-<!-- HALVETH_WORK_CERTIFICATES_V1_1 -->
-## Juri Janovski / Juri Halveth – Privates HALVETH-Werkzertifikat
+Kostenlose Lernplattform mit interaktiven Lektionen und eigenen Lernpfaden. Veröffentlichte Inhalte sind ohne Pflichtkonto oder Kauf direkt zugänglich; bestehende Konten bleiben optional. Ohne Konto liegt der Lernfortschritt im Browser.
 
-[Privates HALVETH-Werkzertifikat: Dokumentierte Lernplattform und Testorganisation – Lernstudio](https://juri-halveth.github.io/werkzertifikate/#werk-lernstudio).
+[**Lernstudio direkt öffnen**](https://juri-halveth.github.io/lernstudio/) · [Lokal starten](#lokal-starten) · [Quellcode](https://github.com/Juri-Halveth/lernstudio/tree/main)
 
-HALVETH VERACHEL STUDIOS · Quellstand, dokumentierte Ergebnisse und SHA-256-Belege stehen im Werkzertifikat. Private, mit Codex erstellte Werkdokumentation; keine ISTQB- oder sonstige Personenzertifizierung.
-<!-- /HALVETH_WORK_CERTIFICATES_V1_1 -->
+**Person: Juri. Projekt: HALVETH.** [Namenszuordnung](IDENTITY.md).
 
+![Lernstudio: geöffnetes Buch mit einem Weg aus Lernstationen](HALVETH_NETZ_HERO.svg)
 
-Kostenlose Lernplattform mit interaktiven Lektionen, einem eigenen KI-Lernpfad, Marketing ohne Werbebudget und selbst gestaltbaren Tier-Avataren. Ohne Pflichtkonto direkt loslernen: Alle veröffentlichten Lerninhalte sind ohne Kauf, Abonnement oder Zahlungsdaten verfügbar. Bestehende Lernstudio-Konten bleiben optional nutzbar. Ohne Konto liegt dein Fortschritt nur in deinem Browser.
+[Starship Lab als optionaler HALVETH-Überblick](https://juri-halveth.github.io/universum/)
 
-**HALVETH authorship and participation:** Juri Halveth (Juri Janovski) claims the rights in original platform design, lesson selection and arrangement, original prose, models, diagrams and new code contributions. Evidence or teaching boundaries are not rights waivers. Historical ISC permissions remain effective; protected new HALVETH contributions require a written commercial license and participation agreement.
+**HALVETH authorship and participation:** Juri Janovski (Projekt HALVETH) claims the rights in original platform design, lesson selection and arrangement, original prose, models, diagrams and new code contributions. Evidence or teaching boundaries are not rights waivers. Historical ISC permissions remain effective; protected new HALVETH contributions require a written commercial license and participation agreement.
 
 - [Lernstudio öffnen](https://juri-halveth.github.io/lernstudio/)
 - [Community](https://github.com/Juri-Halveth/lernstudio/discussions)
 - [EVE-Forschung](contracts/README.md)
-- [HALVETH Research: Forschung prüfen, Entscheidungen erklären](https://github.com/Juri-Halveth/open-research-branches/blob/main/reports/HALVETH_RESEARCH_2026-09-18.md)
+- [Öffentliche HALVETH-Forschungsbeispiele: Quellen und Entscheidungen](https://juri-halveth.github.io/halveth-forschungslabor/wissen/) — die früher verlinkte Archivnotiz wurde am 28.10.2026 als privat festgestellt; die öffentliche Übersicht ist keine Kopie davon.
 
 ## Lokal starten
 

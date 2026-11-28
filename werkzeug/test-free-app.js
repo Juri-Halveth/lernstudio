@@ -4,7 +4,7 @@ const {JSDOM,VirtualConsole}=require("jsdom");
 const root=path.resolve(__dirname,"..");
 async function createApp(hash="",stored={},signedIn=true){
   const errors=[],requests=[];const virtualConsole=new VirtualConsole();virtualConsole.on("jsdomError",e=>errors.push(e));
-  const dom=new JSDOM('<!doctype html><html><body><div id="app"></div></body></html>',{url:"https://local.example/"+hash,runScripts:"outside-only",virtualConsole});
+  const dom=new JSDOM('<!doctype html><html><body><a class="skip-link" href="#main-content">Zum Lernen</a><div id="app"></div></body></html>',{url:"https://local.example/"+hash,runScripts:"outside-only",virtualConsole});
   const w=dom.window;
   w.structuredClone=value=>w.JSON.parse(w.JSON.stringify(value));
   w.scrollTo=()=>{};w.HTMLElement.prototype.scrollIntoView=()=>{};w.confirm=()=>true;w.alert=()=>{};
@@ -31,7 +31,59 @@ async function createApp(hash="",stored={},signedIn=true){
 }
 (async()=>{
 const guest=await createApp('#lesson/html-0-magie',{},false);
+const lessonHref=guest.w.location.href;
+const lessonMain=guest.w.document.getElementById('main-content');
+guest.w.document.querySelector('.skip-link').click();
+await new Promise(resolve=>guest.w.setTimeout(resolve,10));
+assert.equal(guest.w.location.href,lessonHref,'Skip link preserves the current lesson route');
+assert.equal(guest.w.document.activeElement,lessonMain,'Skip link focuses the existing main content');
+
 assert(guest.w.document.querySelector('.lesson-focus'),'Guest can open an actual lesson');assert.equal(guest.requests.length,0,'Browsing as guest sends no account request');
+function visitExercise(w, lesson, selector) {
+  w.__test.go('lesson', lesson);
+  for (let i = 0; i < 5 && !w.document.querySelector(selector); i++) {
+    w.document.querySelector('.beat-opt')?.click();
+    w.document.querySelector('.beat-weiter').click();
+  }
+  const exercise = w.document.querySelector(selector);
+  assert(exercise, 'Expected exercise ' + lesson);
+  return exercise;
+}
+const draftProduct = 'Gastprojekt';
+visitExercise(guest.w, 'seo-0-1', '.brief-form').querySelector('[data-k="produkt"]').value = draftProduct;
+guest.w.document.querySelector('.act-brief').click();
+assert.match(guest.w.document.querySelector('.brief-msg').textContent, /Auf diesem Gerät gespeichert/);
+const serpTitle = visitExercise(guest.w, 'seo-1-1', '.serp-title');
+serpTitle.value = 'Ein eigener Titel';
+serpTitle.dispatchEvent(new guest.w.Event('input'));
+visitExercise(guest.w, 'html-2-5', '.check-list input').click();
+const exerciseKey = 'lernstudio_guest:extra';
+const guestExercises = guest.w.localStorage.getItem(exerciseKey);
+const restored = await createApp('', {[exerciseKey]: guestExercises}, false);
+assert.equal(visitExercise(restored.w, 'seo-0-1', '.brief-form').querySelector('[data-k="produkt"]').value, draftProduct);
+assert.equal(visitExercise(restored.w, 'seo-1-1', '.serp-title').value, 'Ein eigener Titel');
+assert.equal(visitExercise(restored.w, 'html-2-5', '.check-list input').checked, true);
+assert.equal(restored.requests.length, 0, 'Guest exercise persistence stays local');
+restored.dom.window.close();
+const isolated = await createApp('', {[exerciseKey]: guestExercises}, true);
+assert.equal(visitExercise(isolated.w, 'seo-0-1', '.brief-form').querySelector('[data-k="produkt"]').value, '', 'Account starts separately');
+assert.equal(isolated.w.localStorage.getItem(exerciseKey), guestExercises, 'Guest cache survives sign-in');
+isolated.dom.window.close();
+const blocked = await createApp('', {}, false);
+visitExercise(blocked.w, 'seo-0-1', '.brief-form').querySelector('[data-k="produkt"]').value = 'Entwurf';
+blocked.w.Storage.prototype.setItem = () => { throw new Error('Storage unavailable'); };
+blocked.w.document.querySelector('.act-brief').click();
+assert.match(blocked.w.document.querySelector('.brief-msg').textContent, /gerade nicht gespeichert/);
+blocked.dom.window.close();
+guest.w.__test.go('lesson','ideenwerkstatt-0-1');
+assert(guest.w.document.querySelector('.beat-stage')?.textContent.includes('Burger'), 'New illustrated path is reachable');
+guest.w.document.querySelector('.beat-weiter').click();
+assert.equal(guest.w.document.querySelectorAll('.idea-scene-node').length,4,'Thought scene shows four stages');
+assert(guest.w.document.querySelector('.beat-weiter').hidden,'Scene waits for the learner to explore a route');
+guest.w.document.querySelector('.idea-scene-choice').click();
+assert.equal(guest.w.document.querySelector('.idea-scene-choice').getAttribute('aria-pressed'),'true');
+assert(guest.w.document.querySelector('.idea-scene-result').textContent.includes('Bestellung'),'Selection shows a specific consequence');
+assert(!guest.w.document.querySelector('.beat-weiter').hidden,'A selected route unlocks the next step');
 for(const track of guest.w.CURRICULUM.tracks)for(const stage of track.stages)for(const lesson of stage.lessons){
   guest.w.__test.go('lesson',lesson.id);assert(guest.w.document.querySelector('.lesson-focus'),lesson.id+': accessible without an account');
   assert(guest.w.document.querySelector('.lesson-model'),lesson.id+': visual model is available');
@@ -50,8 +102,30 @@ const returningGuest=await createApp('#lesson/html-0-magie',{[guestKey]:guestSta
 assert.equal(returningGuest.w.__test.getState().done['html-0-magie'],true);
 returningGuest.w.__test.go('home');returningGuest.w.__test.openProfile();assert(returningGuest.w.document.querySelector('dialog[open]'));assert(returningGuest.w.document.getElementById('pp-logout').hidden);returningGuest.dom.window.close();
 const {dom,w,errors,requests}=await createApp();
-assert(w.document.querySelector(".journey-screen"),"Home is a single mission, not a catalogue");
+assert(w.document.querySelector(".studio-home"),"Home opens the direct learning catalogue");
 assert.equal(w.document.querySelectorAll(".world-card,.sidebar").length,0);
+assert.equal(w.document.querySelectorAll(".studio-track").length,w.CURRICULUM.tracks.length);
+const studioSearch=w.document.getElementById('studioSearch');studioSearch.value='Python';studioSearch.dispatchEvent(new w.Event('input'));
+assert(w.document.querySelectorAll('.studio-track').length>=1,'Catalogue search narrows the learning routes');
+assert(w.document.querySelector('.studio-search-status').textContent.includes('gefunden'));
+const focusCheck=await createApp('#lesson/einstieg-0-3',{},false);
+const focusW=focusCheck.w;
+const focusTitle=focusW.document.querySelector('.beatlesson .lesson-focus-title');
+const noteDialog=focusW.document.querySelector('.beatlesson dialog.lesson-thinking');
+assert(focusTitle&&!focusTitle.hidden,'Lesson title stays visible as orientation');
+assert(noteDialog&&!noteDialog.open,'Thinking field starts outside the learning flow');
+focusW.document.querySelector('.beat-note-button').click();
+assert(noteDialog.open,'Thinking field opens deliberately');
+noteDialog.querySelector('#thinkingNote').value='Meine Frage';
+noteDialog.querySelector('.thinking-close').click();
+assert(!noteDialog.open,'Thinking field can be closed');
+const lessonNext=focusW.document.querySelector('.beat-weiter');
+if(!lessonNext.hidden){lessonNext.click();assert(!focusTitle.hidden,'Advancing does not erase the lesson title');}
+focusW.document.querySelector('.beat-note-button').click();
+assert.equal(noteDialog.querySelector('#thinkingNote').value,'Meine Frage','Local note survives a step change');
+noteDialog.close();
+focusCheck.dom.window.close();
+w.__test.go('expedition');
 assert.equal(w.document.querySelectorAll(".mission-choices").length,1);
 for (const station of w.LernExpedition.stations) {
   assert.equal(w.document.querySelector(".mission-content h1").textContent,station.title);
@@ -65,8 +139,8 @@ for (const station of w.LernExpedition.stations) {
 assert(w.document.querySelector("#missionContinue"),"Arrival connects to a real lesson");
 assert.equal(w.document.activeElement,w.document.querySelector(".mission-content h1"),"Focus reaches the final recommendation");
 assert.equal(Object.keys(w.__test.getState().done).length,0,"Arrival does not complete curriculum lessons");
-w.__test.go("home");assert(w.document.querySelector("#missionContinue"),"Arrival state survives navigation");
-w.__test.go("expedition");assert(w.document.querySelector(".mission-choices"),"Arrival can be replayed without resetting lesson progress");
+w.__test.go("home");assert(w.document.querySelector(".studio-home"),"Direct catalogue survives navigation");
+w.__test.go("expedition");assert(w.document.querySelector("#missionContinue"),"Finished arrival resumes without resetting lesson progress");
 w.__test.go("bridge");assert(w.document.querySelector("#packetFile"),"Explicit learning-note import is reachable");
 w.__test.go("map");
 assert.equal(w.document.querySelectorAll(".world-card").length,w.CURRICULUM.tracks.length);
@@ -113,16 +187,17 @@ assert.equal(Object.keys(w.__test.getState().done).length,1,"Repeated completion
 w.__test.go("home");w.__test.openProfile();assert(w.document.querySelector("dialog[open]"));
 w.document.querySelector('[data-animal="🐢"]').click();assert.equal(w.__test.getState().avatar,"🐢");
 w.document.querySelector('[data-color="mint"]').click();assert.equal(w.__test.getState().color,"mint");
-w.document.querySelector("dialog").close();assert.equal(w.document.activeElement.id,"acctBtn");
+w.document.querySelector("dialog").close();assert.equal(w.document.activeElement.id,"studioProfile");
 const accountKey='lernstudio_account_fixture-a:'+w.LearningProfile.KEY;
 const saved=w.localStorage.getItem(accountKey);assert(saved);dom.window.close();
 const storageBlocked=await createApp('',{},false);
 storageBlocked.w.localStorage.setItem('lernstudio_expedition_v1:guest',JSON.stringify({version:1,solved:[]}));
 storageBlocked.w.Storage.prototype.setItem=function(){throw new Error('Storage denied by test');};
+storageBlocked.w.__test.go('expedition');
 const firstStation=storageBlocked.w.LernExpedition.stations[0];
 storageBlocked.w.document.querySelector('[data-choice="'+firstStation.correctChoice+'"]').click();
 assert(storageBlocked.w.document.querySelector('.mission-note').textContent.includes('Sitzung'));
-storageBlocked.w.__test.go('map');storageBlocked.w.__test.go('home');
+storageBlocked.w.__test.go('map');storageBlocked.w.__test.go('expedition');
 assert.equal(storageBlocked.w.document.querySelector('.mission-content h1').textContent,storageBlocked.w.LernExpedition.stations[1].title,"In-memory progress survives a view change when storage is blocked");
 storageBlocked.dom.window.close();
 const second=await createApp("#lesson/"+first,{[accountKey]:saved});assert.equal(second.w.__test.getState().lastLesson,first);assert.equal(second.w.__test.getState().avatar,"🐢");second.dom.window.close();

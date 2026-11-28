@@ -32,11 +32,17 @@ for(const language of ['de','en','ru'])test(language+' lesson search retains cur
   assert.equal(decodeURIComponent(w.location.hash),'#lesson/'+lesson.id);assert.equal(JSON.stringify(w.CURRICULUM),original);
   const pre=w.document.createElement('pre');pre.textContent='Lernpfad öffnen';w.document.body.append(pre);
   const retained=w.document.createElement('input');retained.value='Mein eigener Text / 42';w.document.body.append(retained);
-  const count=w.document.createElement('p');count.textContent='13 Lernpfade · 702 Lektionen';w.document.body.append(count);
+  const count=w.document.createElement('p');count.textContent='14 Lernpfade · 727 Lektionen';w.document.body.append(count);
   const label=w.document.createElement('p');label.textContent='🧠 Logik & Mathe · Suchen. · Lernen.';w.document.body.append(label);
   await new Promise(resolve=>setTimeout(resolve,10));
   assert.equal(pre.textContent,'Lernpfad öffnen');assert.equal(retained.value,'Mein eigener Text / 42');
-  assert.deepEqual(count.textContent.match(/[0-9]+/g),['13','702']);
+  assert.deepEqual(count.textContent.match(/[0-9]+/g),['14','727']);
+  if(language==='de'){
+   assert.equal(count.textContent,'14 Lernpfade · 727 Lektionen','Separator stays a separator');
+   const atelier=w.document.createElement('p');atelier.textContent='Praxisatelier: Denken & Bauen';w.document.body.append(atelier);
+   await new Promise(resolve=>setTimeout(resolve,10));
+   assert.equal(atelier.textContent,'Praxisatelier: Denken & Bauen','Colon stays a separator');
+  }
   if(language!=='de')assert(!/Lernpfade|Lektionen/.test(count.textContent),'Dynamic counters are localized');
   if(language!=='de')assert(!/Logik|Suchen|Lernen/.test(label.textContent),'Decorated and punctuated labels are localized');
   assert.equal(errors.length,0,errors.join('\n'));assert.equal(network.length,0);

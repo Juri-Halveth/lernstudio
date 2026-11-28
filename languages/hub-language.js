@@ -34,7 +34,9 @@
     if(progress)return part.replace(key,t('Fortschritt')+' '+t(progress[1]));
     return part;
    };
-   translated=trimmed.split(/(\s*·\s*|:\s+)/).map(piece).join('');
+   // Separators are structure, not translation keys. The catalog also uses
+   // ":" and "·" as translated values of unrelated short phrases.
+   translated=trimmed.split(/(\s*·\s*|:\s+)/).map((part,index)=>index%2?part:piece(part)).join('');
   }
   return value.replace(trimmed,translated);
  }

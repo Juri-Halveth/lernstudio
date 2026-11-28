@@ -53,13 +53,25 @@
     document.querySelectorAll("[data-account-status]").forEach(node => { node.textContent = message; });
   }
   function extraForSync() { return { ...extraState, appearance: { color: state.color, accessory: state.accessory } }; }
+  function extraCacheKey(userId) {
+    return userId ? LS_ACCOUNT_PREFIX + userId + ":extra" : "lernstudio_guest:extra";
+  }
+  function readExtraCache(userId) {
+    try { return window.LSAccountProgress.cleanExtraState(JSON.parse(localStorage.getItem(extraCacheKey(userId)) || "{}")); }
+    catch (_) { return {}; }
+  }
   function saveExtraCache() {
-    if (activeUser) { try { localStorage.setItem(LS_ACCOUNT_PREFIX + activeUser + ":extra", JSON.stringify(extraForSync())); } catch (_) {} }
+    try {
+      const data = window.LSAccountProgress.encodeExtraState(extraForSync());
+      localStorage.setItem(extraCacheKey(activeUser), data);
+      return true;
+    } catch (_) { return false; }
   }
   function planeFortschrittSync() {
-    if (!accountReady || !activeUser || auth.getSession()?.user_id !== activeUser) return;
-    saveExtraCache(); setAccountMessage("Änderungen werden gespeichert …"); clearTimeout(syncTimer);
+    if (!accountReady || !activeUser || auth.getSession()?.user_id !== activeUser) return false;
+    const cached = saveExtraCache(); setAccountMessage("Änderungen werden gespeichert …"); clearTimeout(syncTimer);
     syncTimer = setTimeout(syncFortschrittJetzt, 350);
+    return cached;
   }
   function syncFortschrittJetzt() {
     clearTimeout(syncTimer);
@@ -74,11 +86,10 @@
   }
   async function activateAccount() {
     const run = ++accountEpoch, session = auth.getSession();
-    accountReady = false; activeUser = session?.user_id || null; extraState = {};
+    accountReady = false; activeUser = session?.user_id || null; extraState = readExtraCache(activeUser);
     profileStore = scopedStore(activeUser); state = profileStore.read();
     if (!activeUser) { accountBusy = false; accountReady = true; setAccountMessage("Auf diesem Gerät gespeichert."); render(); return; }
     accountBusy = true; setAccountMessage("Dein Lernstand wird geladen …"); render();
-    try { extraState = window.LSAccountProgress.cleanExtraState(JSON.parse(localStorage.getItem(LS_ACCOUNT_PREFIX + activeUser + ":extra") || "{}")); } catch (_) {}
     const result = await progressClient.load(state, extraState);
     if (run !== accountEpoch || session.user_id !== auth.getSession()?.user_id) return;
     accountBusy = false;
@@ -100,12 +111,12 @@
       await auth.restore(callbackHash);
       if (auth.isRecovery()) { authMode = "password"; current = { view: "login", arg: null }; accountBusy = false; render(); }
       else await activateAccount();
-    } catch (error) { activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); accountBusy = false; accountReady = true; authMessage = error.message; render(); }
+    } catch (error) { activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); extraState = readExtraCache(null); accountBusy = false; accountReady = true; authMessage = error.message; render(); }
   }
   async function logout() {
     await syncFortschrittJetzt();
     ++accountEpoch; clearTimeout(syncTimer); accountReady = false; activeUser = null;
-    const pending = auth.signOut(); profileStore = scopedStore(null); state = profileStore.read(); extraState = {}; accountReady = true;
+    const pending = auth.signOut(); profileStore = scopedStore(null); state = profileStore.read(); extraState = readExtraCache(null); accountReady = true;
     document.querySelector(".profile-dialog")?.close(); go("home");
     const revoked = await pending;
     if (!revoked) { authMessage = "Auf diesem Gerät abgemeldet. Die serverseitige Abmeldung konnte nicht bestätigt werden."; go("login"); }
@@ -142,7 +153,7 @@
     { id: "ki",        icon: "✳", name: "Künstliche Intelligenz",   tracks: ["ki"] },
     { id: "coding",    icon: "💻", name: "Programmieren",            tracks: ["html", "python", "js"] },
     { id: "security",  icon: "🛡️", name: "Digitale Sicherheit",       tracks: ["sec"] },
-    { id: "projekte",  icon: "🎮", name: "Projekte",                 tracks: ["proj"] },
+    { id: "projekte",  icon: "🎮", name: "Projekte",                 tracks: ["ideenwerkstatt", "atelier", "proj"] },
     { id: "server",    icon: "🖥️", name: "Terminal, Linux & Server", tracks: ["srv"] },
     { id: "marketing", icon: "📈", name: "Marketing & Suche",        tracks: ["mktg", "seo"] },
   ];
@@ -243,7 +254,7 @@
     const head = el(`<header class="app universe-header">
       <button class="iconbtn mobile-nav-btn" id="mobileNavBtn" type="button" aria-controls="studioSidebar" aria-expanded="false" aria-label="Lernpfade öffnen">☰</button>
       <button class="brand-button" id="brandHome" type="button"><img src="icon-192.png" width="40" height="40" alt=""><span><b>Lernstudio</b><small>Wissen gehört allen.</small></span></button>
-      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="#home">Sternenbucht</a><a href="#map">Lernkarte</a><a href="#lab">Code-Werkstatt</a><a href="#bridge">Wissensbrücke</a></nav>
+      <nav class="universe-nav" aria-label="Hauptnavigation"><a href="#home">Lernwege</a><a href="#map">Lernkarte</a><a href="#lab">Code-Werkstatt</a><a href="#bridge">Wissensbrücke</a></nav>
       <span class="spacer"></span>${accountReady ? `<span class="xp" title="Deine Erfahrungspunkte">✦ <b>${totalXp()}</b> XP</span>` : ""}
       <button class="account" id="acctBtn" type="button" aria-label="Lernprofil öffnen" title="Lernprofil öffnen"><i data-lucide="user-round" aria-hidden="true"></i><span class="aname">${activeUser ? esc(state.name === "Lernender" ? "Mein Konto" : state.name) : "Mein Lernstand"}</span></button>
       ${themeSwitchMarkup("themeBtn")}
@@ -255,6 +266,20 @@
     return head;
   }
 
+
+  function renderStudioHeader() {
+    const head = el(`<header class="studio-header" aria-label="Lernstudio-Navigation">
+      <button class="studio-wordmark" id="studioHome" type="button">LERNSTUDIO<span>Wissen gehört allen.</span></button>
+      <nav aria-label="Lernbereiche"><a href="#home">Lernwege</a><a href="#lab/">Werkstatt</a></nav>
+      <span class="studio-header-space"></span>
+      <button class="studio-profile" id="studioProfile" type="button">Mein Lernstand</button>
+      ${themeSwitchMarkup("studioTheme")}
+    </header>`);
+    head.querySelector('#studioHome').addEventListener('click', () => go('home'));
+    head.querySelector('#studioProfile').addEventListener('click', openProfile);
+    head.querySelector('#studioTheme').addEventListener('click', toggleTheme);
+    return head;
+  }
 
   function renderFocusHeader(context) {
     const { track, stage, lesson } = context;
@@ -272,8 +297,8 @@
           </span>
         </button>
         <span class="focus-spacer"></span>
-        <button class="focus-exit" id="focusExit" type="button" aria-label="Lernmodus verlassen und zur Sternenbucht zurückkehren">
-          <span>Bucht</span><b aria-hidden="true">×</b>
+        <button class="focus-exit" id="focusExit" type="button" aria-label="Lernmodus verlassen und zur Übersicht zurückkehren">
+          <span>Übersicht</span><b aria-hidden="true">×</b>
         </button>
       </header>
     `);
@@ -320,6 +345,7 @@
       <fieldset><legend>Deine Farbe</legend><div class="choice-row">${window.LearningProfile.COLORS.map(c => `<button type="button" data-color="${c}" class="swatch buddy-${c}" aria-label="${colorLabels[c]}" aria-pressed="${c === state.color}"></button>`).join("")}</div></fieldset>
       <fieldset><legend>Ein kleines Extra</legend><div class="emoji-row">${window.LearningProfile.ACCESSORIES.map((a,i) => `<button type="button" data-accessory="${a}" aria-label="${["Kein Extra", "Pflänzchen", "Stern", "Blume", "Kopfhörer", "Krone"][i]}" aria-pressed="${a === state.accessory}">${a || "–"}</button>`).join("")}</div></fieldset>
       <p class="local-note">${activeUser ? 'Dein Lernstand wird in deinem Konto gespeichert. Auf einem anderen Gerät meldest du dich mit derselben E-Mail-Adresse an.' : 'Dein Lernstand bleibt in diesem Browser. Eine Sicherung schützt ihn vor gelöschten Browserdaten. Ein Konto ist freiwillig; Gast- und Kontostand bleiben getrennt.'}</p>
+      <p class="local-note">Die Dateisicherung enthält dein Lernprofil und deine Abschlüsse. Marketing-Brief, Suchvorschau und Checklisten werden separat im Browser oder im angemeldeten Konto gespeichert.</p>
       <div class="profile-actions"><button class="btn" id="pp-export" type="button">Sicherung herunterladen</button><button class="btn" id="pp-import" type="button">Sicherung laden</button></div>
       <p id="profileMessage" data-account-status role="status">${esc(accountMessage)}</p>
       <button class="text-button" id="pp-sync" type="button">Speicherung erneut versuchen</button>
@@ -352,7 +378,7 @@
         await auth.deleteAccount();
         const prefix = LS_ACCOUNT_PREFIX + activeUser + ":";
         try { Object.keys(localStorage).filter(key => key.startsWith(prefix) || key === "lernstudio_v2_account_" + activeUser).forEach(key => localStorage.removeItem(key)); } catch (_) {}
-        activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); extraState = {}; accountReady = true; dialog.close(); go("home");
+        activeUser = null; profileStore = scopedStore(null); state = profileStore.read(); extraState = readExtraCache(null); accountReady = true; dialog.close(); go("home");
       } catch (error) { accountReady = true; event.target.disabled = false; setAccountMessage(error.message + " Bei weiteren Problemen nutze bitte unsere Kontaktseite."); }
     });
     if (!activeUser) {
@@ -361,7 +387,7 @@
       login.onclick = () => { dialog.close(); go('login'); };
       dialog.appendChild(login);
     }
-    dialog.addEventListener("close", () => { dialog.remove(); if (current.view === "home") render(); const opener = document.getElementById("acctBtn") || document.getElementById("focusExit"); if (opener) opener.focus(); });
+    dialog.addEventListener("close", () => { dialog.remove(); if (current.view === "home") render(); const opener = document.getElementById("studioProfile") || document.getElementById("acctBtn") || document.getElementById("focusExit"); if (opener) opener.focus(); });
     document.body.appendChild(dialog); dialog.showModal();
   }
   function exportProgress() {
@@ -589,18 +615,21 @@
     const lessonContext = !authRequired && current.view === "lesson" ? findLesson(current.arg) : null;
     if (lessonContext && state.lastLesson !== current.arg) { state.lastLesson = current.arg; save(); }
     const focusMode = !!lessonContext;
-    const journeyMode = !authRequired && ["home", "expedition"].includes(current.view);
-    const singleTask = !authRequired && (journeyMode || focusMode || ["lab", "bridge", "connections"].includes(current.view));
+    const studioMode = !authRequired && ["home", "roadmap"].includes(current.view);
+    const journeyMode = !authRequired && current.view === "expedition";
+    const singleTask = !authRequired && (studioMode || journeyMode || focusMode || ["lab", "bridge", "connections"].includes(current.view));
     document.body.classList.toggle("lesson-focus-active", focusMode);
     document.body.classList.toggle("journey-active", journeyMode);
+    document.body.classList.toggle("studio-active", studioMode);
     document.body.classList.toggle("single-task-active", singleTask);
-    root.appendChild(focusMode ? renderFocusHeader(lessonContext) : singleTask && window.LernJourney ? window.LernJourney.header({go,onProfile:openProfile,onTheme:toggleTheme}) : renderHeader());
+    root.appendChild(focusMode ? renderFocusHeader(lessonContext) : studioMode ? renderStudioHeader() : singleTask && window.LernJourney ? window.LernJourney.header({go,onProfile:openProfile,onTheme:toggleTheme}) : renderHeader());
     const layout = el(`<div class="layout ${focusMode ? "lesson-focus" : ""}"></div>`);
     const activeLesson = lessonContext ? current.arg : null;
     if (!singleTask) layout.appendChild(renderSidebar(activeLesson));
     const main = el(`<main id="main-content" tabindex="-1" class="content ${focusMode ? "lesson-focus-content" : ""}"></main>`);
     if (authRequired) renderAuth(main);
-    else if (journeyMode) renderHome(main);
+    else if (studioMode && current.view === "home") renderHome(main);
+    else if (journeyMode) viewCleanup = window.LernJourney.mount(main, {curriculum:C,state,go,namespace:activeUser || 'guest',forceIntro:false});
     else if (current.view === "map") renderMap(main);
     else if (current.view === "connections") viewCleanup = window.LernConnections.mount(main, {curriculum:C,state,go});
     else if (current.view === "bridge") viewCleanup = window.LernJourney.mountBridge(main, {curriculum:C,state,go});
@@ -665,8 +694,44 @@
   }
 
   function renderHome(main) {
-    if (!window.LernJourney) { renderMap(main); return; }
-    viewCleanup = window.LernJourney.mount(main, {curriculum:C,state,go,namespace:activeUser || 'guest',forceIntro:current.view === 'expedition'});
+    const groups = rubrikGruppen();
+    const total = C.tracks.reduce((sum, track) => sum + trackProgress(track).total, 0);
+    const recent = state.lastLesson ? findLesson(state.lastLesson) : null;
+    const firstLesson = C.tracks.flatMap(track => allLessons(track))[0]?.lesson;
+    const start = recent?.lesson || firstLesson;
+    const rows = groups.flatMap(group => group.tracks.map(track => ({group, track})));
+    const home = el(`<section class="studio-home">
+      <div class="studio-intro"><p class="studio-kicker">FREI LERNEN · ${C.tracks.length} WEGE · ${total} LEKTIONEN</p>
+        <h1>Eine Frage. <em>Ein neuer Blick.</em></h1>
+        <p>Wähle einen Weg und arbeite an einem Gedanken nach dem anderen. Lies, probiere aus und prüfe, was du wirklich verstanden hast.</p>
+        <div class="studio-intro-actions"><button type="button" class="studio-primary" id="studioStart">${recent ? 'Weiterlernen' : 'Erste Lektion starten'} <span aria-hidden="true">↗</span></button><button type="button" class="studio-jump" id="studioJump">Alle Lernwege ansehen ↓</button></div>
+        <p class="studio-progress">${Object.keys(state.done || {}).filter(id => !!state.done[id]).length} Lektionen in deinem Lernstand · kostenlos · Konto freiwillig</p>
+        <a class="studio-netz-entry" href="https://juri-halveth.github.io/universum/" aria-label="Lernstudio im HALVETH NETZ Starship Lab öffnen"><img src="HALVETH_NETZ_HERO.svg" alt="" width="1200" height="300"><span>LERNE IM HALVETH NETZ<small>Starship Lab öffnen ↗</small></span></a>
+      </div>
+      <div class="studio-catalogue" id="studio-catalogue"><div class="studio-catalogue-head"><div><p class="studio-kicker">DIE BIBLIOTHEK</p><h2>Finde deinen Einstieg.</h2></div><label for="studioSearch">Lernweg suchen<input id="studioSearch" type="search" autocomplete="off" placeholder="Thema oder Weg …"></label></div>
+        <p class="studio-search-status" role="status" aria-live="polite"></p><div class="studio-track-list"></div>
+      </div>
+      <p class="studio-secondary-link"><a href="#expedition/">Experimentelle Entdeckungsreise öffnen ↗</a></p>
+    </section>`);
+    home.querySelector('#studioStart').addEventListener('click', () => start && go('lesson', start.id));
+    home.querySelector('#studioJump').addEventListener('click', () => home.querySelector('#studio-catalogue').scrollIntoView({behavior:'smooth'}));
+    const list = home.querySelector('.studio-track-list');
+    const search = home.querySelector('#studioSearch');
+    const status = home.querySelector('.studio-search-status');
+    function paint() {
+      const query = search.value.trim().toLocaleLowerCase('de');
+      const shown = rows.filter(({group, track}) => `${group.name} ${track.name} ${track.subtitle}`.toLocaleLowerCase('de').includes(query));
+      list.replaceChildren();
+      shown.forEach(({group, track}, index) => {
+        const progress = trackProgress(track);
+        const row = el(`<button class="studio-track" type="button"><span class="studio-track-no">${String(index + 1).padStart(2, '0')}</span><span class="studio-track-copy"><small>${esc(group.name)}</small><strong>${esc(track.name)}</strong><span>${esc(track.subtitle)}</span></span><span class="studio-track-progress">${progress.done}/${progress.total}<small>gelernt</small></span><span class="studio-track-arrow" aria-hidden="true">↗</span></button>`);
+        row.addEventListener('click', () => go('roadmap', track.id));
+        list.appendChild(row);
+      });
+      status.textContent = query ? `${shown.length} von ${rows.length} Lernwegen gefunden.` : `${rows.length} Lernwege stehen offen.`;
+    }
+    search.addEventListener('input', paint);
+    paint(); main.appendChild(home);
   }
   function renderMap(main) {
     return window.LearningSpace.mount(main, {curriculum:C, state, go, progress:trackProgress, groups:rubrikGruppen(), persistent:profileStore.canPersist() && !profileStore.recovered()});
@@ -731,17 +796,52 @@
     const p = trackProgress(tr);
     const top = el(`<div class="rmhead"><button class="text-button" id="bk">← Alle Lernpfade</button><h1>${tr.icon} ${esc(tr.name)}</h1><p class="sub">${esc(tr.subtitle)}</p><p>${p.done} von ${p.total} Lektionen · ${p.pct}%</p></div>`);
     top.querySelector("#bk").addEventListener("click", () => go("home")); main.appendChild(top);
+    const entrance = el(`<section class="learning-entrance" aria-labelledby="entrance-title"><div><p class="eyebrow">DEIN EINSTIEG</p><h2 id="entrance-title">Womit willst du beginnen?</h2><p>Du schätzt selbst ein, was du schon kannst. Die Wahl ändert nur diese Übersicht, nicht deinen Lernstand.</p></div><div class="entrance-options" role="group" aria-label="Einstieg wählen"><button type="button" data-entry="all">Alles zeigen</button><button type="button" data-entry="practice">Direkt üben</button><button type="button" data-entry="expert">Fortgeschritten starten</button></div><p class="entrance-status" role="status"></p></section>`);
+    main.appendChild(entrance);
+    const entryKey = 'ls_entry_v1:' + tr.id;
+    let entry = 'all';
+    try { entry = localStorage.getItem(entryKey) || 'all'; } catch (_) {}
+    if (!['all', 'practice', 'expert'].includes(entry)) entry = 'all';
+    const sections = [];
+    const refreshEntry = () => {
+      entrance.querySelectorAll('[data-entry]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.entry === entry)));
+      const firstAdvanced = Math.floor(tr.stages.length / 2);
+      sections.forEach(({element, stage, index}) => {
+        const show = entry !== 'expert' || index >= firstAdvanced;
+        element.hidden = !show;
+      });
+      entrance.querySelector('.entrance-status').textContent = entry === 'expert'
+        ? 'Frühere Stufen sind eingeklappt. Mit „Alles zeigen“ holst du sie jederzeit zurück.'
+        : entry === 'practice' ? 'Übungen und Quizfragen stehen in jeder Stufe zuerst.'
+        : 'Alle Stufen sind sichtbar.';
+    };
+    entrance.querySelectorAll('[data-entry]').forEach(button => button.addEventListener('click', () => {
+      entry = button.dataset.entry;
+      try { localStorage.setItem(entryKey, entry); } catch (_) {}
+      sections.forEach(({element}) => {
+        const list = element.querySelector('.open-lessons');
+        const buttons = [...list.children];
+        buttons.sort((a, b) => entry === 'practice' ? Number(b.dataset.practice === 'true') - Number(a.dataset.practice === 'true') : Number(a.dataset.order) - Number(b.dataset.order));
+        buttons.forEach(item => list.appendChild(item));
+      });
+      refreshEntry();
+    }));
     if (tr.id === "sec") main.appendChild(el(`<p class="ethics">Die Übungen laufen in lokalen Lernumgebungen. Wende Sicherheitstests nur an eigenen oder ausdrücklich dafür freigegebenen Systemen an.</p>`));
     if (p.total && p.done === p.total) { const cert = el(`<button class="btn">Teilnahmebestätigung erstellen</button>`); cert.addEventListener("click", () => go("cert",tr.id)); main.appendChild(cert); }
-    for (const st of tr.stages) {
+    for (const [stageIndex, st] of tr.stages.entries()) {
       if (!st.lessons.length) continue;
       const stage = el(`<section class="open-stage"><h2>${esc(stufeLabel(st))} · ${esc(st.title)}</h2><p class="muted">${esc(st.goal || "")}</p><div class="open-lessons"></div></section>`);
-      for (const lesson of st.lessons) {
+      for (const [lessonIndex, lesson] of st.lessons.entries()) {
         const button = el(`<button class="open-lesson" type="button"><span class="lesson-dot" aria-hidden="true">${isDone(lesson.id) ? "✓" : "○"}</span><span>${esc(lesson.title)}<small>${lesson.type === "quiz" ? "Quiz" : "Lektion"}${isDone(lesson.id) ? " · abgeschlossen" : ""}</small></span><span aria-hidden="true">↗</span></button>`);
+        button.dataset.order = String(lessonIndex);
+        button.dataset.practice = String(lesson.type === 'quiz' || !!lesson.task || !!lesson.beats?.some(beat => beat.kind && beat.kind !== 'text'));
         button.addEventListener("click", () => go("lesson",lesson.id)); stage.querySelector(".open-lessons").appendChild(button);
       }
       main.appendChild(stage);
+      sections.push({element:stage, stage:st, index:stageIndex});
     }
+    if (entry === 'practice') entrance.querySelector('[data-entry="practice"]').click();
+    else refreshEntry();
   }
 
 
@@ -840,17 +940,6 @@
   function installLessonTitleIntro(wrap, title) {
     if (!wrap || !title) return;
     title.classList.add("lesson-focus-title");
-    title.setAttribute("data-title-state", "intro");
-    let ausgeblendet = false;
-    wrap.addEventListener("click", (event) => {
-      if (ausgeblendet) return;
-      const action = event.target && event.target.closest ? event.target.closest("button") : null;
-      if (!action || action.matches(".lesson-reader-back,.beat-zurueck")) return;
-      ausgeblendet = true;
-      title.hidden = true;
-      title.setAttribute("aria-hidden", "true");
-      title.setAttribute("data-title-state", "done");
-    });
   }
 
   function renderLesson(main, lessonId) {
@@ -872,7 +961,7 @@
 
     const wrap = el(`<div class="lesson lesson-focus-layout"></div>`);
     const glyph = lesson.type === "quiz" ? "📝 " : (lesson.task && lesson.task.kind === "flag" ? "🚩 " : "");
-    const lessonTitle = el(`<h2>${glyph}${esc(lesson.title)}</h2>`);
+    const lessonTitle = el(`<h1>${glyph}${esc(lesson.title)}</h1>`);
     wrap.appendChild(lessonTitle);
     installLessonTitleIntro(wrap, lessonTitle);
 
@@ -1969,7 +2058,15 @@ document.getElementById("go").addEventListener("click", function(){
 
   /* ---------------- MARKETING/SEO: geteilter Projekt-Zustand (eigener localStorage-Namespace, unabhaengig vom App-State) ---------------- */
   function mktgGet() { return extraState.marketing || {}; }
-  function mktgSet(patch) { const s = { ...mktgGet() }; Object.keys(patch || {}).forEach(k => { s[k] = (patch[k] && typeof patch[k] === "object" && !Array.isArray(patch[k])) ? Object.assign({}, s[k], patch[k]) : patch[k]; }); extraState.marketing = s; planeFortschrittSync(); return s; }
+  function mktgSet(patch) {
+    const next = { ...mktgGet() };
+    for (const [key, value] of Object.entries(patch)) {
+      next[key] = { ...next[key], ...value };
+    }
+    extraState.marketing = next;
+    if (activeUser) return planeFortschrittSync();
+    return accountReady && saveExtraCache();
+  }
   /* SERP-Pixelmessung wie Google (canvas.measureText). Google schneidet nach PIXELN ab, nicht nach Zeichen. */
   let _serpCanvas = null;
   function serpMeasure(text, fontPx, family) { _serpCanvas = _serpCanvas || document.createElement("canvas"); const cx = _serpCanvas.getContext("2d"); cx.font = fontPx + "px " + (family || "arial, sans-serif"); return Math.round(cx.measureText(String(text || "")).width); }
@@ -1983,14 +2080,16 @@ document.getElementById("go").addEventListener("click", function(){
     main.appendChild(crumb);
 
     const wrap = el(`<div class="lesson beatlesson lesson-focus-layout"></div>`);
-    const lessonTitle = el(`<h2>${esc(lesson.title)}</h2>`);
+    const lessonTitle = el(`<h1>${esc(lesson.title)}</h1>`);
     wrap.appendChild(lessonTitle);
     installLessonTitleIntro(wrap, lessonTitle);
     const prog = el(`<div class="beat-prog" hidden aria-hidden="true"></div>`);
     beats.forEach(() => prog.appendChild(el(`<span class="seg"></span>`)));
     wrap.appendChild(prog);
-    const stepInfo = el(`<div class="beat-step" hidden aria-live="polite"></div>`);
-    wrap.appendChild(stepInfo);
+    const statusBar = el(`<div class="beat-status"></div>`);
+    const stepInfo = el(`<div class="beat-step" aria-live="polite"></div>`);
+    statusBar.appendChild(stepInfo);
+    wrap.appendChild(statusBar);
     const stageEl = el(`<div class="beat-stage"></div>`);
     wrap.appendChild(stageEl);
     const navRow = el(`<div class="beat-nav"></div>`);
@@ -1999,10 +2098,16 @@ document.getElementById("go").addEventListener("click", function(){
     navRow.appendChild(zurueck);
     navRow.appendChild(weiter);
     wrap.appendChild(navRow);
+    const noteButton = el(`<button class="beat-note-button" type="button" aria-haspopup="dialog">Gedanken notieren</button>`);
+    statusBar.appendChild(noteButton);
+    const thinking = el(`<dialog class="lesson-thinking" aria-labelledby="thinkingTitle"><div class="thinking-inner"><div class="thinking-top"><span class="thinking-kicker">DEIN RAUM</span><button class="thinking-close" type="button" aria-label="Denkfeld schließen">×</button></div><h3 id="thinkingTitle">Was würdest du prüfen?</h3><p class="thinking-prompt">Schau auf den aktuellen Gedanken. Welche Frage bleibt für dich offen?</p><label for="thinkingNote">Deine Notiz</label><textarea id="thinkingNote" rows="5" placeholder="Eine Frage, Vermutung oder Beobachtung …"></textarea><details class="thinking-models"><summary>Zwei Erklärungen vergleichen</summary><p>Beschreibe zwei Möglichkeiten. Welche spätere Beobachtung würde sie auseinanderhalten?</p><label for="thinkingModelA">Möglichkeit A</label><textarea id="thinkingModelA" rows="2"></textarea><label for="thinkingModelB">Möglichkeit B</label><textarea id="thinkingModelB" rows="2"></textarea><label for="thinkingDiscriminator">Unterscheidende Beobachtung</label><textarea id="thinkingDiscriminator" rows="2"></textarea></details><p class="thinking-privacy">Nur in dieser geöffneten Lektion. Die Felder werden nicht versendet.</p></div></dialog>`);
+    noteButton.addEventListener("click", () => thinking.showModal());
+    thinking.querySelector(".thinking-close").addEventListener("click", () => thinking.close());
+    thinking.addEventListener("click", event => { if (event.target === thinking) thinking.close(); });
+    wrap.appendChild(thinking);
     main.appendChild(wrap);
 
     let idx = 0, weitesterSchritt = 0, zeigtErgebnis = false;
-    const textPositions = new Map();
     const hypothesisDraft = Object.create(null);
     function weiterLabel() { return idx < beats.length - 1 ? "Weiter →" : "Geschafft →"; }
     function setWeiter(on, label) {
@@ -2015,8 +2120,7 @@ document.getElementById("go").addEventListener("click", function(){
       else if (frei) weiter.textContent = weiterLabel();
     }
     function setZurueck() {
-      const textPos = textPositions.get(idx) || 0;
-      const frei = zeigtErgebnis || idx > 0 || textPos > 0;
+      const frei = zeigtErgebnis || idx > 0;
       zurueck.disabled = !frei;
       zurueck.hidden = !frei;
     }
@@ -2024,16 +2128,6 @@ document.getElementById("go").addEventListener("click", function(){
 
     function vorwaerts() {
       if (weiter.disabled) return;
-      const beat = beats[idx];
-      if ((!beat.kind || beat.kind === "text")) {
-        const fragments = lessonFocusFragments(beat.html || "");
-        const position = textPositions.get(idx) || 0;
-        if (position < fragments.length - 1) {
-          textPositions.set(idx, position + 1);
-          renderBeat();
-          return;
-        }
-      }
       weitesterSchritt = Math.max(weitesterSchritt, idx + 1);
       if (idx < beats.length - 1) { idx++; renderBeat(); }
       else finish();
@@ -2042,9 +2136,6 @@ document.getElementById("go").addEventListener("click", function(){
       if (zeigtErgebnis) {
         zeigtErgebnis = false;
         idx = beats.length - 1;
-        renderBeat();
-      } else if ((textPositions.get(idx) || 0) > 0) {
-        textPositions.set(idx, (textPositions.get(idx) || 0) - 1);
         renderBeat();
       } else if (idx > 0) {
         idx--;
@@ -2081,9 +2172,11 @@ document.getElementById("go").addEventListener("click", function(){
       stepInfo.textContent = "Schritt " + (idx + 1) + " von " + beats.length;
       stageEl.innerHTML = "";
       const b = beats[idx];
+      thinking.querySelector('.thinking-prompt').textContent = b.kind === 'predict' ? 'Entscheide zuerst selbst. Was spricht für deine Antwort?' : b.kind === 'text' ? 'Welche Aussage würdest du mit einem eigenen Beispiel prüfen?' : 'Was erwartest du vor dem Ausprobieren – und was beobachtest du danach?';
       weiter.textContent = weiterLabel();
       setWeiter(false);
       if (b.kind === "predict") beatPredict(b);
+      else if (b.kind === "ideaScene") beatIdeaScene(b);
       else if (b.kind === "hypothesisWorksheet") beatHypothesisWorksheet(b);
       else if (b.kind === "live") beatLive(b);
       else if (b.kind === "do") beatDo(b);
@@ -2101,7 +2194,7 @@ document.getElementById("go").addEventListener("click", function(){
       else if (b.kind === "plot") beatPlot(b);
       else if (b.kind === "rechner") beatRechner(b);
       else beatText(b);
-      if (b.kind !== "text") {
+      if (b.kind !== "text" && b.kind !== "ideaScene") {
         const hilfe = hilfeEinsetzen(stageEl.firstElementChild, b.kind, b);
         if (hilfe) stageEl.appendChild(hilfe);
       }
@@ -2110,11 +2203,36 @@ document.getElementById("go").addEventListener("click", function(){
       window.scrollTo(0, 0);
     }
     function beatText(b) {
-      const fragments = lessonFocusFragments(b.html || "");
-      const position = Math.min(textPositions.get(idx) || 0, fragments.length - 1);
-      textPositions.set(idx, position);
-      stageEl.appendChild(el(`<div class="beat-text lesson-reader-card is-entering">${fragments[position]}</div>`));
-      setWeiter(true, position < fragments.length - 1 ? "Weiter →" : weiterLabel());
+      stageEl.appendChild(el(`<div class="beat-text lesson-reader-card is-entering">${b.html || '<p>Diese Unterlektion hat noch keinen Inhalt.</p>'}</div>`));
+      setWeiter(true, weiterLabel());
+    }
+    function beatIdeaScene(b) {
+      const scene = el(`<section class="idea-scene" aria-label="Interaktives Gedankenbild">
+        <p class="idea-scene-kicker">GEDANKENBILD · WÄHLE EINEN WEG</p>
+        <h3>${esc(b.title)}</h3><p class="idea-scene-prompt">${esc(b.prompt)}</p>
+        <div class="idea-scene-path" role="img" aria-label="Vier Stationen des Gedankenwegs"></div>
+        <div class="idea-scene-choices" role="group" aria-label="Mögliche Wege"></div>
+        <p class="idea-scene-result" role="status" aria-live="polite">Wähle einen Weg, um seine Wirkung zu sehen.</p>
+      </section>`);
+      const path = scene.querySelector('.idea-scene-path');
+      b.nodes.forEach((label, i) => {
+        const station = el(`<div class="idea-scene-node"><span class="idea-scene-orb" aria-hidden="true">${i + 1}</span><span>${esc(label)}</span></div>`);
+        path.appendChild(station);
+      });
+      const choices = scene.querySelector('.idea-scene-choices');
+      const result = scene.querySelector('.idea-scene-result');
+      b.choices.forEach((choice, i) => {
+        const button = el(`<button type="button" class="idea-scene-choice" aria-pressed="false"><span aria-hidden="true">${String(i + 1).padStart(2, '0')}</span>${esc(choice.label)} <span aria-hidden="true">↗</span></button>`);
+        button.addEventListener('click', () => {
+          choices.querySelectorAll('button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+          path.querySelectorAll('.idea-scene-node').forEach((item, index) => item.classList.toggle('is-active', index < choice.path));
+          path.setAttribute('aria-label', `${choice.path} von ${b.nodes.length} Stationen: ${choice.result}`);
+          result.textContent = choice.result;
+          setWeiter(true);
+        });
+        choices.appendChild(button);
+      });
+      stageEl.appendChild(scene);
     }
     function beatHypothesisWorksheet(b) {
       const fields = [
@@ -2511,8 +2629,8 @@ document.getElementById("go").addEventListener("click", function(){
       c.querySelector(".act-brief").addEventListener("click", () => {
         const brief = {};
         form.querySelectorAll("[data-k]").forEach(i => { brief[i.getAttribute("data-k")] = i.value.trim(); });
-        mktgSet({ brief: brief });
-        c.querySelector(".brief-msg").textContent = "Gespeichert. Ab jetzt personalisiert dein Produkt beide Pfade, Suche und Wachstum.";
+        const saved = mktgSet({ brief });
+        c.querySelector(".brief-msg").textContent = saved ? "Auf diesem Gerät gespeichert. Dein Produkt personalisiert Suche und Wachstum." : "Auf diesem Gerät gerade nicht gespeichert. Der Brief bleibt in der geöffneten Ansicht.";
         setWeiter(true, idx < beats.length - 1 ? "Weiter →" : "Geschafft →");
       });
       stageEl.appendChild(c);
@@ -2548,7 +2666,7 @@ document.getElementById("go").addEventListener("click", function(){
       tin.value = saved.title || b.title || (brief.produkt ? (brief.produkt + " kaufen") : "");
       din.value = saved.desc || b.desc || "";
       const urlText = String(brief.url || b.url || "deinewebsite.de").replace(/^https?:\/\//, "").replace(/\/$/, "");
-      function render() {
+      function render(event) {
         const t = tin.value, d = din.value;
         const tpx = serpMeasure(t, 20, "arial, sans-serif");
         const tOk = tpx <= TITLE_MAX && t.trim().length > 0;
@@ -2561,7 +2679,9 @@ document.getElementById("go").addEventListener("click", function(){
         let dprev = d || "Deine Meta-Beschreibung erscheint hier. Schreib etwas, das zum Klicken einlädt.";
         if (dprev.length > DESC_HARD) dprev = dprev.slice(0, DESC_HARD - 1).replace(/\s+\S*$/, "") + " …";
         pd.textContent = dprev;
-        mktgSet({ serp: { title: t, desc: d } });
+        if (event && !mktgSet({ serp: { title: t, desc: d } })) {
+          dmeter.append(" · Auf diesem Gerät gerade nicht gespeichert.");
+        }
         const ok = tOk && dlen > 0;
         setWeiter(ok, ok ? (idx < beats.length - 1 ? "Weiter →" : "Geschafft →") : null);
       }
@@ -2580,14 +2700,16 @@ document.getElementById("go").addEventListener("click", function(){
         state[i] = !!store[i];
         const row = el(`<label style="display:flex;gap:11px;align-items:flex-start;cursor:pointer;background:var(--panel,#141518);border:1px solid var(--line,#262730);border-radius:10px;padding:11px 13px"><input type="checkbox" style="margin-top:2px;width:18px;height:18px;flex:none;accent-color:var(--good,#7ee787)"><span style="font-size:14.5px;line-height:1.5">${it}</span></label>`);
         const cb = row.querySelector("input"); cb.checked = state[i];
-        cb.addEventListener("change", () => { state[i] = cb.checked; sync(); });
+        cb.addEventListener("change", () => { state[i] = cb.checked; sync(true); });
         list.appendChild(row);
       });
-      function sync() {
+      function sync(changed) {
         const n = items.length, ok = items.filter((x, i) => state[i]).length;
         fill.style.width = (n ? Math.round(ok / n * 100) : 0) + "%";
         msg.textContent = ok + " von " + n + " erledigt";
-        const checks = mktgGet().checks || {}; checks[key] = state; mktgSet({ checks: checks });
+        if (changed && !mktgSet({ checks: { [key]: state } })) {
+          msg.append(" · Auf diesem Gerät gerade nicht gespeichert.");
+        }
         const all = n > 0 && ok === n;
         done.innerHTML = all ? ('<div class="beat-rev ok">' + (b.erklaerung || "Stark. Alles erledigt.") + '</div>') : "";
         setWeiter(all, all ? (idx < beats.length - 1 ? "Weiter →" : "Geschafft →") : null);
@@ -3079,7 +3201,7 @@ document.getElementById("go").addEventListener("click", function(){
     const prog = el(`<div class="beat-prog" hidden aria-hidden="true"></div>`);
     qs.forEach(() => prog.appendChild(el(`<span class="seg"></span>`)));
     wrap.appendChild(prog);
-    const stepInfo = el(`<div class="beat-step" hidden aria-live="polite"></div>`);
+    const stepInfo = el(`<div class="beat-step" aria-live="polite"></div>`);
     wrap.appendChild(stepInfo);
     const stageEl = el(`<div class="beat-stage"></div>`);
     wrap.appendChild(stageEl);
@@ -3516,6 +3638,16 @@ document.getElementById("go").addEventListener("click", function(){
   readRoute(); render();
   window.learningAccountReady = bootAccount(callbackHash);
   window.addEventListener("popstate", () => { readRoute(); render(); });
+  // Routes and the skip link share a fragment. Focus the rendered content
+  // directly so a keyboard shortcut cannot change lessons or discard a beat.
+  document.querySelector('.skip-link[href="#main-content"]')?.addEventListener("click", event => {
+    if (event.button !== 0 || event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return;
+    const content = document.getElementById("main-content");
+    if (!content) return;
+    event.preventDefault();
+    content.focus({ preventScroll: true });
+    content.scrollIntoView({ block: "start" });
+  });
   window.addEventListener("hashchange", () => { readRoute(); render(); });
   window.addEventListener("storage", event => {
     if (event.key === window.LearningAccount.SESSION_KEY || event.key === null) { ++accountEpoch; bootAccount(""); return; }
